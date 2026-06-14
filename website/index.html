@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureFedHE — Privacy-Preserving Federated Learning</title>
+    <meta name="description" content="SecureFedHE: A novel framework for Privacy-Preserving Federated Learning with Selective Homomorphic Encryption">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <!-- SPA Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">Secure<span class="logo-accent">Fed</span>HE</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" onclick="switchPage('page-home')" class="nav-item active" id="nav-home">Overview</a></li>
+                <li><a href="#" onclick="switchPage('page-architecture')" class="nav-item" id="nav-architecture">Architecture</a></li>
+                <li><a href="#" onclick="switchPage('page-simulation')" class="nav-item" id="nav-simulation">Simulation</a></li>
+                <li><a href="#" onclick="switchPage('page-evaluation')" class="nav-item" id="nav-evaluation">Evaluation</a></li>
+                <li><a href="#" onclick="switchPage('page-large-eval')" class="nav-item" id="nav-large-eval">Large-Scale</a></li>
+                <li><a href="#" onclick="switchPage('page-security')" class="nav-item" id="nav-security">Security</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- MAIN SPA CONTAINER -->
+    <main class="spa-container">
+
+        <!-- ==================== PAGE 1: HOME ==================== -->
+        <div id="page-home" class="page active fade-in">
+            <!-- Home / Hero Section -->
+            <section class="hero">
+                <div class="container">
+                    <div class="hero-content">
+                        <div class="hero-badge">RESEARCH PROJECT SHOWCASE</div>
+                        <h1 class="hero-title">
+                            Privacy-Preserving<br>
+                            <span class="text-gradient">Federated Learning</span>
+                        </h1>
+                        <p class="hero-subtitle">
+                            Standard Federated Learning isn't secure enough, and full Homomorphic Encryption is too slow for edge devices. 
+                            <strong>SecureFedHE</strong> bridges the gap with Selective HE and Differential Privacy, achieving strong security with only a ~0.20% drop in accuracy.
+                        </p>
+                        <div class="hero-cta">
+                            <button onclick="switchPage('page-architecture')" class="btn btn-secondary">Explore the Architecture</button>
+                            <button onclick="switchPage('page-simulation')" class="btn btn-primary">Run the Simulation</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Roadmap Section -->
+            <section class="section">
+                <div class="container">
+                    <div class="section-header">
+                        <h2 class="section-title">The 5-Phase Roadmap</h2>
+                        <p class="section-desc">From theoretical foundation to a fully decentralized, mathematically secure architecture.</p>
+                    </div>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item completed">
+                            <div class="timeline-marker">1</div>
+                            <div class="timeline-content card-glass">
+                                <h3>Phase 1: Foundation & Gap Analysis</h3>
+                                <p>Developed the Statement of Purpose and built a 13-paper comparative matrix. Proved to supervisors that standard FL lacks security while full HE is computationally unfeasible for edge devices. Gap identified.</p>
+                                <span class="status-badge">Completed</span>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item completed">
+                            <div class="timeline-marker">2</div>
+                            <div class="timeline-content card-glass">
+                                <h3>Phase 2: Architectural Design</h3>
+                                <p>Mapped out the logic for the SecureFedHE framework before writing code. Designed the exact neural network layer split: final layers get encrypted, intermediate layers get protected with mathematical noise (Differential Privacy).</p>
+                                <span class="status-badge">Completed</span>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item completed">
+                            <div class="timeline-marker">3</div>
+                            <div class="timeline-content card-glass">
+                                <h3>Phase 3: Prototyping & The "Three Rings"</h3>
+                                <p>Heavy engineering phase. Built isolated rings to avoid complexity: Vanilla FL baseline (Ring 1), Selective HE + DP (Ring 2), and Decentralization (Ring 3). Successfully debugged DP noise and proved the ~0.20% accuracy drop target.</p>
+                                <span class="status-badge">Completed</span>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item active">
+                            <div class="timeline-marker">4</div>
+                            <div class="timeline-content card-glass active-card">
+                                <h3>Phase 4: Evaluation & Benchmarking</h3>
+                                <p>Translating raw CSV data from the Phase 3 experiments into publication-ready graphs that prove the system is 3–5x faster than standard methods without sacrificing accuracy.</p>
+                                <button onclick="switchPage('page-evaluation')" class="link-btn">Jump to Dashboard →</button>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item upcoming">
+                            <div class="timeline-marker">5</div>
+                            <div class="timeline-content card-glass">
+                                <h3>Phase 5: Drafting the Manuscript</h3>
+                                <p>Detailing the methodology, presenting the figures, and submitting to a top-tier security or privacy conference. The hardest coding is behind us.</p>
+                                <span class="status-badge upcoming-badge">Future Work</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== PAGE 2: ARCHITECTURE DEEP DIVE ==================== -->
+        <div id="page-architecture" class="page hidden">
+            <section class="section bg-alternate">
+                <div class="container">
+                    <div class="section-header">
+                        <div class="hero-badge mb-4">THEORY & IMPLEMENTATION</div>
+                        <h2 class="section-title">Architecture Deep-Dive</h2>
+                        <p class="section-desc">Click on any component below to reveal the deep technical explanation of how SecureFedHE achieves decentralized privacy.</p>
+                    </div>
+
+                    <div class="interactive-accordion mt-12">
+                        <!-- Accordion Item 1 -->
+                        <div class="accordion-card card-glass" onclick="toggleAccordion('acc1')">
+                            <div class="accordion-header">
+                                <div class="acc-icon">1</div>
+                                <h3>Selective Homomorphic Encryption (TenSEAL CKKS)</h3>
+                                <div class="acc-toggle">+</div>
+                            </div>
+                            <div class="accordion-body" id="acc1">
+                                <p><strong>The Problem:</strong> Applying Fully Homomorphic Encryption (FHE) to an entire Deep Neural Network causes a 1000x computational slowdown, making it impossible to run on edge devices like hospital computers.</p>
+                                <p><strong>The Solution:</strong> We mathematically isolated the neural network layers. We <em>only</em> apply heavy TenSEAL CKKS encryption to the final classification layer (FC2). By leaving the massive convolutional blocks in plaintext, we bypass the FHE bottleneck entirely while maintaining cryptographic security on the final prediction.</p>
+                            </div>
+                        </div>
+
+                        <!-- Accordion Item 2 -->
+                        <div class="accordion-card card-glass" onclick="toggleAccordion('acc2')">
+                            <div class="accordion-header">
+                                <div class="acc-icon">2</div>
+                                <h3>Differential Privacy (Gaussian Mechanism)</h3>
+                                <div class="acc-toggle">+</div>
+                            </div>
+                            <div class="accordion-body" id="acc2">
+                                <p><strong>The Problem:</strong> If we don't encrypt the early layers of the Neural Network, attackers could use "Gradient Inversion Attacks" to reconstruct the original patient data from the plaintext weights.</p>
+                                <p><strong>The Solution:</strong> We inject mathematical Gaussian Noise into the intermediate layer (FC1). This is called Differential Privacy. The noise is carefully calibrated using an Epsilon (ε) budget. It obscures the exact data points enough to prevent reconstruction attacks, but preserves enough statistical patterns for the AI to learn. We tested ε=10, 20, and 50 to find the perfect privacy-utility trade-off.</p>
+                            </div>
+                        </div>
+
+                        <!-- Accordion Item 3 -->
+                        <div class="accordion-card card-glass" onclick="toggleAccordion('acc3')">
+                            <div class="accordion-header">
+                                <div class="acc-icon">3</div>
+                                <h3>True Distributed Ring Topology (Peer-to-Peer)</h3>
+                                <div class="acc-toggle">+</div>
+                            </div>
+                            <div class="accordion-body" id="acc3">
+                                <p><strong>The Problem:</strong> Standard Federated Learning relies on a Central Aggregation Server (a "Star Topology"). If that central server is hacked or crashes, the entire global AI network collapses.</p>
+                                <p><strong>The Solution:</strong> We deleted the central server. Using Flask web servers, we built a decentralized <em>Ring Topology</em>. Hospital A encrypts its weights into a Base64 string and sends them directly to Hospital B over HTTP. Hospital B mathematically adds its local encrypted weights to the payload <em>without decrypting it</em>, and passes it to Hospital C. Once the payload returns to Hospital A, the global model is fully aggregated with zero central authority.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visual Framework Diagram -->
+                    <div class="framework-diagram card-glass mt-16">
+                        <h3 class="text-center mb-8">SecureFedHE Neural Network Split</h3>
+                        <div class="diagram-flex">
+                            <div class="fw-layer fw-layer-conv">
+                                <div class="fw-badge">PLAINTEXT</div>
+                                <div class="fw-name">Conv Blocks</div>
+                                <div class="fw-detail">Generic features</div>
+                            </div>
+                            <div class="fw-arrow">→</div>
+                            <div class="fw-layer fw-layer-fc1">
+                                <div class="fw-badge">DP NOISE</div>
+                                <div class="fw-name">FC1 (256 units)</div>
+                                <div class="fw-detail">Gaussian mechanism</div>
+                            </div>
+                            <div class="fw-arrow">→</div>
+                            <div class="fw-layer fw-layer-fc2">
+                                <div class="fw-badge">CKKS HE</div>
+                                <div class="fw-name">FC2 (Classifier)</div>
+                                <div class="fw-detail">Homomorphic encryption</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Literature Comparison Section -->
+            <section class="section">
+                <div class="container">
+                    <div class="section-header">
+                        <div class="hero-badge mb-4">RESEARCH GAP ANALYSIS</div>
+                        <h2 class="section-title">How SecureFedHE Compares</h2>
+                        <p class="section-desc">A comprehensive comparative study against 13 published research papers. SecureFedHE is the only framework that achieves full coverage across all five critical dimensions.</p>
+                    </div>
+
+                    <!-- Feature Legend -->
+                    <div class="legend-grid mt-12">
+                        <div class="legend-item card-glass">
+                            <div class="legend-letter">A</div>
+                            <div class="legend-desc"><strong>Federated Learning</strong><br>Distributed model training across localized nodes</div>
+                        </div>
+                        <div class="legend-item card-glass">
+                            <div class="legend-letter">B</div>
+                            <div class="legend-desc"><strong>Cryptographic Privacy</strong><br>SMPC or Homomorphic Encryption to protect model weights</div>
+                        </div>
+                        <div class="legend-item card-glass">
+                            <div class="legend-letter">C</div>
+                            <div class="legend-desc"><strong>Decentralization</strong><br>No central aggregation server (P2P, Blockchain, etc.)</div>
+                        </div>
+                        <div class="legend-item card-glass">
+                            <div class="legend-letter">D</div>
+                            <div class="legend-desc"><strong>Differential Privacy</strong><br>Statistical noise against inference & inversion attacks</div>
+                        </div>
+                        <div class="legend-item card-glass">
+                            <div class="legend-letter">E</div>
+                            <div class="legend-desc"><strong>Scalability</strong><br>Reduced overhead via selective encryption, quantization</div>
+                        </div>
+                    </div>
+
+                    <!-- Comparison Table -->
+                    <div class="chart-card card-glass mt-12">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Scorecard: ● Full &nbsp; ◑ Partial &nbsp; ○ Not Covered</h3>
+                        </div>
+                        <div class="table-container">
+                            <table id="comparisonTable">
+                                <thead>
+                                    <tr>
+                                        <th>Ref</th>
+                                        <th>Source</th>
+                                        <th>A</th>
+                                        <th>B</th>
+                                        <th>C</th>
+                                        <th>D</th>
+                                        <th>E</th>
+                                        <th>Key Limitation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>[1]</td>
+                                        <td style="font-family:var(--font-sans);color:#fff">Healthcare FL (PMC8566325)</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-partial">◑</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-partial">◑</td>
+                                        <td style="font-family:var(--font-sans);font-size:0.8rem;color:var(--text-secondary)">Retains reliance on a centralized aggregation server</td>
+                                    </tr>
+                                    <tr>
+                                        <td>[2]</td>
+                                        <td style="font-family:var(--font-sans);color:#fff">CSUS Distributed Framework</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-partial">◑</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-none">○</td>
+                                        <td style="font-family:var(--font-sans);font-size:0.8rem;color:var(--text-secondary)">Lacks cryptographic or decentralization guarantees</td>
+                                    </tr>
+                                    <tr>
+                                        <td>[3]</td>
+                                        <td style="font-family:var(--font-sans);color:#fff">Meta AI (CrypTen SMPC)</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-partial">◑</td>
+                                        <td style="font-family:var(--font-sans);font-size:0.8rem;color:var(--text-secondary)">Not designed for large-scale decentralized topologies</td>
+                                    </tr>
+                                    <tr>
+                                        <td>[4]</td>
+                                        <td style="font-family:var(--font-sans);color:#fff">FedML-HE (arXiv:2303.10837)</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-full">●</td>
+                                        <td style="font-family:var(--font-sans);font-size:0.8rem;color:var(--text-secondary)">Still fundamentally requires a centralized aggregator</td>
+                                    </tr>
+                                    <tr>
+                                        <td>[5]</td>
+                                        <td style="font-family:var(--font-sans);color:#fff">Blockchain HE (Wiley)</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-partial">◑</td>
+                                        <td style="font-family:var(--font-sans);font-size:0.8rem;color:var(--text-secondary)">High transaction latency, lacks differential privacy</td>
+                                    </tr>
+                                    <tr>
+                                        <td>[6]</td>
+                                        <td style="font-family:var(--font-sans);color:#fff">Multi-Key HE FL (IEEE)</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-partial">◑</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-partial">◑</td>
+                                        <td style="font-family:var(--font-sans);font-size:0.8rem;color:var(--text-secondary)">Communication overhead prohibitively high for edge</td>
+                                    </tr>
+                                    <tr>
+                                        <td>[7]</td>
+                                        <td style="font-family:var(--font-sans);color:#fff">ScienceDirect FL Integration</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-partial">◑</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-partial">◑</td>
+                                        <td class="score-partial">◑</td>
+                                        <td style="font-family:var(--font-sans);font-size:0.8rem;color:var(--text-secondary)">Does not eliminate central failure point or provide full HE</td>
+                                    </tr>
+                                    <tr>
+                                        <td>[8]</td>
+                                        <td style="font-family:var(--font-sans);color:#fff">MaskCrypt (IEEE TDSC)</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-partial">◑</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-full">●</td>
+                                        <td style="font-family:var(--font-sans);font-size:0.8rem;color:var(--text-secondary)">Lacks differential privacy against advanced inference</td>
+                                    </tr>
+                                    <tr>
+                                        <td>[9]</td>
+                                        <td style="font-family:var(--font-sans);color:#fff">GuardianML (IEEE)</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-partial">◑</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-partial">◑</td>
+                                        <td style="font-family:var(--font-sans);font-size:0.8rem;color:var(--text-secondary)">Survey/recommendation system, not a deployable protocol</td>
+                                    </tr>
+                                    <tr>
+                                        <td>[10]</td>
+                                        <td style="font-family:var(--font-sans);color:#fff">JSEE Decentralized Framework</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-none">○</td>
+                                        <td style="font-family:var(--font-sans);font-size:0.8rem;color:var(--text-secondary)">Fails to implement HE for weight protection</td>
+                                    </tr>
+                                    <tr>
+                                        <td>[11]</td>
+                                        <td style="font-family:var(--font-sans);color:#fff">NeurIPS 2024 Tutorial</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-partial">◑</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-full">●</td>
+                                        <td style="font-family:var(--font-sans);font-size:0.8rem;color:var(--text-secondary)">Broad theoretical overview, not a specific architecture</td>
+                                    </tr>
+                                    <tr>
+                                        <td>[12]</td>
+                                        <td style="font-family:var(--font-sans);color:#fff">Google Secure Aggregation</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-full">●</td>
+                                        <td style="font-family:var(--font-sans);font-size:0.8rem;color:var(--text-secondary)">Strongly assumes a trusted centralized aggregator</td>
+                                    </tr>
+                                    <tr>
+                                        <td>[13]</td>
+                                        <td style="font-family:var(--font-sans);color:#fff">CryptoQFL (arXiv:2307.07012)</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-full">●</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-none">○</td>
+                                        <td class="score-full">●</td>
+                                        <td style="font-family:var(--font-sans);font-size:0.8rem;color:var(--text-secondary)">Reliant on a central quantum server for aggregation</td>
+                                    </tr>
+                                    <tr class="highlight-row">
+                                        <td style="font-weight:800;color:var(--accent-indigo)">Ours</td>
+                                        <td style="font-family:var(--font-sans);font-weight:800;color:var(--accent-indigo)">SecureFedHE (This Work)</td>
+                                        <td class="score-full" style="color:var(--accent-emerald)">●</td>
+                                        <td class="score-full" style="color:var(--accent-emerald)">●</td>
+                                        <td class="score-full" style="color:var(--accent-emerald)">●</td>
+                                        <td class="score-full" style="color:var(--accent-emerald)">●</td>
+                                        <td class="score-full" style="color:var(--accent-emerald)">●</td>
+                                        <td style="font-family:var(--font-sans);font-size:0.8rem;font-weight:700;color:var(--accent-emerald)">First practical zero-trust AI pipeline — fully integrated HE, P2P, and DP with low overhead</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Key Takeaway -->
+                    <div class="takeaway-card card-glass mt-12">
+                        <h3>🔑 Key Takeaway</h3>
+                        <p>Out of 13 surveyed papers, <strong>none</strong> achieves full implementation across all five dimensions simultaneously. SecureFedHE is the <strong>only framework</strong> that delivers Federated Learning (A), Homomorphic Encryption (B), True Decentralization (C), Differential Privacy (D), and Scalable Optimization (E) in a single, deployable architecture — as demonstrated live in the VS Code terminal.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== PAGE 3: SIMULATION ==================== -->
+        <div id="page-simulation" class="page hidden">
+            <!-- Interactive Simulation -->
+            <section class="section">
+                <div class="container">
+                    <div class="section-header">
+                        <div class="hero-badge mb-4">HOW IT WORKS</div>
+                        <h2 class="section-title">Interactive Ring Demonstration</h2>
+                        <p class="section-desc">Watch how hospitals train on private data, encrypt the model, and safely update the global AI in a decentralized blockchain-style ring.</p>
+                    </div>
+                    
+                    <div class="sim-wrapper card-glass mt-12">
+                        <div class="sim-controls">
+                            <button class="btn btn-primary" id="btnStartSim">▶ Start Training Round</button>
+                            <div class="sim-status" id="simStatusText">System Idle. Waiting to start...</div>
+                        </div>
+
+                        <div class="sim-stage ring-topology">
+                            <!-- Data Packets (Hidden by default, animated via JS/CSS) -->
+                            <div class="sim-packets-container" id="simPackets"></div>
+
+                            <!-- Hospital Nodes arranged in a Ring -->
+                            <div class="sim-nodes ring-nodes">
+                                <div class="sim-node" id="nodeA">
+                                    <div class="node-icon">🏥</div>
+                                    <div class="node-name">Node 0 (Hospital A)</div>
+                                    <div class="node-data">8,432 Patient Records</div>
+                                    <div class="node-model-state" id="stateA">Idle</div>
+                                </div>
+                                <div class="sim-node" id="nodeB">
+                                    <div class="node-icon">🏥</div>
+                                    <div class="node-name">Node 1 (Hospital B)</div>
+                                    <div class="node-data">12,150 Patient Records</div>
+                                    <div class="node-model-state" id="stateB">Idle</div>
+                                </div>
+                                <div class="sim-node" id="nodeC">
+                                    <div class="node-icon">🏥</div>
+                                    <div class="node-name">Node 2 (Hospital C)</div>
+                                    <div class="node-data">5,920 Patient Records</div>
+                                    <div class="node-model-state" id="stateC">Idle</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+
+        <!-- New Large‑Scale Experimental Evaluation Page -->
+        <div id="page-large-eval" class="page hidden">
+            <section class="section">
+                <div class="container">
+                    <div class="section-header">
+                        <div class="hero-badge mb-4">LARGE-SCALE EVALUATION</div>
+                        <h2 class="section-title">Large‑Scale Experimental Evaluation</h2>
+                        <p class="section-desc">Scalability, non‑IID robustness, latency impact, and model‑architecture performance.</p>
+                        <p class="section-desc" style="font-size: 0.95rem; margin-top: 10px; opacity: 0.8;">
+                            <strong>Client Scaling:</strong> Demonstrates computational efficiency as the number of clients increases to 50.<br>
+                            <strong>Non-IID Robustness:</strong> Shows convergence across varying degrees of Dirichlet data heterogeneity (α).<br>
+                            <strong>Latency Impact:</strong> Assesses model performance under severe simulated network delays up to 100ms.<br>
+                            <strong>Model Architecture:</strong> Compares structural integrity and accuracy between SimpleCNN and ResNet18.
+                        </p>
+                    </div>
+                    <div class="charts-grid mt-16">
+                        <div class="chart-card card-glass">
+                            <div class="chart-header">
+                                <div><h3 class="chart-title">Client Scaling</h3></div>
+                                <button class="btn-export" onclick="exportChart('chartScale')">Export</button>
+                            </div>
+                            <div class="chart-container"><canvas id="chartScale"></canvas></div>
+                        </div>
+                        <div class="chart-card card-glass">
+                            <div class="chart-header">
+                                <div><h3 class="chart-title">Non‑IID Robustness</h3></div>
+                                <button class="btn-export" onclick="exportChart('chartIid')">Export</button>
+                            </div>
+                            <div class="chart-container"><canvas id="chartIid"></canvas></div>
+                        </div>
+                        <div class="chart-card card-glass">
+                            <div class="chart-header">
+                                <div><h3 class="chart-title">Latency Impact</h3></div>
+                                <button class="btn-export" onclick="exportChart('chartLatency')">Export</button>
+                            </div>
+                            <div class="chart-container"><canvas id="chartLatency"></canvas></div>
+                        </div>
+                        <div class="chart-card card-glass">
+                            <div class="chart-header">
+                                <div><h3 class="chart-title">Model Architecture</h3></div>
+                                <button class="btn-export" onclick="exportChart('chartArch')">Export</button>
+                            </div>
+                            <div class="chart-container"><canvas id="chartArch"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <!-- New Security Evaluation Page -->
+        <div id="page-security" class="page hidden">
+            <section class="section">
+                <div class="container">
+                    <div class="section-header">
+                        <div class="hero-badge mb-4">SECURITY EVALUATION</div>
+                        <h2 class="section-title">Security Evaluation</h2>
+                        <p class="section-desc">Gradient inversion, Byzantine/model‑poisoning, and membership inference attacks.</p>
+                        <p class="section-desc" style="font-size: 0.95rem; margin-top: 10px; opacity: 0.8;">
+                            <strong>Gradient Inversion (DLG):</strong> Evaluates image reconstruction PSNR with and without Differential Privacy.<br>
+                            <strong>Model Poisoning:</strong> Demonstrates aggregator resilience (Krum/Trimmed Mean) against malicious weight updates.<br>
+                            <strong>Membership Inference (MIA):</strong> Analyzes the attack advantage of tracing participant data through global models.
+                        </p>
+                    </div>
+                    <div class="charts-grid mt-16">
+                        <div class="chart-card card-glass">
+                            <div class="chart-header">
+                                <div><h3 class="chart-title">Gradient Inversion (DLG)</h3></div>
+                                <button class="btn-export" onclick="exportChart('chartDlg')">Export</button>
+                            </div>
+                            <div class="chart-container"><canvas id="chartDlg"></canvas></div>
+                        </div>
+                        <div class="chart-card card-glass">
+                            <div class="chart-header">
+                                <div><h3 class="chart-title">Model Poisoning</h3></div>
+                                <button class="btn-export" onclick="exportChart('chartPoison')">Export</button>
+                            </div>
+                            <div class="chart-container"><canvas id="chartPoison"></canvas></div>
+                        </div>
+                        <div class="chart-card card-glass">
+                            <div class="chart-header">
+                                <div><h3 class="chart-title">Membership Inference (MIA)</h3></div>
+                                <button class="btn-export" onclick="exportChart('chartMia')">Export</button>
+                            </div>
+                            <div class="chart-container"><canvas id="chartMia"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <!-- ==================== PAGE 4: EVALUATION ==================== -->
+        <div id="page-evaluation" class="page hidden">
+            <section class="section">
+                <div class="container">
+                    <div class="section-header">
+                        <div class="hero-badge mb-4">PHASE 4</div>
+                        <h2 class="section-title">Evaluation Dashboard</h2>
+                        <p class="section-desc">Upload your raw CSV logs from Phase 3 to generate publication-ready benchmarking figures.</p>
+                    </div>
+
+                    <!-- Data Upload -->
+                    <div class="upload-grid">
+                        <div class="upload-card card-glass" id="uploadBaseline">
+                            <div class="upload-icon">📊</div>
+                            <div class="upload-label">Ring 1 — Baseline</div>
+                            <div class="upload-file">baseline_metrics.csv</div>
+                            <input type="file" accept=".csv" data-ring="baseline" class="csv-input">
+                            <div class="upload-status" data-status="baseline">Drop or click to upload</div>
+                        </div>
+                        <div class="upload-card card-glass" id="uploadHE10">
+                            <div class="upload-icon">🔐</div>
+                            <div class="upload-label">Ring 2 — HE ε=10</div>
+                            <div class="upload-file">he_eps10_metrics.csv</div>
+                            <input type="file" accept=".csv" data-ring="he_eps10" class="csv-input">
+                            <div class="upload-status" data-status="he_eps10">Drop or click to upload</div>
+                        </div>
+                        <div class="upload-card card-glass" id="uploadHE20">
+                            <div class="upload-icon">🔐</div>
+                            <div class="upload-label">Ring 2 — HE ε=20</div>
+                            <div class="upload-file">he_eps20_metrics.csv</div>
+                            <input type="file" accept=".csv" data-ring="he_eps20" class="csv-input">
+                            <div class="upload-status" data-status="he_eps20">Drop or click to upload</div>
+                        </div>
+                        <div class="upload-card card-glass" id="uploadHE50">
+                            <div class="upload-icon">🔐</div>
+                            <div class="upload-label">Ring 2 — HE ε=50</div>
+                            <div class="upload-file">he_eps50_metrics.csv</div>
+                            <input type="file" accept=".csv" data-ring="he_eps50" class="csv-input">
+                            <div class="upload-status" data-status="he_eps50">Drop or click to upload</div>
+                        </div>
+                        <div class="upload-card card-glass" id="uploadRing">
+                            <div class="upload-icon">🔗</div>
+                            <div class="upload-label">Ring 3 — Decentralised</div>
+                            <div class="upload-file">ring_metrics.csv</div>
+                            <input type="file" accept=".csv" data-ring="ring" class="csv-input">
+                            <div class="upload-status" data-status="ring">Drop or click to upload</div>
+                        </div>
+                    </div>
+
+                    <div class="upload-actions">
+                        <button class="btn btn-secondary" id="btnLoadDemo" onclick="loadDemoData()">
+                            Load Demo Data
+                        </button>
+                        <button class="btn btn-secondary" id="btnLoadBackend" onclick="loadBackendData()">
+                            Load Backend Logs
+                        </button>
+                        <button class="btn btn-primary" id="btnGenerateCharts" onclick="generateAllCharts()" disabled>
+                            Generate Figures
+                        </button>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div id="charts-wrapper" style="display:none;" class="mt-16">
+                        <!-- Summary Stats -->
+                        <div class="hero-stats mb-12" id="heroStats">
+                            <div class="stat-card card-glass">
+                                <div class="stat-value" id="statAccuracy">—</div>
+                                <div class="stat-label">Best Accuracy</div>
+                            </div>
+                            <div class="stat-card card-glass">
+                                <div class="stat-value" id="statPrivacy">—</div>
+                                <div class="stat-label">Privacy Budget (ε)</div>
+                            </div>
+                            <div class="stat-card card-glass">
+                                <div class="stat-value" id="statOverhead">—</div>
+                                <div class="stat-label">Avg HE Overhead</div>
+                            </div>
+                            <div class="stat-card card-glass">
+                                <div class="stat-value" id="statDrop">—</div>
+                                <div class="stat-label">Accuracy Drop</div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Grid -->
+                        <div class="charts-grid">
+                            <div class="chart-card card-glass" id="chartAccCard">
+                                <div class="chart-header">
+                                    <div><h3 class="chart-title">Figure 1 — Test Accuracy Convergence</h3></div>
+                                    <button class="btn-export" onclick="exportChart('chartAccuracy')">Export</button>
+                                </div>
+                                <div class="chart-container"><canvas id="chartAccuracy"></canvas></div>
+                            </div>
+
+                            <div class="chart-card card-glass" id="chartPrivacyCard">
+                                <div class="chart-header">
+                                    <div><h3 class="chart-title">Figure 2 — Privacy-Utility Trade-off</h3></div>
+                                    <button class="btn-export" onclick="exportChart('chartPrivacy')">Export</button>
+                                </div>
+                                <div class="chart-container"><canvas id="chartPrivacy"></canvas></div>
+                            </div>
+
+                            <div class="chart-card card-glass" id="chartOverheadCard">
+                                <div class="chart-header">
+                                    <div><h3 class="chart-title">Figure 3 — Computational Overhead</h3></div>
+                                    <button class="btn-export" onclick="exportChart('chartOverhead')">Export</button>
+                                </div>
+                                <div class="chart-container"><canvas id="chartOverhead"></canvas></div>
+                            </div>
+
+                            <div class="chart-card card-glass" id="chartCommCard">
+                                <div class="chart-header">
+                                    <div><h3 class="chart-title">Figure 4 — Communication Cost</h3></div>
+                                    <button class="btn-export" onclick="exportChart('chartComm')">Export</button>
+                                </div>
+                                <div class="chart-container"><canvas id="chartComm"></canvas></div>
+                            </div>
+                        </div>
+
+                        <!-- Summary Table -->
+                        <div class="chart-card card-glass mt-8" id="summaryTableCard">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Table 1 — Benchmark Summary</h3>
+                            </div>
+                            <div class="table-container">
+                                <table id="summaryTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Configuration</th>
+                                            <th>Final Accuracy (%)</th>
+                                            <th>Best Accuracy (%)</th>
+                                            <th>Accuracy Drop (%)</th>
+                                            <th>Avg Wall Time (s)</th>
+                                            <th>Avg Enc Overhead (s)</th>
+                                            <th>Avg Comm (MB)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="summaryTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">Secure<span>Fed</span>HE</div>
+                <p>Phase 5 Manuscript Draft Preparation Dashboard</p>
+                <p class="copyright">&copy; 2026 SecureFedHE Research Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

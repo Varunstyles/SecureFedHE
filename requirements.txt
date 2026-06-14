@@ -1,0 +1,24 @@
+# SecureFedHE — Phase 3 Dependencies
+# Install with: pip install -r requirements.txt
+
+# ── Core FL & Deep Learning ───────────────────────────────────────────────────
+torch>=2.0.0
+torchvision>=0.15.0
+flwr>=1.5.0              # Flower — federated learning framework
+
+# ── Homomorphic Encryption ────────────────────────────────────────────────────
+tenseal>=0.3.14          # CKKS scheme for encrypted gradient aggregation
+
+# ── Differential Privacy (optional, for Ring 2 intermediate layers) ───────────
+# opacus>=1.4.0          # PyTorch DP — uncomment when implementing Ring 2
+
+# ── Monitoring & Profiling ────────────────────────────────────────────────────
+psutil>=5.9.0
+
+# ── Data & Utilities ──────────────────────────────────────────────────────────
+numpy>=1.24.0
+pandas>=2.0.0
+matplotlib>=3.7.0        # For Phase 4 benchmark plots
+flask>=2.3.0
+requests>=2.31.0
+tqdm>=4.65.0

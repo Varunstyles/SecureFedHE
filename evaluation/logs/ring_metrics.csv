@@ -1,0 +1,4 @@
+round_num,phase,client_id,train_loss,train_acc,eval_loss,eval_acc,comm_bytes,wall_time_s,cpu_pct,ram_mb,enc_overhead_s
+1,ring,-1,1.2684,0.5463,2.3235,0.1061,14961120,219.379,283.2,101.1,0.044
+2,ring,-1,1.1147,0.6024,2.3086,0.1234,14961120,262.408,237.0,-7.7,0.054
+3,ring,-1,0.9896,0.6475,2.49,0.1105,14961120,228.753,271.3,5.0,0.049

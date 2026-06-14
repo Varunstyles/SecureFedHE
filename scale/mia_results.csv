@@ -1,0 +1,3 @@
+label,attack_acc,advantage,status
+Baseline (no protection),53.25,3.25,STRONG
+SecureFedHE (HE + DP),52.88,2.88,STRONG

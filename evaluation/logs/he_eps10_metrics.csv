@@ -1,0 +1,4 @@
+round_num,phase,client_id,train_loss,train_acc,eval_loss,eval_acc,comm_bytes,wall_time_s,cpu_pct,ram_mb,enc_overhead_s
+1,selectiveHE,-1,1.2613,0.5502,2.2976,0.1018,14920000,168.006,365.5,65.3,0.044
+2,selectiveHE,-1,1.1219,0.6006,2.287,0.1519,14920000,249.084,258.4,36.2,0.054
+3,selectiveHE,-1,0.9907,0.6487,2.453,0.0836,14920000,345.298,185.9,18.0,0.054

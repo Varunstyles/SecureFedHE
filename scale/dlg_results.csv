@@ -1,0 +1,7 @@
+scenario,image,psnr
+No defence (Baseline),0,7.71
+HE + DP (SecureFedHE),0,6.29
+No defence (Baseline),1,5.46
+HE + DP (SecureFedHE),1,5.83
+No defence (Baseline),2,6.06
+HE + DP (SecureFedHE),2,5.18

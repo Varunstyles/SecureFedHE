@@ -1,0 +1,5 @@
+attack,aggregator,best_acc,final_acc
+random,FedAvg,11.14,9.45
+random,FedMedian,39.04,35.28
+inverted,FedAvg,10.2,10.0
+inverted,FedMedian,32.66,24.41
