@@ -1,0 +1,1 @@
+so for the notebook for this, its just ring 2 with changed alpha and num_clients values

@@ -8,11 +8,11 @@ securefedhe-env/
 venv/
 .venv/
 
-# Large datasets — too big for GitHub
+# Large datasets
 data/cifar10/cifar-10-python.tar.gz
 data/cifar10/cifar-10-batches-py/
 
-# Model checkpoints (large binary files)
+# Model checkpoints
 *.pth
 
 # OS files
