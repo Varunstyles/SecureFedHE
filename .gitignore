@@ -18,3 +18,7 @@ data/cifar10/cifar-10-batches-py/
 # OS files
 .DS_Store
 Thumbs.db
+data/cifar10/
+__pycache__/
+*.pyc
+securefedhe/
