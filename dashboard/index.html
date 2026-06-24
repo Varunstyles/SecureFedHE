@@ -1,280 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SecureFedHE — Phase 4 Evaluation Dashboard</title>
-    <meta name="description" content="Publication-ready benchmark visualizations for SecureFedHE: Privacy-Preserving Federated Learning with Selective Homomorphic Encryption">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SecureFedHE — Federated Learning Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <!-- Animated background -->
-    <div class="bg-grid"></div>
-    <div class="bg-glow bg-glow-1"></div>
-    <div class="bg-glow bg-glow-2"></div>
-    <div class="bg-glow bg-glow-3"></div>
 
-    <!-- Hero Section -->
-    <header class="hero" id="hero">
-        <div class="hero-badge">PHASE 4 · EVALUATION</div>
-        <h1 class="hero-title">
-            <span class="hero-title-line">Secure</span><span class="hero-title-accent">Fed</span><span class="hero-title-line">HE</span>
-        </h1>
-        <p class="hero-subtitle">Privacy-Preserving Federated Learning with Selective Homomorphic Encryption</p>
-        <div class="hero-stats" id="heroStats">
-            <div class="stat-card">
-                <div class="stat-value" id="statAccuracy">—</div>
-                <div class="stat-label">Best Accuracy</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="statPrivacy">—</div>
-                <div class="stat-label">Privacy Budget (ε)</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="statOverhead">—</div>
-                <div class="stat-label">HE Overhead</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="statDrop">—</div>
-                <div class="stat-label">Accuracy Drop</div>
-            </div>
-        </div>
-    </header>
+  <!-- ── HEADER ─────────────────────────────────────────────────────────────── -->
+  <header id="header">
+    <div class="hdr-left">
+      <span class="hdr-mark">⬡</span>
+      <span class="hdr-title">SecureFedHE</span>
+      <span class="hdr-sub">Federated Learning Monitor</span>
+    </div>
+    <div class="hdr-pills">
+      <div class="pill" id="pill-status">
+        <span class="dot" id="dot-status"></span>
+        <span id="txt-status">Connecting…</span>
+      </div>
+      <div class="pill">
+        <span class="pill-lbl">Round</span>
+        <span class="pill-val mono" id="txt-round">—/—</span>
+      </div>
+      <div class="pill">
+        <span class="pill-lbl">ε&thinsp;(DP)</span>
+        <span class="pill-val mono" id="txt-eps">—</span>
+      </div>
+      <div class="pill pill--accent">
+        <span class="pill-lbl">Accuracy</span>
+        <span class="pill-val mono" id="txt-acc">—</span>
+      </div>
+    </div>
+  </header>
 
-    <!-- Data Upload Section -->
-    <section class="upload-section" id="upload">
-        <div class="container">
-            <h2 class="section-title">Load Experiment Data</h2>
-            <p class="section-desc">Upload your CSV log files from the <code>evaluation/logs/</code> directory, or use the pre-loaded data below.</p>
-            <div class="upload-grid">
-                <div class="upload-card" id="uploadBaseline">
-                    <div class="upload-icon">📊</div>
-                    <div class="upload-label">Ring 1 — Baseline</div>
-                    <div class="upload-file">baseline_metrics.csv</div>
-                    <input type="file" accept=".csv" data-ring="baseline" class="csv-input">
-                    <div class="upload-status" data-status="baseline">Drop or click to upload</div>
-                </div>
-                <div class="upload-card" id="uploadHE10">
-                    <div class="upload-icon">🔐</div>
-                    <div class="upload-label">Ring 2 — HE ε=10</div>
-                    <div class="upload-file">he_eps10_metrics.csv</div>
-                    <input type="file" accept=".csv" data-ring="he_eps10" class="csv-input">
-                    <div class="upload-status" data-status="he_eps10">Drop or click to upload</div>
-                </div>
-                <div class="upload-card" id="uploadHE20">
-                    <div class="upload-icon">🔐</div>
-                    <div class="upload-label">Ring 2 — HE ε=20</div>
-                    <div class="upload-file">he_eps20_metrics.csv</div>
-                    <input type="file" accept=".csv" data-ring="he_eps20" class="csv-input">
-                    <div class="upload-status" data-status="he_eps20">Drop or click to upload</div>
-                </div>
-                <div class="upload-card" id="uploadHE50">
-                    <div class="upload-icon">🔐</div>
-                    <div class="upload-label">Ring 2 — HE ε=50</div>
-                    <div class="upload-file">he_eps50_metrics.csv</div>
-                    <input type="file" accept=".csv" data-ring="he_eps50" class="csv-input">
-                    <div class="upload-status" data-status="he_eps50">Drop or click to upload</div>
-                </div>
-                <div class="upload-card" id="uploadRing">
-                    <div class="upload-icon">🔗</div>
-                    <div class="upload-label">Ring 3 — Decentralised</div>
-                    <div class="upload-file">ring_metrics.csv</div>
-                    <input type="file" accept=".csv" data-ring="ring" class="csv-input">
-                    <div class="upload-status" data-status="ring">Drop or click to upload</div>
-                </div>
-            </div>
-            <div class="upload-actions">
-                <button class="btn btn-primary" id="btnLoadDemo" onclick="loadDemoData()">
-                    <span class="btn-icon">⚡</span> Load Demo Data
-                </button>
-                <button class="btn btn-secondary" id="btnGenerateCharts" onclick="generateAllCharts()" disabled>
-                    <span class="btn-icon">📈</span> Generate Charts
-                </button>
-            </div>
+  <!-- ── MAIN ───────────────────────────────────────────────────────────────── -->
+  <main>
+
+    <!-- Row 1: Ring topology + Accuracy chart -->
+    <div class="row row--2col">
+
+      <!-- Ring Topology -->
+      <section class="card" id="card-ring">
+        <div class="card-hdr">
+          <h2>Ring Topology</h2>
+          <span class="badge" id="badge-nodes">5 nodes</span>
         </div>
+        <div id="ring-wrap">
+          <div class="ring-loading">Polling nodes…</div>
+        </div>
+        <div id="ring-legend" class="ring-legend"></div>
+      </section>
+
+      <!-- Accuracy Chart -->
+      <section class="card" id="card-acc">
+        <div class="card-hdr">
+          <h2>Training Accuracy</h2>
+          <span class="badge badge--live" id="badge-acc">Live</span>
+        </div>
+        <div class="chart-wrap" id="acc-chart-wrap" style="display:none">
+          <canvas id="acc-chart"></canvas>
+        </div>
+        <div class="empty-state" id="acc-empty">
+          <div class="empty-icon">◌</div>
+          <p>Training not started yet.</p>
+          <p class="dim">Accuracy data will appear here once the ring begins.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Row 2: Hospital Distribution -->
+    <section class="card" id="card-dist">
+      <div class="card-hdr">
+        <h2>Hospital Data Distribution</h2>
+        <span class="badge">Non-IID Dirichlet α=0.3</span>
+      </div>
+      <div class="chart-wrap chart-wrap--dist">
+        <canvas id="dist-chart"></canvas>
+      </div>
     </section>
 
-    <!-- Charts Section -->
-    <section class="charts-section" id="charts" style="display:none;">
-        <div class="container">
-
-            <!-- Chart 1: Accuracy Convergence -->
-            <div class="chart-card" id="chartAccCard">
-                <div class="chart-header">
-                    <div>
-                        <h3 class="chart-title">Figure 1 — Test Accuracy Convergence</h3>
-                        <p class="chart-desc">Global test accuracy across FL rounds for all experimental configurations</p>
-                    </div>
-                    <button class="btn-export" onclick="exportChart('chartAccuracy')">
-                        📥 Export PNG
-                    </button>
-                </div>
-                <div class="chart-container">
-                    <canvas id="chartAccuracy"></canvas>
-                </div>
-            </div>
-
-            <!-- Chart 2: Training Loss -->
-            <div class="chart-card" id="chartLossCard">
-                <div class="chart-header">
-                    <div>
-                        <h3 class="chart-title">Figure 2 — Training Loss Convergence</h3>
-                        <p class="chart-desc">Mean training loss across FL rounds showing learning progression</p>
-                    </div>
-                    <button class="btn-export" onclick="exportChart('chartLoss')">
-                        📥 Export PNG
-                    </button>
-                </div>
-                <div class="chart-container">
-                    <canvas id="chartLoss"></canvas>
-                </div>
-            </div>
-
-            <!-- Chart 3: Privacy-Utility Trade-off -->
-            <div class="chart-card" id="chartPrivacyCard">
-                <div class="chart-header">
-                    <div>
-                        <h3 class="chart-title">Figure 3 — Privacy-Utility Trade-off</h3>
-                        <p class="chart-desc">Final test accuracy vs. differential privacy budget (ε) — lower ε means stronger privacy</p>
-                    </div>
-                    <button class="btn-export" onclick="exportChart('chartPrivacy')">
-                        📥 Export PNG
-                    </button>
-                </div>
-                <div class="chart-container chart-container-sm">
-                    <canvas id="chartPrivacy"></canvas>
-                </div>
-            </div>
-
-            <!-- Chart 4: Overhead Comparison -->
-            <div class="chart-card" id="chartOverheadCard">
-                <div class="chart-header">
-                    <div>
-                        <h3 class="chart-title">Figure 4 — Computational Overhead</h3>
-                        <p class="chart-desc">Average wall-clock time and encryption overhead per FL round</p>
-                    </div>
-                    <button class="btn-export" onclick="exportChart('chartOverhead')">
-                        📥 Export PNG
-                    </button>
-                </div>
-                <div class="chart-container chart-container-sm">
-                    <canvas id="chartOverhead"></canvas>
-                </div>
-            </div>
-
-            <!-- Chart 5: Communication Cost -->
-            <div class="chart-card" id="chartCommCard">
-                <div class="chart-header">
-                    <div>
-                        <h3 class="chart-title">Figure 5 — Communication Cost</h3>
-                        <p class="chart-desc">Total bytes transmitted per round (including ciphertext expansion)</p>
-                    </div>
-                    <button class="btn-export" onclick="exportChart('chartComm')">
-                        📥 Export PNG
-                    </button>
-                </div>
-                <div class="chart-container chart-container-sm">
-                    <canvas id="chartComm"></canvas>
-                </div>
-            </div>
-
-            <!-- Chart 6: Resource Footprint -->
-            <div class="chart-card" id="chartResourceCard">
-                <div class="chart-header">
-                    <div>
-                        <h3 class="chart-title">Figure 6 — Resource Footprint</h3>
-                        <p class="chart-desc">CPU utilization and RAM consumption across FL rounds</p>
-                    </div>
-                    <button class="btn-export" onclick="exportChart('chartResource')">
-                        📥 Export PNG
-                    </button>
-                </div>
-                <div class="chart-container">
-                    <canvas id="chartResource"></canvas>
-                </div>
-            </div>
-
-            <!-- Summary Table -->
-            <div class="chart-card" id="summaryTableCard">
-                <div class="chart-header">
-                    <div>
-                        <h3 class="chart-title">Table 1 — Benchmark Summary</h3>
-                        <p class="chart-desc">Comparative performance metrics across all experimental configurations</p>
-                    </div>
-                </div>
-                <div class="table-container">
-                    <table id="summaryTable">
-                        <thead>
-                            <tr>
-                                <th>Configuration</th>
-                                <th>Final Accuracy (%)</th>
-                                <th>Best Accuracy (%)</th>
-                                <th>Accuracy Drop (%)</th>
-                                <th>Avg Wall Time (s)</th>
-                                <th>Avg Enc Overhead (s)</th>
-                                <th>Avg Comm (MB)</th>
-                                <th>Final Loss</th>
-                            </tr>
-                        </thead>
-                        <tbody id="summaryTableBody"></tbody>
-                    </table>
-                </div>
-            </div>
+    <!-- Row 3: Prediction -->
+    <section class="card" id="card-predict">
+      <div class="card-hdr">
+        <h2>Patient Prediction</h2>
+        <div class="card-hdr-actions">
+          <button class="btn btn--ghost btn--sm" onclick="loadExample('healthy')">
+            Load Healthy Example
+          </button>
+          <button class="btn btn--ghost btn--sm" onclick="loadExample('diabetic')">
+            Load Diabetic Example
+          </button>
         </div>
+      </div>
+
+      <div class="predict-layout">
+        <!-- Input form -->
+        <div class="predict-form">
+          <div class="form-note">
+            Enter 8 clinical vitals and run inference against the federated model.
+          </div>
+          <div class="form-grid">
+            <label class="field">
+              <span class="field-name">Pregnancies</span>
+              <span class="field-unit">count</span>
+              <input type="number" id="f0" min="0" max="20" step="1" placeholder="e.g. 6">
+            </label>
+            <label class="field">
+              <span class="field-name">Glucose</span>
+              <span class="field-unit">mg/dL</span>
+              <input type="number" id="f1" min="0" max="250" placeholder="e.g. 148">
+            </label>
+            <label class="field">
+              <span class="field-name">Blood Pressure</span>
+              <span class="field-unit">mm Hg</span>
+              <input type="number" id="f2" min="0" max="150" placeholder="e.g. 72">
+            </label>
+            <label class="field">
+              <span class="field-name">Skin Thickness</span>
+              <span class="field-unit">mm</span>
+              <input type="number" id="f3" min="0" max="100" placeholder="e.g. 35">
+            </label>
+            <label class="field">
+              <span class="field-name">Insulin</span>
+              <span class="field-unit">μU/mL</span>
+              <input type="number" id="f4" min="0" max="900" placeholder="e.g. 0">
+            </label>
+            <label class="field">
+              <span class="field-name">BMI</span>
+              <span class="field-unit">kg/m²</span>
+              <input type="number" id="f5" min="0" max="80" step="0.1" placeholder="e.g. 33.6">
+            </label>
+            <label class="field">
+              <span class="field-name">Pedigree Function</span>
+              <span class="field-unit">score</span>
+              <input type="number" id="f6" min="0" max="3" step="0.001" placeholder="e.g. 0.627">
+            </label>
+            <label class="field">
+              <span class="field-name">Age</span>
+              <span class="field-unit">years</span>
+              <input type="number" id="f7" min="1" max="120" placeholder="e.g. 50">
+            </label>
+          </div>
+
+          <button class="btn btn--primary btn--full" id="btn-predict" onclick="runPrediction()">
+            Run Prediction
+          </button>
+        </div>
+
+        <!-- Result panel -->
+        <div id="predict-result" class="predict-result">
+          <div class="result-empty">
+            <div class="empty-icon">⬡</div>
+            <p>Prediction result will appear here.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- Framework Diagram -->
-    <section class="framework-section" id="framework">
-        <div class="container">
-            <h2 class="section-title">SecureFedHE Framework Architecture</h2>
-            <div class="framework-diagram">
-                <div class="fw-layer fw-layer-conv">
-                    <div class="fw-badge">PLAINTEXT</div>
-                    <div class="fw-name">Conv Blocks</div>
-                    <div class="fw-detail">Generic features · Low sensitivity</div>
-                </div>
-                <div class="fw-arrow">→</div>
-                <div class="fw-layer fw-layer-fc1">
-                    <div class="fw-badge">DP NOISE</div>
-                    <div class="fw-name">FC1 (256 units)</div>
-                    <div class="fw-detail">Gaussian mechanism · (ε, δ)-DP</div>
-                </div>
-                <div class="fw-arrow">→</div>
-                <div class="fw-layer fw-layer-fc2">
-                    <div class="fw-badge">CKKS HE</div>
-                    <div class="fw-name">FC2 (Classifier)</div>
-                    <div class="fw-detail">Homomorphic encryption · 128-bit security</div>
-                </div>
-            </div>
-            <div class="framework-rings">
-                <div class="ring-card ring-1">
-                    <div class="ring-num">Ring 1</div>
-                    <div class="ring-name">Vanilla FL</div>
-                    <div class="ring-desc">Standard FedAvg baseline with central server</div>
-                </div>
-                <div class="ring-card ring-2">
-                    <div class="ring-num">Ring 2</div>
-                    <div class="ring-name">Selective HE</div>
-                    <div class="ring-desc">CKKS encryption on fc2 + DP noise on fc1</div>
-                </div>
-                <div class="ring-card ring-3">
-                    <div class="ring-num">Ring 3</div>
-                    <div class="ring-name">Decentralised</div>
-                    <div class="ring-desc">Peer-to-peer ring topology, no central server</div>
-                </div>
-            </div>
+    <!-- Row 4: Audit Log -->
+    <section class="card" id="card-audit">
+      <div class="card-hdr">
+        <h2>Audit Log</h2>
+        <div class="card-hdr-actions">
+          <span class="badge" id="audit-count">0 entries</span>
+          <button class="btn btn--ghost btn--sm" onclick="refreshAudit()">↻ Refresh</button>
         </div>
+      </div>
+      <div id="audit-log" class="audit-log">
+        <div class="empty-state">No log entries yet.</div>
+      </div>
     </section>
 
-    <footer class="footer">
-        <p>SecureFedHE · Phase 4 Evaluation Dashboard · Built for publication-ready benchmarking</p>
-    </footer>
+  </main>
 
-    <script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

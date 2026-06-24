@@ -1,653 +1,594 @@
-/* ============================================================
-   SecureFedHE · Phase 4 Dashboard — Chart Engine
-   CSV parsing, chart rendering, and data analysis
-   ============================================================ */
+/* ─────────────────────────────────────────────────────────────────────────────
+   app.js — SecureFedHE Dashboard  (all frontend logic)
+   ───────────────────────────────────────────────────────────────────────────── */
 
-// ── Global State ─────────────────────────────────────────────
-const datasets = {};
-const chartInstances = {};
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+const POLL_RING_MS    = 5_000;
+const POLL_METRICS_MS = 8_000;
+const POLL_AUDIT_MS   = 15_000;
 
-const COLORS = {
-    baseline:  { main: '#06b6d4', bg: 'rgba(6, 182, 212, 0.1)',   border: 'rgba(6, 182, 212, 0.8)' },
-    he_eps10:  { main: '#6366f1', bg: 'rgba(99, 102, 241, 0.1)',  border: 'rgba(99, 102, 241, 0.8)' },
-    he_eps20:  { main: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.1)',  border: 'rgba(139, 92, 246, 0.8)' },
-    he_eps50:  { main: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.8)' },
-    ring:      { main: '#10b981', bg: 'rgba(16, 185, 129, 0.1)', border: 'rgba(16, 185, 129, 0.8)' },
+const FEATURE_NAMES = [
+  'Pregnancies', 'Glucose', 'Blood Pressure', 'Skin Thickness',
+  'Insulin', 'BMI', 'Pedigree Function', 'Age',
+];
+
+// Classic Pima rows  (row 0 = diabetic, row 1 = healthy)
+const EXAMPLES = {
+  diabetic: [6, 148, 72, 35, 0, 33.6, 0.627, 50],
+  healthy:  [1,  85, 66, 29, 0, 26.6, 0.351, 31],
 };
 
-const LABELS = {
-    baseline:  'Ring 1 — Baseline',
-    he_eps10:  'Ring 2 — HE (ε=10)',
-    he_eps20:  'Ring 2 — HE (ε=20)',
-    he_eps50:  'Ring 2 — HE (ε=50)',
-    ring:      'Ring 3 — Decentralised',
+// ─── STATE ────────────────────────────────────────────────────────────────────
+const S = {
+  config:         null,
+  ringNodes:      [],
+  metrics:        { rounds: [], accuracy: [], current_round: 0, total_rounds: 20 },
+  distribution:   [],
+  lastPrediction: null,
+  lastFeatures:   null,
+  charts:         { accuracy: null, distribution: null },
 };
 
-// ── CSV Parser ───────────────────────────────────────────────
-function parseCSV(text) {
-    const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
-    if (!normalized) return [];
+// ─── UTILITY ──────────────────────────────────────────────────────────────────
+async function api(path, opts = {}) {
+  const r = await fetch(path, opts);
+  if (!r.ok) {
+    let detail = `HTTP ${r.status}`;
+    try { const j = await r.json(); detail = j.detail || detail; } catch (_) {}
+    throw new Error(detail);
+  }
+  return r.json();
+}
 
-    const lines = normalized.split('\n').map(l => l.trim()).filter(l => l);
-    if (lines.length < 2) return [];
+const $ = id => document.getElementById(id);
 
-    const headers = lines[0].split(',').map(h => h.trim().replace(/^\uFEFF/, ''));
-    const rows = [];
+function setStatus(text, state) {
+  // state: 'ok' | 'training' | 'idle' | 'error'
+  $('txt-status').textContent = text;
+  $('dot-status').className   = `dot dot--${state}`;
+  $('pill-status').className  = `pill pill--${state}`;
+}
 
-    for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(',').map(v => v.trim().replace(/^\uFEFF/, ''));
-        if (values.length < headers.length) continue;
+// ─── RING TOPOLOGY SVG ────────────────────────────────────────────────────────
+function renderRing(nodes, totalRounds) {
+  const W = 380, H = 310;
+  const cx = W / 2, cy = H / 2 - 4;
+  const RING_R = 116, NODE_R = 26;
+  const n = nodes.length;
 
-        const row = {};
-        headers.forEach((h, j) => {
-            const val = values[j] ?? '';
-            const parsed = parseFloat(val);
-            row[h] = val === '' ? '' : Number.isNaN(parsed) ? val : parsed;
-        });
-        rows.push(row);
+  const onlineCount = nodes.filter(nd => nd.online).length;
+  $('badge-nodes').textContent = `${onlineCount}/${n} online`;
+
+  // Pentagon positions
+  const pos = nodes.map((_, i) => {
+    const ang = (-90 + i * (360 / n)) * (Math.PI / 180);
+    return { x: cx + RING_R * Math.cos(ang), y: cy + RING_R * Math.sin(ang) };
+  });
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="ring-svg">
+<defs>
+  <marker id="arr" viewBox="0 0 8 8" refX="8" refY="4"
+    markerWidth="4.5" markerHeight="4.5" orient="auto">
+    <path d="M0,0 L8,4 L0,8 Z" fill="#00c9a7"/>
+  </marker>
+  <marker id="arr-off" viewBox="0 0 8 8" refX="8" refY="4"
+    markerWidth="4.5" markerHeight="4.5" orient="auto">
+    <path d="M0,0 L8,4 L0,8 Z" fill="#1e3a52"/>
+  </marker>
+  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="3.5" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>`;
+
+  // ── Edges (ring connections with animated flow) ────────────────────────────
+  for (let i = 0; i < n; i++) {
+    const a  = pos[i], b = pos[(i + 1) % n];
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const d  = Math.sqrt(dx * dx + dy * dy);
+    const pad = NODE_R + 5, ap = NODE_R + 13;
+    const sx = a.x + (dx / d) * pad,  sy = a.y + (dy / d) * pad;
+    const ex = b.x - (dx / d) * ap,   ey = b.y - (dy / d) * ap;
+    const active = nodes[i].online && nodes[(i + 1) % n].online;
+
+    svg += `<line
+      x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}"
+      x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}"
+      stroke="${active ? '#00c9a7' : '#1e3a52'}"
+      stroke-width="${active ? 2 : 1}"
+      stroke-dasharray="${active ? '7 3' : '4 6'}"
+      class="${active ? 'ring-edge ring-edge--active' : 'ring-edge'}"
+      marker-end="url(#${active ? 'arr' : 'arr-off'})"/>`;
+  }
+
+  // ── Nodes ─────────────────────────────────────────────────────────────────
+  nodes.forEach((node, i) => {
+    const { x, y } = pos[i];
+    const isMaster  = i === 0;
+    const col = node.online
+      ? (node.zkp_ready ? '#00e09e' : '#ffd166')
+      : '#ff4d6d';
+
+    // Pulse halo (online only)
+    if (node.online) {
+      svg += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}"
+        r="${NODE_R + 11}" fill="${col}" opacity="0.07" class="pulse"/>`;
     }
-    return rows;
-}
 
-// ── File Upload Handlers ─────────────────────────────────────
-document.querySelectorAll('.csv-input').forEach(input => {
-    input.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
+    // Circle body
+    svg += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}"
+      r="${NODE_R}" fill="#162840"
+      stroke="${col}" stroke-width="${isMaster ? 2.8 : 2}"
+      ${node.online ? 'filter="url(#glow)"' : ''}/>`;
 
-        const ring = this.getAttribute('data-ring');
-        const reader = new FileReader();
+    // Node ID (centred, large)
+    svg += `<text x="${x.toFixed(1)}" y="${(y + 1.5).toFixed(1)}"
+      text-anchor="middle" dominant-baseline="middle"
+      class="nid" fill="${col}">${i}</text>`;
 
-        reader.onload = function(ev) {
-            const data = parseCSV(ev.target.result);
-            const status = document.querySelector(`[data-status="${ring}"]`);
-            const card = input.closest('.upload-card');
-
-            if (data.length > 0) {
-                datasets[ring] = data;
-                status.textContent = `✓ Loaded ${data.length} rounds`;
-                status.classList.remove('error');
-                status.classList.add('success');
-                card.classList.add('loaded');
-            } else {
-                delete datasets[ring];
-                status.textContent = '⚠ No data rows found in this CSV';
-                status.classList.remove('success');
-                status.classList.add('error');
-                card.classList.remove('loaded');
-            }
-
-            checkReady();
-        };
-        reader.readAsText(file);
-    });
-});
-
-function checkReady() {
-    const btn = document.getElementById('btnGenerateCharts');
-    btn.disabled = Object.keys(datasets).length === 0;
-}
-
-// ── Demo Data Generator ──────────────────────────────────────
-function loadDemoData() {
-    // Generate realistic demo data based on typical SecureFedHE experiment results
-    const rounds = 20;
-
-    // Ring 1 — Baseline (from actual baseline_metrics.csv pattern)
-    datasets.baseline = generateDemoRing('baseline', rounds, {
-        startAcc: 0.2255, endAcc: 0.7943, startLoss: 2.15, endLoss: 0.59,
-        wallTime: 350, encOverhead: 0, commBytes: 24832400,
-        cpuBase: 200, ramBase: 15,
-    });
-
-    // Ring 2 — HE ε=10
-    datasets.he_eps10 = generateDemoRing('selectiveHE', rounds, {
-        startAcc: 0.2180, endAcc: 0.7928, startLoss: 2.18, endLoss: 0.60,
-        wallTime: 370, encOverhead: 0.035, commBytes: 24853200,
-        cpuBase: 210, ramBase: 18,
-    });
-
-    // Ring 2 — HE ε=20
-    datasets.he_eps20 = generateDemoRing('selectiveHE', rounds, {
-        startAcc: 0.2210, endAcc: 0.7935, startLoss: 2.16, endLoss: 0.595,
-        wallTime: 368, encOverhead: 0.033, commBytes: 24853200,
-        cpuBase: 208, ramBase: 17,
-    });
-
-    // Ring 2 — HE ε=50
-    datasets.he_eps50 = generateDemoRing('selectiveHE', rounds, {
-        startAcc: 0.2240, endAcc: 0.7940, startLoss: 2.15, endLoss: 0.592,
-        wallTime: 365, encOverhead: 0.032, commBytes: 24853200,
-        cpuBase: 205, ramBase: 16,
-    });
-
-    // Ring 3 — Decentralised Ring
-    datasets.ring = generateDemoRing('ring', rounds, {
-        startAcc: 0.2100, endAcc: 0.7890, startLoss: 2.20, endLoss: 0.62,
-        wallTime: 400, encOverhead: 0.045, commBytes: 25100000,
-        cpuBase: 220, ramBase: 20,
-    });
-
-    // Update UI
-    Object.keys(LABELS).forEach(key => {
-        const status = document.querySelector(`[data-status="${key}"]`);
-        if (status && datasets[key]) {
-            status.textContent = `✓ Demo: ${datasets[key].length} rounds`;
-            status.classList.add('success');
-            const card = status.closest('.upload-card');
-            if (card) card.classList.add('loaded');
-        }
-    });
-
-    checkReady();
-    generateAllCharts();
-}
-
-function generateDemoRing(phase, rounds, cfg) {
-    const data = [];
-    for (let r = 1; r <= rounds; r++) {
-        const progress = r / rounds;
-        // Logarithmic convergence curve
-        const accCurve = 1 - Math.exp(-3.5 * progress);
-        const acc = cfg.startAcc + (cfg.endAcc - cfg.startAcc) * accCurve;
-        const lossCurve = Math.exp(-3 * progress);
-        const loss = cfg.endLoss + (cfg.startLoss - cfg.endLoss) * lossCurve;
-        const trainAcc = acc * (0.98 + Math.random() * 0.04);
-        const trainLoss = loss * (0.85 + Math.random() * 0.1);
-
-        data.push({
-            round_num: r,
-            phase: phase,
-            client_id: -1,
-            train_loss: +(trainLoss).toFixed(4),
-            train_acc: +(trainAcc).toFixed(4),
-            eval_loss: +(loss + (Math.random() - 0.5) * 0.02).toFixed(4),
-            eval_acc: +(acc + (Math.random() - 0.5) * 0.005).toFixed(4),
-            comm_bytes: cfg.commBytes,
-            wall_time_s: +(cfg.wallTime + (Math.random() - 0.5) * 100).toFixed(1),
-            cpu_pct: +(cfg.cpuBase + (Math.random() - 0.5) * 40).toFixed(1),
-            ram_mb: +(cfg.ramBase + Math.random() * 10).toFixed(1),
-            enc_overhead_s: +(cfg.encOverhead + Math.random() * 0.01).toFixed(3),
-        });
+    // Round number (small, below ID)
+    if (node.online && node.round > 0) {
+      svg += `<text x="${x.toFixed(1)}" y="${(y + 15).toFixed(1)}"
+        text-anchor="middle" class="nround" fill="#6b8fa8">R${node.round}</text>`;
     }
-    return data;
+
+    // External label
+    const ang = (-90 + i * (360 / n)) * (Math.PI / 180);
+    const lr  = RING_R + 52;
+    const lx  = cx + lr * Math.cos(ang);
+    const ly  = cy + lr * Math.sin(ang);
+
+    // ≤2 words for the label
+    const words = node.name.split(' ');
+    const label = words.length > 2 ? words[0] + '\u00A0' + words[1] : node.name;
+    svg += `<text x="${lx.toFixed(1)}" y="${(ly - 7).toFixed(1)}"
+      text-anchor="middle" class="nlabel" fill="#c8dce9">${label}</text>`;
+
+    const stateText = node.online
+      ? (node.zkp_ready ? '◉ ZKP' : '◎ Init')
+      : '✕ Offline';
+    svg += `<text x="${lx.toFixed(1)}" y="${(ly + 8).toFixed(1)}"
+      text-anchor="middle" class="nstate" fill="${col}">${stateText}</text>`;
+
+    // MASTER badge beneath node 0
+    if (isMaster) {
+      svg += `
+        <rect x="${(x - 22).toFixed(1)}" y="${(y + NODE_R + 5).toFixed(1)}"
+          width="44" height="14" rx="3" fill="#00c9a7" opacity="0.13"/>
+        <text x="${x.toFixed(1)}" y="${(y + NODE_R + 15).toFixed(1)}"
+          text-anchor="middle" class="master-tag" fill="#00c9a7">MASTER</text>`;
+    }
+  });
+
+  svg += '</svg>';
+  $('ring-wrap').innerHTML = svg;
+
+  // Legend below SVG
+  $('ring-legend').innerHTML = nodes.map(nd => {
+    const col = nd.online
+      ? (nd.zkp_ready ? '#00e09e' : '#ffd166')
+      : '#ff4d6d';
+    return `<div class="legend-item">
+      <span class="legend-dot" style="background:${col}"></span>
+      <span class="legend-name">${nd.name}</span>
+      <span class="legend-ip mono">${nd.ip}:${nd.port}</span>
+    </div>`;
+  }).join('');
 }
 
-// ── Chart Generation ─────────────────────────────────────────
-function generateAllCharts() {
-    if (Object.keys(datasets).length === 0) return;
+// ─── ACCURACY CHART ───────────────────────────────────────────────────────────
+function initAccuracyChart() {
+  const ctx  = $('acc-chart').getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 0, 270);
+  grad.addColorStop(0,  'rgba(0,201,167,0.25)');
+  grad.addColorStop(1,  'rgba(0,201,167,0.00)');
 
-    document.getElementById('charts').style.display = 'block';
-
-    // Destroy existing charts
-    Object.values(chartInstances).forEach(c => c.destroy());
-
-    // Generate each chart
-    renderAccuracyChart();
-    renderLossChart();
-    renderPrivacyChart();
-    renderOverheadChart();
-    renderCommChart();
-    renderResourceChart();
-    renderSummaryTable();
-    updateHeroStats();
-
-    // Smooth scroll to charts
-    document.getElementById('charts').scrollIntoView({ behavior: 'smooth' });
-}
-
-// ── Chart Defaults ───────────────────────────────────────────
-const CHART_DEFAULTS = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-        legend: {
-            position: 'top',
-            labels: {
-                color: '#94a3b8',
-                font: { family: "'Inter', sans-serif", size: 12, weight: '500' },
-                padding: 16,
-                usePointStyle: true,
-                pointStyleWidth: 12,
-            },
-        },
-        tooltip: {
-            backgroundColor: 'rgba(17, 24, 39, 0.95)',
-            titleColor: '#f1f5f9',
-            bodyColor: '#94a3b8',
-            borderColor: 'rgba(99, 102, 241, 0.3)',
-            borderWidth: 1,
-            cornerRadius: 8,
-            padding: 12,
-            titleFont: { family: "'Inter', sans-serif", weight: '600' },
-            bodyFont: { family: "'JetBrains Mono', monospace", size: 12 },
-        },
+  S.charts.accuracy = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label:               'Accuracy (%)',
+        data:                [],
+        borderColor:         '#00c9a7',
+        backgroundColor:     grad,
+        borderWidth:         2.5,
+        pointRadius:         4,
+        pointHoverRadius:    7,
+        pointBackgroundColor:'#00c9a7',
+        pointBorderColor:    '#0d1e2e',
+        pointBorderWidth:    2,
+        tension:             0.38,
+        fill:                true,
+      }],
     },
-    scales: {
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation:  { duration: 400 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0d1e2e',
+          borderColor:     '#1e3a52',
+          borderWidth:     1,
+          titleColor:      '#00c9a7',
+          bodyColor:       '#c8dce9',
+          padding:         10,
+          callbacks: {
+            title:  items => `Round ${items[0].label}`,
+            label:  item  => `  Accuracy: ${item.parsed.y.toFixed(2)}%`,
+          },
+        },
+      },
+      scales: {
         x: {
-            grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
-            ticks: { color: '#64748b', font: { family: "'Inter', sans-serif", size: 11 } },
+          title: { display: true, text: 'Round', color: '#6b8fa8', font: { size: 11 } },
+          ticks: { color: '#6b8fa8', font: { family: "'Space Mono'", size: 10 } },
+          grid:  { color: 'rgba(30,58,82,0.55)' },
         },
         y: {
-            grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
-            ticks: { color: '#64748b', font: { family: "'JetBrains Mono', monospace", size: 11 } },
+          min: 0, max: 100,
+          title: { display: true, text: 'Accuracy (%)', color: '#6b8fa8', font: { size: 11 } },
+          ticks: {
+            color:    '#6b8fa8',
+            font:     { family: "'Space Mono'", size: 10 },
+            callback: v => v + '%',
+          },
+          grid: { color: 'rgba(30,58,82,0.55)' },
         },
+      },
     },
-};
-
-function makeLineDataset(key, field, extras = {}) {
-    if (!datasets[key]) return null;
-    const color = COLORS[key];
-    return {
-        label: LABELS[key],
-        data: datasets[key].map(d => d[field]),
-        borderColor: color.border,
-        backgroundColor: color.bg,
-        borderWidth: 2.5,
-        pointRadius: 3,
-        pointHoverRadius: 6,
-        pointBackgroundColor: color.main,
-        pointBorderColor: 'transparent',
-        tension: 0.35,
-        fill: false,
-        ...extras,
-    };
+  });
 }
 
-// ── Chart 1: Accuracy Convergence ────────────────────────────
-function renderAccuracyChart() {
-    const ctx = document.getElementById('chartAccuracy').getContext('2d');
-    const dsets = Object.keys(LABELS)
-        .map(key => makeLineDataset(key, 'eval_acc'))
-        .filter(Boolean)
-        .map(ds => ({
-            ...ds,
-            data: ds.data.map(v => +(v * 100).toFixed(2)),
-        }));
+function updateAccuracyChart(metrics) {
+  S.metrics = metrics;
+  const { rounds, accuracy, current_round, total_rounds, latest_accuracy } = metrics;
 
-    const maxRounds = Math.max(...Object.values(datasets).map(d => d.length));
-    const labels = Array.from({ length: maxRounds }, (_, i) => i + 1);
+  $('txt-round').textContent = `${current_round}/${total_rounds}`;
+  if (latest_accuracy != null) {
+    $('txt-acc').textContent = latest_accuracy.toFixed(1) + '%';
+  }
 
-    chartInstances.chartAccuracy = new Chart(ctx, {
-        type: 'line',
-        data: { labels, datasets: dsets },
-        options: {
-            ...CHART_DEFAULTS,
-            scales: {
-                ...CHART_DEFAULTS.scales,
-                x: {
-                    ...CHART_DEFAULTS.scales.x,
-                    title: { display: true, text: 'FL Round', color: '#64748b',
-                             font: { family: "'Inter', sans-serif", size: 12, weight: '500' } },
-                },
-                y: {
-                    ...CHART_DEFAULTS.scales.y,
-                    title: { display: true, text: 'Test Accuracy (%)', color: '#64748b',
-                             font: { family: "'Inter', sans-serif", size: 12, weight: '500' } },
-                    min: 0,
-                },
+  if (!rounds.length) {
+    $('acc-chart-wrap').style.display = 'none';
+    $('acc-empty').style.display      = 'flex';
+    return;
+  }
+  $('acc-empty').style.display      = 'none';
+  $('acc-chart-wrap').style.display = 'block';
+
+  const c = S.charts.accuracy;
+  c.data.labels              = rounds;
+  c.data.datasets[0].data   = accuracy;
+  c.update('none');
+}
+
+// ─── DISTRIBUTION CHART ────────────────────────────────────────────────────────
+function renderDistChart(hospitals) {
+  S.distribution = hospitals;
+
+  // Shorten hospital names for axis labels
+  const labels = hospitals.map(h =>
+    h.name.replace(' Hospital', '').replace(' Clinic', '').replace(' Centre', '').replace(' Medical', '')
+  );
+
+  S.charts.distribution = new Chart($('dist-chart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label:           'Non-Diabetic',
+          data:            hospitals.map(h => h.healthy),
+          backgroundColor: 'rgba(0,224,158,0.72)',
+          borderColor:     '#00e09e',
+          borderWidth:     1,
+          borderRadius:    5,
+        },
+        {
+          label:           'Diabetic',
+          data:            hospitals.map(h => h.diabetic),
+          backgroundColor: 'rgba(255,77,109,0.72)',
+          borderColor:     '#ff4d6d',
+          borderWidth:     1,
+          borderRadius:    5,
+        },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          labels: {
+            color: '#c8dce9',
+            font:  { family: "'Inter'", size: 12 },
+            boxWidth: 12, boxHeight: 12, padding: 20,
+          },
+        },
+        tooltip: {
+          backgroundColor: '#0d1e2e',
+          borderColor:     '#1e3a52',
+          borderWidth:     1,
+          titleColor:      '#c8dce9',
+          bodyColor:       '#c8dce9',
+          callbacks: {
+            afterLabel(ctx) {
+              const h   = hospitals[ctx.dataIndex];
+              const pct = ctx.datasetIndex === 0
+                ? (100 - h.diabetic_pct).toFixed(1)
+                : h.diabetic_pct.toFixed(1);
+              return `  (${pct}% of hospital total)`;
             },
+          },
         },
-    });
+      },
+      scales: {
+        x: {
+          ticks: { color: '#6b8fa8', font: { size: 11 } },
+          grid:  { color: 'rgba(30,58,82,0.4)' },
+        },
+        y: {
+          title: { display: true, text: 'Patients', color: '#6b8fa8', font: { size: 11 } },
+          ticks: { color: '#6b8fa8', font: { family: "'Space Mono'", size: 10 } },
+          grid:  { color: 'rgba(30,58,82,0.4)' },
+        },
+      },
+    },
+  });
 }
 
-// ── Chart 2: Training Loss ───────────────────────────────────
-function renderLossChart() {
-    const ctx = document.getElementById('chartLoss').getContext('2d');
-    const dsets = Object.keys(LABELS)
-        .map(key => makeLineDataset(key, 'eval_loss'))
-        .filter(Boolean);
-
-    const maxRounds = Math.max(...Object.values(datasets).map(d => d.length));
-    const labels = Array.from({ length: maxRounds }, (_, i) => i + 1);
-
-    chartInstances.chartLoss = new Chart(ctx, {
-        type: 'line',
-        data: { labels, datasets: dsets },
-        options: {
-            ...CHART_DEFAULTS,
-            scales: {
-                ...CHART_DEFAULTS.scales,
-                x: {
-                    ...CHART_DEFAULTS.scales.x,
-                    title: { display: true, text: 'FL Round', color: '#64748b',
-                             font: { family: "'Inter', sans-serif", size: 12, weight: '500' } },
-                },
-                y: {
-                    ...CHART_DEFAULTS.scales.y,
-                    title: { display: true, text: 'Evaluation Loss', color: '#64748b',
-                             font: { family: "'Inter', sans-serif", size: 12, weight: '500' } },
-                },
-            },
-        },
-    });
+// ─── PREDICTION FORM ──────────────────────────────────────────────────────────
+function loadExample(type) {
+  EXAMPLES[type].forEach((v, i) => {
+    const el = $('f' + i);
+    if (el) el.value = v;
+  });
 }
 
-// ── Chart 3: Privacy-Utility Trade-off ───────────────────────
-function renderPrivacyChart() {
-    const ctx = document.getElementById('chartPrivacy').getContext('2d');
+async function runPrediction() {
+  const btn = $('btn-predict');
 
-    // Collect final accuracy for each ε value
-    const epsilonData = [];
-
-    if (datasets.he_eps10) {
-        const d = datasets.he_eps10;
-        epsilonData.push({ eps: 10, acc: d[d.length - 1].eval_acc * 100 });
+  // Collect + validate
+  const features = [];
+  let firstBad = null;
+  for (let i = 0; i < 8; i++) {
+    const el = $('f' + i);
+    const v  = parseFloat(el?.value);
+    if (!el || el.value === '' || isNaN(v)) {
+      el?.classList.add('input--error');
+      firstBad = firstBad ?? el;
+    } else {
+      el.classList.remove('input--error');
+      features.push(v);
     }
-    if (datasets.he_eps20) {
-        const d = datasets.he_eps20;
-        epsilonData.push({ eps: 20, acc: d[d.length - 1].eval_acc * 100 });
-    }
-    if (datasets.he_eps50) {
-        const d = datasets.he_eps50;
-        epsilonData.push({ eps: 50, acc: d[d.length - 1].eval_acc * 100 });
-    }
+  }
+  if (firstBad) { firstBad.focus(); return; }
 
-    // Add baseline as reference line
-    let baselineAcc = null;
-    if (datasets.baseline) {
-        const d = datasets.baseline;
-        baselineAcc = d[d.length - 1].eval_acc * 100;
-    }
+  btn.disabled    = true;
+  btn.textContent = 'Running…';
+  $('predict-result').innerHTML =
+    '<div class="result-loading"><span class="spinner"></span> Analysing vitals…</div>';
 
-    const dsets = [{
-        label: 'Selective HE + DP',
-        data: epsilonData.map(d => ({ x: d.eps, y: +d.acc.toFixed(2) })),
-        borderColor: COLORS.he_eps10.border,
-        backgroundColor: COLORS.he_eps10.main,
-        pointRadius: 8,
-        pointHoverRadius: 12,
-        pointBackgroundColor: COLORS.he_eps10.main,
-        borderWidth: 3,
-        tension: 0.3,
-        showLine: true,
-    }];
-
-    if (baselineAcc !== null) {
-        dsets.push({
-            label: 'Baseline (no privacy)',
-            data: [{ x: 10, y: +baselineAcc.toFixed(2) }, { x: 50, y: +baselineAcc.toFixed(2) }],
-            borderColor: COLORS.baseline.border,
-            borderDash: [8, 4],
-            borderWidth: 2,
-            pointRadius: 0,
-            fill: false,
-            showLine: true,
-        });
-    }
-
-    chartInstances.chartPrivacy = new Chart(ctx, {
-        type: 'scatter',
-        data: { datasets: dsets },
-        options: {
-            ...CHART_DEFAULTS,
-            scales: {
-                x: {
-                    ...CHART_DEFAULTS.scales.x,
-                    type: 'linear',
-                    title: { display: true, text: 'Privacy Budget ε (lower = stronger privacy)', color: '#64748b',
-                             font: { family: "'Inter', sans-serif", size: 12, weight: '500' } },
-                },
-                y: {
-                    ...CHART_DEFAULTS.scales.y,
-                    title: { display: true, text: 'Final Test Accuracy (%)', color: '#64748b',
-                             font: { family: "'Inter', sans-serif", size: 12, weight: '500' } },
-                },
-            },
-        },
+  try {
+    const result = await api('/api/predict', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ features }),
     });
+    S.lastPrediction = result;
+    S.lastFeatures   = features;
+    renderPrediction(result);
+  } catch (err) {
+    $('predict-result').innerHTML =
+      `<div class="result-error">⚠ Prediction failed: ${err.message}</div>`;
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = 'Run Prediction';
+  }
 }
 
-// ── Chart 4: Overhead Comparison ─────────────────────────────
-function renderOverheadChart() {
-    const ctx = document.getElementById('chartOverhead').getContext('2d');
+function renderPrediction(result) {
+  const isDiabetic = result.prediction === 1;
+  const conf       = result.confidence.toFixed(1);
+  const pDia       = result.prob_diabetic.toFixed(1);
+  const pHlt       = result.prob_healthy.toFixed(1);
 
-    const configs = [];
-    const avgWallTimes = [];
-    const avgEncOverheads = [];
-    const barColors = [];
+  // Feature risk rows (top 3)
+  const riskRows = (result.top_features || []).slice(0, 3).map(([name, info]) => {
+    const score = info.risk_score || 0;
+    const pct   = Math.min(Math.abs(score) * 120, 100).toFixed(0);
+    const up    = score > 0;
+    return `<div class="risk-row">
+      <span class="risk-name">${name}</span>
+      <div class="risk-bar-track">
+        <div class="risk-bar-fill ${up ? 'risk--up' : 'risk--down'}" style="width:${pct}%"></div>
+      </div>
+      <span class="risk-score ${up ? 'risk--up' : 'risk--down'}">${up ? '↑' : '↓'} ${Math.abs(score).toFixed(3)}</span>
+    </div>`;
+  }).join('');
 
-    Object.keys(LABELS).forEach(key => {
-        if (!datasets[key]) return;
-        const d = datasets[key];
-        configs.push(LABELS[key]);
-        avgWallTimes.push(+(d.reduce((s, r) => s + r.wall_time_s, 0) / d.length).toFixed(1));
-        avgEncOverheads.push(+(d.reduce((s, r) => s + r.enc_overhead_s, 0) / d.length).toFixed(3));
-        barColors.push(COLORS[key].main);
-    });
+  $('predict-result').innerHTML = `
+    <div class="result-inner">
+      <div class="result-badge ${isDiabetic ? 'badge--diabetic' : 'badge--healthy'}">
+        ${isDiabetic ? '⚠ DIABETIC' : '✓ NOT DIABETIC'}
+      </div>
 
-    chartInstances.chartOverhead = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: configs,
-            datasets: [
-                {
-                    label: 'Avg Wall Time (s)',
-                    data: avgWallTimes,
-                    backgroundColor: barColors.map(c => c + '99'),
-                    borderColor: barColors,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                },
-                {
-                    label: 'Avg Enc Overhead (s)',
-                    data: avgEncOverheads,
-                    backgroundColor: barColors.map(c => c + '44'),
-                    borderColor: barColors,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                },
-            ],
-        },
-        options: {
-            ...CHART_DEFAULTS,
-            scales: {
-                ...CHART_DEFAULTS.scales,
-                y: {
-                    ...CHART_DEFAULTS.scales.y,
-                    title: { display: true, text: 'Time (seconds)', color: '#64748b',
-                             font: { family: "'Inter', sans-serif", size: 12, weight: '500' } },
-                },
-            },
-        },
-    });
+      <div class="result-conf">
+        Confidence <span class="mono">${conf}%</span>
+      </div>
+
+      <div class="prob-wrap">
+        <div class="prob-bar">
+          <div class="prob-seg prob--healthy" style="width:${pHlt}%"></div>
+          <div class="prob-seg prob--diabetic" style="width:${pDia}%"></div>
+        </div>
+        <div class="prob-labels">
+          <span class="prob-lbl prob-lbl--healthy">Healthy ${pHlt}%</span>
+          <span class="prob-lbl prob-lbl--diabetic">Diabetic ${pDia}%</span>
+        </div>
+      </div>
+
+      <div class="risk-section">
+        <p class="risk-title">Top Risk Factors</p>
+        ${riskRows || '<p class="dim">No feature data available.</p>'}
+      </div>
+
+      <button class="btn btn--explain" id="btn-explain" onclick="explainPrediction()">
+        ✦ Explain with Claude AI
+      </button>
+      <div id="expl-wrap"></div>
+    </div>`;
 }
 
-// ── Chart 5: Communication Cost ──────────────────────────────
-function renderCommChart() {
-    const ctx = document.getElementById('chartComm').getContext('2d');
+// ─── CLAUDE EXPLANATION ───────────────────────────────────────────────────────
+async function explainPrediction() {
+  if (!S.lastPrediction) return;
+  const btn  = $('btn-explain');
+  const wrap = $('expl-wrap');
 
-    const configs = [];
-    const commMB = [];
-    const barColors = [];
+  btn.disabled    = true;
+  btn.textContent = '✦ Generating…';
+  wrap.innerHTML  =
+    '<div class="expl-loading"><span class="spinner"></span> Claude is thinking…</div>';
 
-    Object.keys(LABELS).forEach(key => {
-        if (!datasets[key]) return;
-        const d = datasets[key];
-        configs.push(LABELS[key]);
-        commMB.push(+(d[0].comm_bytes / (1024 * 1024)).toFixed(2));
-        barColors.push(COLORS[key].main);
+  try {
+    const { explanation } = await api('/api/explain', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ features: S.lastFeatures, ...S.lastPrediction }),
     });
 
-    chartInstances.chartComm = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: configs,
-            datasets: [{
-                label: 'Communication per Round (MB)',
-                data: commMB,
-                backgroundColor: barColors.map(c => c + '99'),
-                borderColor: barColors,
-                borderWidth: 2,
-                borderRadius: 6,
-            }],
-        },
-        options: {
-            ...CHART_DEFAULTS,
-            scales: {
-                ...CHART_DEFAULTS.scales,
-                y: {
-                    ...CHART_DEFAULTS.scales.y,
-                    title: { display: true, text: 'Communication (MB)', color: '#64748b',
-                             font: { family: "'Inter', sans-serif", size: 12, weight: '500' } },
-                },
-            },
-        },
-    });
+    wrap.innerHTML = `
+      <div class="expl-card">
+        <div class="expl-hdr">
+          <span class="expl-icon">✦</span>
+          <span>Claude AI Explanation</span>
+        </div>
+        <p class="expl-body">${explanation.replace(/\n/g, '<br>')}</p>
+        <p class="expl-disclaimer">
+          ⚕ This is an AI screening tool only — not a medical diagnosis.
+          Please consult a qualified physician for any health concerns.
+        </p>
+      </div>`;
+
+    btn.textContent = '✦ Re-explain';
+    btn.disabled    = false;
+
+  } catch (err) {
+    const needsKey = err.message.toLowerCase().includes('key') ||
+                     err.message.toLowerCase().includes('configured');
+    wrap.innerHTML = `<div class="expl-error">
+      ${needsKey
+        ? `⚠ Claude API key not set.<br>Add <code>"claude_api_key": "sk-ant-…"</code>
+           under <code>"dashboard"</code> in <code>config.json</code>.`
+        : `⚠ ${err.message}`}
+    </div>`;
+    btn.disabled    = false;
+    btn.textContent = '✦ Retry';
+  }
 }
 
-// ── Chart 6: Resource Footprint ──────────────────────────────
-function renderResourceChart() {
-    const ctx = document.getElementById('chartResource').getContext('2d');
-    const dsets = [];
+// ─── AUDIT LOG ────────────────────────────────────────────────────────────────
+const LEVEL_CLS = { INFO: 'log--info', WARNING: 'log--warn', ERROR: 'log--err', DEBUG: 'log--dbg', RAW: 'log--raw' };
 
-    Object.keys(LABELS).forEach(key => {
-        if (!datasets[key]) return;
-        const color = COLORS[key];
-        dsets.push({
-            label: LABELS[key] + ' (CPU%)',
-            data: datasets[key].map(d => d.cpu_pct),
-            borderColor: color.border,
-            backgroundColor: color.bg,
-            borderWidth: 1.5,
-            pointRadius: 2,
-            tension: 0.3,
-            fill: true,
-            yAxisID: 'y',
-        });
-    });
+async function refreshAudit() {
+  try {
+    const { entries, count } = await api('/api/audit?limit=60');
+    $('audit-count').textContent = `${count} entries`;
 
-    const maxRounds = Math.max(...Object.values(datasets).map(d => d.length));
-    const labels = Array.from({ length: maxRounds }, (_, i) => i + 1);
-
-    chartInstances.chartResource = new Chart(ctx, {
-        type: 'line',
-        data: { labels, datasets: dsets },
-        options: {
-            ...CHART_DEFAULTS,
-            scales: {
-                x: {
-                    ...CHART_DEFAULTS.scales.x,
-                    title: { display: true, text: 'FL Round', color: '#64748b',
-                             font: { family: "'Inter', sans-serif", size: 12, weight: '500' } },
-                },
-                y: {
-                    ...CHART_DEFAULTS.scales.y,
-                    position: 'left',
-                    title: { display: true, text: 'CPU %', color: '#64748b',
-                             font: { family: "'Inter', sans-serif", size: 12, weight: '500' } },
-                },
-            },
-        },
-    });
-}
-
-// ── Summary Table ────────────────────────────────────────────
-function renderSummaryTable() {
-    const tbody = document.getElementById('summaryTableBody');
-    tbody.innerHTML = '';
-
-    let baselineAcc = null;
-    if (datasets.baseline) {
-        const d = datasets.baseline;
-        baselineAcc = d[d.length - 1].eval_acc;
+    if (!entries.length) {
+      $('audit-log').innerHTML = '<div class="empty-state">No log entries yet.</div>';
+      return;
     }
 
-    Object.keys(LABELS).forEach(key => {
-        if (!datasets[key]) return;
-        const d = datasets[key];
-        const n = d.length;
-        const finalAcc = d[n - 1].eval_acc;
-        const bestAcc = Math.max(...d.map(r => r.eval_acc));
-        const accDrop = baselineAcc !== null ? ((baselineAcc - finalAcc) * 100) : 0;
-        const avgWall = d.reduce((s, r) => s + r.wall_time_s, 0) / n;
-        const avgEnc = d.reduce((s, r) => s + r.enc_overhead_s, 0) / n;
-        const avgComm = d[0].comm_bytes / (1024 * 1024);
-        const finalLoss = d[n - 1].eval_loss;
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${LABELS[key]}</td>
-            <td>${(finalAcc * 100).toFixed(2)}</td>
-            <td>${(bestAcc * 100).toFixed(2)}</td>
-            <td>${key === 'baseline' ? '—' : (accDrop >= 0 ? '+' : '') + accDrop.toFixed(2)}</td>
-            <td>${avgWall.toFixed(1)}</td>
-            <td>${avgEnc.toFixed(3)}</td>
-            <td>${avgComm.toFixed(2)}</td>
-            <td>${finalLoss.toFixed(4)}</td>
-        `;
-        tbody.appendChild(tr);
-    });
+    $('audit-log').innerHTML = entries.map(e => {
+      const lvl  = e.level || 'INFO';
+      const cls  = LEVEL_CLS[lvl] || 'log--info';
+      const time = (e.time || '').split(',')[0];               // drop milliseconds
+      const msg  = (e.msg || '').replace(/^"|"$/g, '');        // strip JSON outer quotes
+      return `<div class="log-row ${cls}">
+        <span class="log-time mono">${time}</span>
+        <span class="log-lvl">${lvl}</span>
+        <span class="log-msg">${msg}</span>
+      </div>`;
+    }).join('');
+  } catch (err) {
+    console.warn('Audit poll error:', err.message);
+  }
 }
 
-// ── Hero Stats Update ────────────────────────────────────────
-function updateHeroStats() {
-    // Best accuracy across all configs
-    let bestAcc = 0;
-    let bestConfig = '';
-    Object.keys(datasets).forEach(key => {
-        const d = datasets[key];
-        const maxAcc = Math.max(...d.map(r => r.eval_acc));
-        if (maxAcc > bestAcc) {
-            bestAcc = maxAcc;
-            bestConfig = key;
-        }
-    });
-    document.getElementById('statAccuracy').textContent = (bestAcc * 100).toFixed(2) + '%';
+// ─── STATUS BAR ───────────────────────────────────────────────────────────────
+function updateStatus(ring, metrics) {
+  const online  = ring.nodes.filter(n => n.online).length;
+  const total   = ring.nodes.length;
+  const round   = metrics.current_round || 0;
+  const totalR  = metrics.total_rounds  || S.config?.rounds || 20;
 
-    // Privacy budget (lowest ε used)
-    const epsilons = [];
-    if (datasets.he_eps10) epsilons.push(10);
-    if (datasets.he_eps20) epsilons.push(20);
-    if (datasets.he_eps50) epsilons.push(50);
-    document.getElementById('statPrivacy').textContent =
-        epsilons.length > 0 ? 'ε=' + Math.min(...epsilons) : '—';
+  $('txt-round').textContent = `${round}/${totalR}`;
 
-    // Average HE overhead
-    let totalEnc = 0, encCount = 0;
-    ['he_eps10', 'he_eps20', 'he_eps50', 'ring'].forEach(key => {
-        if (!datasets[key]) return;
-        datasets[key].forEach(r => { totalEnc += r.enc_overhead_s; encCount++; });
-    });
-    document.getElementById('statOverhead').textContent =
-        encCount > 0 ? (totalEnc / encCount).toFixed(3) + 's' : '—';
-
-    // Accuracy drop (best HE vs baseline)
-    if (datasets.baseline) {
-        const bAcc = datasets.baseline[datasets.baseline.length - 1].eval_acc;
-        let minDrop = Infinity;
-        ['he_eps10', 'he_eps20', 'he_eps50'].forEach(key => {
-            if (!datasets[key]) return;
-            const hAcc = datasets[key][datasets[key].length - 1].eval_acc;
-            const drop = Math.abs(bAcc - hAcc) * 100;
-            if (drop < minDrop) minDrop = drop;
-        });
-        document.getElementById('statDrop').textContent =
-            minDrop !== Infinity ? minDrop.toFixed(2) + '%' : '—';
-    }
+  if (online === 0)              setStatus('All nodes offline', 'error');
+  else if (round >= totalR && round > 0) setStatus(`Training complete — ${online}/${total} online`, 'ok');
+  else if (round > 0)            setStatus(`Training · round ${round}/${totalR}`, 'training');
+  else                           setStatus(`${online}/${total} nodes online · waiting`, 'idle');
 }
 
-// ── Export Chart as PNG ──────────────────────────────────────
-function exportChart(chartId) {
-    const canvas = document.getElementById(chartId);
-    if (!canvas) return;
-
-    // Create a temporary canvas with white background for paper
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = canvas.width * 2;
-    tempCanvas.height = canvas.height * 2;
-    const tempCtx = tempCanvas.getContext('2d');
-
-    // White background for publication
-    tempCtx.fillStyle = '#ffffff';
-    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-
-    // Scale up for high DPI
-    tempCtx.scale(2, 2);
-    tempCtx.drawImage(canvas, 0, 0);
-
-    const link = document.createElement('a');
-    link.download = `securefedhe_${chartId}.png`;
-    link.href = tempCanvas.toDataURL('image/png', 1.0);
-    link.click();
+// ─── POLLING ─────────────────────────────────────────────────────────────────
+async function pollRing() {
+  try {
+    const ring = await api('/api/ring');
+    S.ringNodes = ring.nodes;
+    renderRing(ring.nodes, ring.total_rounds);
+    updateStatus(ring, S.metrics);
+  } catch {
+    setStatus('Dashboard backend unreachable', 'error');
+  }
 }
+
+async function pollMetrics() {
+  try {
+    const metrics = await api('/api/metrics');
+    updateAccuracyChart(metrics);
+    updateStatus({ nodes: S.ringNodes }, metrics);
+  } catch (err) {
+    console.warn('Metrics poll error:', err.message);
+  }
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+async function init() {
+  setStatus('Connecting…', 'idle');
+  try {
+    S.config = await api('/api/config');
+    $('txt-eps').textContent = S.config.epsilon;
+
+    initAccuracyChart();
+
+    const [ring, metrics, dist] = await Promise.all([
+      api('/api/ring'),
+      api('/api/metrics'),
+      api('/api/distribution'),
+    ]);
+
+    S.ringNodes    = ring.nodes;
+    S.distribution = dist.hospitals;
+
+    renderRing(ring.nodes, ring.total_rounds);
+    updateAccuracyChart(metrics);
+    updateStatus(ring, metrics);
+    renderDistChart(dist.hospitals);
+    await refreshAudit();
+
+    // Start polling loops
+    setInterval(pollRing,     POLL_RING_MS);
+    setInterval(pollMetrics,  POLL_METRICS_MS);
+    setInterval(refreshAudit, POLL_AUDIT_MS);
+
+  } catch (err) {
+    setStatus('Cannot reach dashboard backend', 'error');
+    console.error('[SecureFedHE] init error:', err);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', init);
