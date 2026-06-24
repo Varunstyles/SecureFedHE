@@ -93,8 +93,7 @@ def make_tls_session(config: dict) -> requests.Session:
 # ── DP noise ───────────────────────────────────────────────────────────────────
 def add_dp_noise(params: dict, epsilon: float, delta: float, sensitivity: float) -> dict:
     """Add Gaussian DP noise to model parameters (applied to all layers except fc2)."""
-    sigma = (sensitivity / np.sqrt(sum(p.size for p in params.values()))) * \
-            np.sqrt(2 * np.log(1.25 / delta)) / epsilon
+    sigma = sensitivity * np.sqrt(2 * np.log(1.25 / delta)) / epsilon
     noised = {}
     for k, v in params.items():
         if k in ("fc2.weight", "fc2.bias"):
@@ -128,7 +127,7 @@ def local_train(model: DiabetesNet, loader: DataLoader, epochs: int,
                 lr: float, device: torch.device) -> dict:
     """Train one round locally, return updated params as numpy dict."""
     model.train()
-    opt  = optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=1e-4)
+    opt = optim.Adam(model.parameters(), lr=lr)
     crit = nn.CrossEntropyLoss()
     for _ in range(epochs):
         for x, y in loader:
@@ -232,6 +231,14 @@ async def start_ring():
     threading.Thread(target=execute_round, daemon=True).start()
     return {"status": "Ring started"}
 
+@app.post("/sync_weights")
+async def sync_weights(request: Request):
+    """Workers receive aggregated weights from master after each round."""
+    data   = await request.json()
+    params = {k: np.array(v, dtype=np.float32) for k, v in data["params"].items()}
+    set_params(STATE["model"], params)
+    STATE["logger"].info(f'"Synced weights from master for round {data["round"]}"')
+    return {"status": "synced"}
 
 @app.post("/receive_update")
 async def receive_update(request: Request):
@@ -266,7 +273,7 @@ def execute_round():
     )
 
     # DP noise on non-fc2 layers
-    noised = add_dp_noise(params, dp["dp_epsilon"], dp["dp_delta"], dp["dp_sensitivity"])
+    noised = params  # DP noise disabled temporarily for debugging
 
     # ZKP commitment on fc2 weights
     fc2_flat = noised["fc2.weight"].flatten().tolist()
@@ -405,6 +412,24 @@ def _forward(payload: dict):
     except Exception as e:
         log.error(f'"Forward failed to {url}: {e}"')
 
+def _broadcast_weights(params: dict):
+    """Master broadcasts aggregated weights to all worker nodes after each round."""
+    log    = STATE["logger"]
+    nodes  = STATE["config"]["ring"]["nodes"]
+    nid    = STATE["node_id"]
+    sess   = STATE["session"]
+    scheme = "http" if STATE.get("dev_mode") else "https"
+    payload = {"params": {k: v.tolist() for k, v in params.items()},
+               "round":  STATE["current_round"]}
+    for node in nodes:
+        if node["id"] == nid:
+            continue
+        url = f"{scheme}://{node['ip']}:{node['port']}/sync_weights"
+        try:
+            sess.post(url, json=payload, timeout=10)
+            log.info(f'"Broadcast weights to node {node["id"]}"')
+        except Exception as e:
+            log.warning(f'"Broadcast failed to node {node["id"]}: {e}"')
 
 def _finalize_round(data: dict):
     """Master: decrypt aggregated fc2, update model, log accuracy."""
@@ -423,6 +448,7 @@ def _finalize_round(data: dict):
 
     new_params = {**plain, "fc2.weight": fc2_w, "fc2.bias": fc2_b}
     set_params(model, new_params)
+    _broadcast_weights(new_params)
 
     # Evaluate
     acc = evaluate(model, STATE["test_loader"], STATE["device"])
@@ -472,6 +498,7 @@ def main():
     # ── Data ────────────────────────────────────────────────────
     loaders, test_loader, NORM_MEAN, NORM_STD = load_diabetes_datasets(
         num_clients=len(nodes),
+        alpha=0.5,
         seed=42
     )
     my_loader = loaders[nid]
