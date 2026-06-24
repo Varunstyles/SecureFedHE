@@ -73,7 +73,7 @@ echo.
 
 :: ── Step 1: Check Python ──────────────────────────────────────────────────
 echo [1/6] Checking Python installation...
-python --version >nul 2>&1
+py --version >nul 2>&1
 if errorlevel 1 (
     echo.
     echo  ERROR: Python not found.
@@ -84,7 +84,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-for /f "tokens=2 delims= " %%v in ('python --version 2^>^&1') do set PYVER=%%v
+for /f "tokens=2 delims= " %%v in ('py --version 2^>^&1') do set PYVER=%%v
 for /f "tokens=1,2 delims=." %%a in ("%PYVER%") do (
     set PY_MAJOR=%%a
     set PY_MINOR=%%b
@@ -103,7 +103,7 @@ echo  OK  Python %PYVER%
 echo.
 echo [2/6] Setting up virtual environment...
 if not exist ".venv" (
-    python -m venv .venv
+    py -m venv .venv
     if errorlevel 1 (
         echo  ERROR: Could not create virtual environment.
         pause & exit /b 1
@@ -126,8 +126,8 @@ echo.
 echo [3/6] Installing Python dependencies...
 echo  This may take 2-5 minutes on first run.
 echo.
-python -m pip install --upgrade pip --quiet
-pip install -r requirements.txt --quiet
+py -m pip install --upgrade pip --quiet
+py -m pip install -r requirements.txt --quiet
 if errorlevel 1 (
     echo.
     echo  ERROR: pip install failed. Check your internet connection.
@@ -146,7 +146,7 @@ if "%DEV_MODE%"=="1" (
 
 if "%IS_MASTER%"=="1" (
     echo  Generating mTLS certificates ^(master PC only^)...
-    python generate_certs.py
+    py generate_certs.py
     if errorlevel 1 (
         echo  ERROR: Certificate generation failed.
         pause & exit /b 1
@@ -217,7 +217,7 @@ if "%DEV_MODE%"=="0" (
 echo.
 echo [6/6] Creating desktop shortcuts...
 set DESKTOP=%USERPROFILE%\Desktop
-set VENV_PYTHON=%CD%\.venv\Scripts\python.exe
+set VENV_PYTHON=%CD%\.venv\Scripts\py.exe
 set LAUNCH_DIR=%CD%
 
 :: Shortcut: Start This Node
@@ -228,9 +228,9 @@ set SHORTCUT_NODE=%DESKTOP%\Start SecureFedHE Node %NODE_ID%.bat
     echo cd /d "%LAUNCH_DIR%"
     echo call .venv\Scripts\activate.bat
     if "%DEV_MODE%"=="1" (
-        echo python launch.py --id %NODE_ID% --dev
+        echo py launch.py --id %NODE_ID% --dev
     ) else (
-        echo python launch.py --id %NODE_ID%
+        echo py launch.py --id %NODE_ID%
     )
     echo pause
 ) > "%SHORTCUT_NODE%"
@@ -245,9 +245,9 @@ if "%NODE_ID%"=="0" (
         echo cd /d "%LAUNCH_DIR%"
         echo call .venv\Scripts\activate.bat
         if "%DEV_MODE%"=="1" (
-            echo python dashboard\dashboard.py --dev
+            echo py dashboard\dashboard.py --dev
         ) else (
-            echo python dashboard\dashboard.py
+            echo py dashboard\dashboard.py
         )
         echo pause
     ) > "%SHORTCUT_DASH%"
