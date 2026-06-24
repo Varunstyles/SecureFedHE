@@ -1,0 +1,71 @@
+{"time":"2026-06-24 14:18:40,389","level":"INFO","node":1,"msg":"Starting node 1: Suburban Medical Clinic"}
+{"time":"2026-06-24 14:20:55,365","level":"INFO","node":1,"msg":"Starting node 1: Suburban Medical Clinic"}
+{"time":"2026-06-24 14:29:58,808","level":"INFO","node":1,"msg":"Starting node 1: Suburban Medical Clinic"}
+{"time":"2026-06-24 14:30:13,261","level":"WARNING","node":1,"msg":"DEV MODE: running without TLS"}
+{"time":"2026-06-24 14:30:13,261","level":"INFO","node":1,"msg":"Listening on 127.0.0.1:8001 | TLS=False"}
+{"time":"2026-06-24 14:33:16,538","level":"INFO","node":1,"msg":"Starting node 1: Suburban Medical Clinic"}
+{"time":"2026-06-24 14:33:20,751","level":"WARNING","node":1,"msg":"DEV MODE: running without TLS"}
+{"time":"2026-06-24 14:33:20,752","level":"INFO","node":1,"msg":"Listening on 127.0.0.1:8001 | TLS=False"}
+{"time":"2026-06-24 14:49:35,625","level":"INFO","node":1,"msg":"Starting node 1: Suburban Medical Clinic"}
+{"time":"2026-06-24 14:49:39,603","level":"WARNING","node":1,"msg":"DEV MODE: running without TLS"}
+{"time":"2026-06-24 14:49:39,604","level":"INFO","node":1,"msg":"Listening on 127.0.0.1:8001 | TLS=False"}
+{"time":"2026-06-24 14:49:51,860","level":"INFO","node":1,"msg":"Received update from node 0, round 0"}
+{"time":"2026-06-24 14:49:51,916","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:49:55,816","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:50:11,285","level":"INFO","node":1,"msg":"Received update from node 0, round 1"}
+{"time":"2026-06-24 14:50:11,334","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:50:13,627","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:50:23,767","level":"INFO","node":1,"msg":"Received update from node 0, round 2"}
+{"time":"2026-06-24 14:50:23,823","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:50:26,015","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:50:36,261","level":"INFO","node":1,"msg":"Received update from node 0, round 3"}
+{"time":"2026-06-24 14:50:36,312","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:50:38,474","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:50:48,422","level":"INFO","node":1,"msg":"Received update from node 0, round 4"}
+{"time":"2026-06-24 14:50:48,484","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:50:50,710","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:51:00,117","level":"INFO","node":1,"msg":"Received update from node 0, round 5"}
+{"time":"2026-06-24 14:51:00,162","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:51:02,108","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:51:11,241","level":"INFO","node":1,"msg":"Received update from node 0, round 6"}
+{"time":"2026-06-24 14:51:11,288","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:51:13,243","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:51:22,235","level":"INFO","node":1,"msg":"Received update from node 0, round 7"}
+{"time":"2026-06-24 14:51:22,287","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:51:24,226","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:51:33,085","level":"INFO","node":1,"msg":"Received update from node 0, round 8"}
+{"time":"2026-06-24 14:51:33,130","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:51:35,041","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:51:43,880","level":"INFO","node":1,"msg":"Received update from node 0, round 9"}
+{"time":"2026-06-24 14:51:43,927","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:51:45,826","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:51:55,020","level":"INFO","node":1,"msg":"Received update from node 0, round 10"}
+{"time":"2026-06-24 14:51:55,066","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:51:56,961","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:52:06,072","level":"INFO","node":1,"msg":"Received update from node 0, round 11"}
+{"time":"2026-06-24 14:52:06,115","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:52:08,100","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:52:17,208","level":"INFO","node":1,"msg":"Received update from node 0, round 12"}
+{"time":"2026-06-24 14:52:17,253","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:52:19,301","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:52:28,279","level":"INFO","node":1,"msg":"Received update from node 0, round 13"}
+{"time":"2026-06-24 14:52:28,325","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:52:30,304","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:52:39,536","level":"INFO","node":1,"msg":"Received update from node 0, round 14"}
+{"time":"2026-06-24 14:52:39,585","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:52:41,543","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:52:50,668","level":"INFO","node":1,"msg":"Received update from node 0, round 15"}
+{"time":"2026-06-24 14:52:50,717","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:52:52,753","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:53:01,705","level":"INFO","node":1,"msg":"Received update from node 0, round 16"}
+{"time":"2026-06-24 14:53:01,751","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:53:03,725","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:53:12,755","level":"INFO","node":1,"msg":"Received update from node 0, round 17"}
+{"time":"2026-06-24 14:53:12,804","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:53:14,873","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:53:23,768","level":"INFO","node":1,"msg":"Received update from node 0, round 18"}
+{"time":"2026-06-24 14:53:23,812","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:53:25,754","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
+{"time":"2026-06-24 14:53:35,086","level":"INFO","node":1,"msg":"Received update from node 0, round 19"}
+{"time":"2026-06-24 14:53:35,135","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
+{"time":"2026-06-24 14:53:37,127","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}

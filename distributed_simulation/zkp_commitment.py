@@ -42,7 +42,7 @@ Usage:
         # Fix-1 skip protocol
         forward_to_next_node(skip=True)
 """
-
+# -*- coding: utf-8 -*-
 import os
 import json
 import time
@@ -51,8 +51,9 @@ import logging
 from typing import Tuple, Dict, Any, Optional
 
 # ── Import ZKP Engine ──
-from zkp_engine import ZKPEngine, CommitmentPackage, ZKProof
-from zkp_math import poseidon_hash, quantize, norm_sq_int, threshold_sq_int, Fr
+from distributed_simulation.zkp_engine import ZKPEngine, CommitmentPackage, ZKProof
+from distributed_simulation.zkp_math import poseidon_hash, quantize, norm_sq_int, threshold_sq_int, Fr
+
 
 logger = logging.getLogger("SecureFedHE.ZKP")
 

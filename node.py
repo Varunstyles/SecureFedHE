@@ -24,6 +24,7 @@ Or use launch.py which handles all the above automatically.
 """
 
 import os
+os.environ["PYTHONIOENCODING"] = "utf-8"
 import sys
 import json
 import time
@@ -51,7 +52,7 @@ ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
 from models.diabetes_net import DiabetesNet
-from data.diabetes_loader import load_diabetes_federated
+from data.diabetes_loader import load_diabetes_datasets
 from distributed_simulation.zkp_commitment import (
     zkp_ring_setup, generate_commitment, verify_commitment, generate_node_keypair
 )
@@ -183,6 +184,7 @@ STATE = {
     "current_round": 0,
     "is_master":     False,
     "zkp_ready":     False,
+    "dev_mode": False,
 }
 
 
@@ -191,7 +193,8 @@ def get_successor_url() -> str:
     nid     = STATE["node_id"]
     n       = len(nodes)
     succ    = nodes[(nid + 1) % n]
-    return f"https://{succ['ip']}:{succ['port']}"
+    scheme  = "http" if STATE.get("dev_mode") else "https"
+    return f"{scheme}://{succ['ip']}:{succ['port']}"
 
 
 def get_node_url(node_id: int) -> str:
@@ -467,8 +470,8 @@ def main():
     STATE["zkp_ready"] = True
 
     # ── Data ────────────────────────────────────────────────────
-    loaders, test_loader = load_diabetes_federated(
-        n_hospitals=len(nodes),
+    loaders, test_loader, NORM_MEAN, NORM_STD = load_diabetes_datasets(
+        num_clients=len(nodes),
         seed=42
     )
     my_loader = loaders[nid]
@@ -478,13 +481,13 @@ def main():
     mcfg   = config["model"]
     model  = DiabetesNet(
         input_dim=mcfg["input_dim"],
-        hidden_dim=mcfg["hidden_dim"],
-        output_dim=mcfg["output_dim"]
+        num_classes=mcfg["output_dim"]
     ).to(device)
 
     # ── State ───────────────────────────────────────────────────
     STATE.update({
         "node_id":     nid,
+        "dev_mode": args.dev,
         "config":      config,
         "model":       model,
         "loader":      my_loader,

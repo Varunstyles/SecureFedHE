@@ -14,7 +14,7 @@ The circuit encodes two constraints:
 A valid proof means: "I know a gradient that hashes to this commitment
 AND satisfies the norm bound" — without revealing the gradient itself.
 """
-
+# -*- coding: utf-8 -*-
 import hashlib
 import secrets
 import json
@@ -22,7 +22,7 @@ import time
 from dataclasses import dataclass, field, asdict
 from typing import List, Tuple, Optional
 
-from zkp_math import (
+from distributed_simulation.zkp_math import (
     Fr, G1,
     fr_add, fr_sub, fr_mul, fr_neg, fr_inv, fr_div, fr_pow,
     point_add, point_mul, point_neg, point_on_curve,
@@ -149,7 +149,7 @@ class NormBoundCircuit:
         # Check norm bound BEFORE generating proof
         if ns > self.norm_sq_bound:
             raise ValueError(
-                f"Gradient norm violation: ‖g‖²={ns} > bound={self.norm_sq_bound}. "
+                f"Gradient norm violation: norm_sq={ns} > bound={self.norm_sq_bound}. "
                 f"Apply gradient clipping (C={self.C}) before proving."
             )
         
@@ -304,7 +304,7 @@ class TrustedSetup:
         
         elapsed = time.time() - t0
         print(f"[TrustedSetup] Done in {elapsed:.2f}s — keys generated for {cid}")
-        print(f"[TrustedSetup] Toxic waste discarded. α={alpha % 10**6}... (truncated)")
+        print(f"[TrustedSetup] Toxic waste discarded. alpha={alpha % 10**6}... (truncated)")
         
         return pk, vk
 

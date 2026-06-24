@@ -3,7 +3,7 @@ zkp_math.py — SecureFedHE Phase 1
 Core finite field arithmetic and elliptic curve primitives for zk-SNARK implementation.
 Uses BN128 (alt_bn128) — same curve as Ethereum, Circom, snarkjs.
 """
-
+# -*- coding: utf-8 -*-
 import hashlib
 from typing import Tuple, Optional
 

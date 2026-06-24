@@ -1,0 +1,121 @@
+{"time":"2026-06-24 13:39:16,989","level":"INFO","node":0,"msg":"Starting node 0: City General Hospital"}
+{"time":"2026-06-24 13:41:12,058","level":"INFO","node":0,"msg":"Starting node 0: City General Hospital"}
+{"time":"2026-06-24 13:43:07,507","level":"INFO","node":0,"msg":"Starting node 0: City General Hospital"}
+{"time":"2026-06-24 14:02:52,188","level":"INFO","node":0,"msg":"Starting node 0: City General Hospital"}
+{"time":"2026-06-24 14:03:02,066","level":"WARNING","node":0,"msg":"DEV MODE: running without TLS"}
+{"time":"2026-06-24 14:03:02,066","level":"INFO","node":0,"msg":"Listening on 192.168.1.101:8000 | TLS=False"}
+{"time":"2026-06-24 14:30:17,290","level":"INFO","node":0,"msg":"Starting node 0: City General Hospital"}
+{"time":"2026-06-24 14:30:29,073","level":"WARNING","node":0,"msg":"DEV MODE: running without TLS"}
+{"time":"2026-06-24 14:30:29,073","level":"INFO","node":0,"msg":"Listening on 127.0.0.1:8000 | TLS=False"}
+{"time":"2026-06-24 14:30:29,198","level":"INFO","node":0,"msg":"Starting round 1"}
+{"time":"2026-06-24 14:30:32,157","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Expected gradient dim 128, got 32"}
+{"time":"2026-06-24 14:33:25,469","level":"INFO","node":0,"msg":"Starting node 0: City General Hospital"}
+{"time":"2026-06-24 14:33:28,667","level":"WARNING","node":0,"msg":"DEV MODE: running without TLS"}
+{"time":"2026-06-24 14:33:28,667","level":"INFO","node":0,"msg":"Listening on 127.0.0.1:8000 | TLS=False"}
+{"time":"2026-06-24 14:33:28,872","level":"INFO","node":0,"msg":"Starting round 1"}
+{"time":"2026-06-24 14:33:32,291","level":"ERROR","node":0,"msg":"Forward failed to https://127.0.0.1:8001: HTTPSConnectionPool(host='127.0.0.1', port=8001): Max retries exceeded with url: /receive_update (Caused by SSLError(SSLError(1, '[SSL: WRONG_VERSION_NUMBER] wrong version number (_ssl.c:1081)')))"}
+{"time":"2026-06-24 14:49:43,925","level":"INFO","node":0,"msg":"Starting node 0: City General Hospital"}
+{"time":"2026-06-24 14:49:47,155","level":"WARNING","node":0,"msg":"DEV MODE: running without TLS"}
+{"time":"2026-06-24 14:49:47,155","level":"INFO","node":0,"msg":"Listening on 127.0.0.1:8000 | TLS=False"}
+{"time":"2026-06-24 14:49:47,430","level":"INFO","node":0,"msg":"Starting round 1"}
+{"time":"2026-06-24 14:49:49,320","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=27017201696626 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-06-24 14:49:51,861","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:50:08,361","level":"INFO","node":0,"msg":"Received update from node 4, round 0"}
+{"time":"2026-06-24 14:50:08,362","level":"INFO","node":0,"msg":"Round 1 complete — aggregating"}
+{"time":"2026-06-24 14:50:08,393","level":"INFO","node":0,"msg":"Round 1 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:50:08,894","level":"INFO","node":0,"msg":"Starting round 2"}
+{"time":"2026-06-24 14:50:11,286","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:50:21,189","level":"INFO","node":0,"msg":"Received update from node 4, round 1"}
+{"time":"2026-06-24 14:50:21,190","level":"INFO","node":0,"msg":"Round 2 complete — aggregating"}
+{"time":"2026-06-24 14:50:21,200","level":"INFO","node":0,"msg":"Round 2 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:50:21,701","level":"INFO","node":0,"msg":"Starting round 3"}
+{"time":"2026-06-24 14:50:23,786","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:50:33,562","level":"INFO","node":0,"msg":"Received update from node 4, round 2"}
+{"time":"2026-06-24 14:50:33,562","level":"INFO","node":0,"msg":"Round 3 complete — aggregating"}
+{"time":"2026-06-24 14:50:33,567","level":"INFO","node":0,"msg":"Round 3 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:50:34,068","level":"INFO","node":0,"msg":"Starting round 4"}
+{"time":"2026-06-24 14:50:36,297","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:50:45,771","level":"INFO","node":0,"msg":"Received update from node 4, round 3"}
+{"time":"2026-06-24 14:50:45,771","level":"INFO","node":0,"msg":"Round 4 complete — aggregating"}
+{"time":"2026-06-24 14:50:45,777","level":"INFO","node":0,"msg":"Round 4 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:50:46,279","level":"INFO","node":0,"msg":"Starting round 5"}
+{"time":"2026-06-24 14:50:48,437","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:50:57,611","level":"INFO","node":0,"msg":"Received update from node 4, round 4"}
+{"time":"2026-06-24 14:50:57,611","level":"INFO","node":0,"msg":"Round 5 complete — aggregating"}
+{"time":"2026-06-24 14:50:57,618","level":"INFO","node":0,"msg":"Round 5 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:50:58,119","level":"INFO","node":0,"msg":"Starting round 6"}
+{"time":"2026-06-24 14:51:00,144","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:51:08,676","level":"INFO","node":0,"msg":"Received update from node 4, round 5"}
+{"time":"2026-06-24 14:51:08,676","level":"INFO","node":0,"msg":"Round 6 complete — aggregating"}
+{"time":"2026-06-24 14:51:08,680","level":"INFO","node":0,"msg":"Round 6 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:51:09,180","level":"INFO","node":0,"msg":"Starting round 7"}
+{"time":"2026-06-24 14:51:11,267","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:51:19,715","level":"INFO","node":0,"msg":"Received update from node 4, round 6"}
+{"time":"2026-06-24 14:51:19,715","level":"INFO","node":0,"msg":"Round 7 complete — aggregating"}
+{"time":"2026-06-24 14:51:19,724","level":"INFO","node":0,"msg":"Round 7 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:51:20,225","level":"INFO","node":0,"msg":"Starting round 8"}
+{"time":"2026-06-24 14:51:22,247","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:51:30,604","level":"INFO","node":0,"msg":"Received update from node 4, round 7"}
+{"time":"2026-06-24 14:51:30,604","level":"INFO","node":0,"msg":"Round 8 complete — aggregating"}
+{"time":"2026-06-24 14:51:30,611","level":"INFO","node":0,"msg":"Round 8 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:51:31,112","level":"INFO","node":0,"msg":"Starting round 9"}
+{"time":"2026-06-24 14:51:33,086","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:51:41,476","level":"INFO","node":0,"msg":"Received update from node 4, round 8"}
+{"time":"2026-06-24 14:51:41,476","level":"INFO","node":0,"msg":"Round 9 complete — aggregating"}
+{"time":"2026-06-24 14:51:41,480","level":"INFO","node":0,"msg":"Round 9 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:51:41,982","level":"INFO","node":0,"msg":"Starting round 10"}
+{"time":"2026-06-24 14:51:43,900","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:51:52,568","level":"INFO","node":0,"msg":"Received update from node 4, round 9"}
+{"time":"2026-06-24 14:51:52,568","level":"INFO","node":0,"msg":"Round 10 complete — aggregating"}
+{"time":"2026-06-24 14:51:52,576","level":"INFO","node":0,"msg":"Round 10 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:51:53,077","level":"INFO","node":0,"msg":"Starting round 11"}
+{"time":"2026-06-24 14:51:55,041","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:52:03,576","level":"INFO","node":0,"msg":"Received update from node 4, round 10"}
+{"time":"2026-06-24 14:52:03,577","level":"INFO","node":0,"msg":"Round 11 complete — aggregating"}
+{"time":"2026-06-24 14:52:03,581","level":"INFO","node":0,"msg":"Round 11 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:52:04,081","level":"INFO","node":0,"msg":"Starting round 12"}
+{"time":"2026-06-24 14:52:06,087","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:52:14,792","level":"INFO","node":0,"msg":"Received update from node 4, round 11"}
+{"time":"2026-06-24 14:52:14,793","level":"INFO","node":0,"msg":"Round 12 complete — aggregating"}
+{"time":"2026-06-24 14:52:14,797","level":"INFO","node":0,"msg":"Round 12 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:52:15,298","level":"INFO","node":0,"msg":"Starting round 13"}
+{"time":"2026-06-24 14:52:17,243","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:52:25,796","level":"INFO","node":0,"msg":"Received update from node 4, round 12"}
+{"time":"2026-06-24 14:52:25,797","level":"INFO","node":0,"msg":"Round 13 complete — aggregating"}
+{"time":"2026-06-24 14:52:25,802","level":"INFO","node":0,"msg":"Round 13 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:52:26,303","level":"INFO","node":0,"msg":"Starting round 14"}
+{"time":"2026-06-24 14:52:28,294","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:52:37,153","level":"INFO","node":0,"msg":"Received update from node 4, round 13"}
+{"time":"2026-06-24 14:52:37,154","level":"INFO","node":0,"msg":"Round 14 complete — aggregating"}
+{"time":"2026-06-24 14:52:37,159","level":"INFO","node":0,"msg":"Round 14 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:52:37,660","level":"INFO","node":0,"msg":"Starting round 15"}
+{"time":"2026-06-24 14:52:39,537","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:52:48,147","level":"INFO","node":0,"msg":"Received update from node 4, round 14"}
+{"time":"2026-06-24 14:52:48,147","level":"INFO","node":0,"msg":"Round 15 complete — aggregating"}
+{"time":"2026-06-24 14:52:48,154","level":"INFO","node":0,"msg":"Round 15 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:52:48,655","level":"INFO","node":0,"msg":"Starting round 16"}
+{"time":"2026-06-24 14:52:50,699","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:52:59,285","level":"INFO","node":0,"msg":"Received update from node 4, round 15"}
+{"time":"2026-06-24 14:52:59,285","level":"INFO","node":0,"msg":"Round 16 complete — aggregating"}
+{"time":"2026-06-24 14:52:59,290","level":"INFO","node":0,"msg":"Round 16 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:52:59,791","level":"INFO","node":0,"msg":"Starting round 17"}
+{"time":"2026-06-24 14:53:01,729","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:53:10,391","level":"INFO","node":0,"msg":"Received update from node 4, round 16"}
+{"time":"2026-06-24 14:53:10,392","level":"INFO","node":0,"msg":"Round 17 complete — aggregating"}
+{"time":"2026-06-24 14:53:10,396","level":"INFO","node":0,"msg":"Round 17 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:53:10,897","level":"INFO","node":0,"msg":"Starting round 18"}
+{"time":"2026-06-24 14:53:12,771","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:53:21,355","level":"INFO","node":0,"msg":"Received update from node 4, round 17"}
+{"time":"2026-06-24 14:53:21,356","level":"INFO","node":0,"msg":"Round 18 complete — aggregating"}
+{"time":"2026-06-24 14:53:21,360","level":"INFO","node":0,"msg":"Round 18 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:53:21,861","level":"INFO","node":0,"msg":"Starting round 19"}
+{"time":"2026-06-24 14:53:23,797","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:53:32,499","level":"INFO","node":0,"msg":"Received update from node 4, round 18"}
+{"time":"2026-06-24 14:53:32,499","level":"INFO","node":0,"msg":"Round 19 complete — aggregating"}
+{"time":"2026-06-24 14:53:32,509","level":"INFO","node":0,"msg":"Round 19 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:53:33,010","level":"INFO","node":0,"msg":"Starting round 20"}
+{"time":"2026-06-24 14:53:35,087","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-24 14:53:43,704","level":"INFO","node":0,"msg":"Received update from node 4, round 19"}
+{"time":"2026-06-24 14:53:43,704","level":"INFO","node":0,"msg":"Round 20 complete — aggregating"}
+{"time":"2026-06-24 14:53:43,709","level":"INFO","node":0,"msg":"Round 20 complete | accuracy=0.6818"}
+{"time":"2026-06-24 14:53:43,709","level":"INFO","node":0,"msg":"Training complete after 20 rounds"}
