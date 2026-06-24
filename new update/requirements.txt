@@ -1,0 +1,25 @@
+# SecureFedHE — Real Deployment Dependencies
+# Install with: pip install -r requirements.txt
+# Python 3.9+ required
+
+# ── Web server ────────────────────────────────────────────────────────────────
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+httpx>=0.25.0
+requests>=2.31.0
+pydantic>=2.0.0
+
+# ── Deep learning ─────────────────────────────────────────────────────────────
+torch>=2.0.0
+numpy>=1.24.0
+
+# ── Data ──────────────────────────────────────────────────────────────────────
+pandas>=2.0.0
+scikit-learn>=1.3.0
+
+# ── Certificates / mTLS ──────────────────────────────────────────────────────
+cryptography>=41.0.0
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+tqdm>=4.65.0
+psutil>=5.9.0

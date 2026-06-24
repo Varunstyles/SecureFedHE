@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SecureFedHE — Federated Learning Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- ── HEADER ─────────────────────────────────────────────────────────────── -->
+  <header id="header">
+    <div class="hdr-left">
+      <span class="hdr-mark">⬡</span>
+      <span class="hdr-title">SecureFedHE</span>
+      <span class="hdr-sub">Federated Learning Monitor</span>
+    </div>
+    <div class="hdr-pills">
+      <div class="pill" id="pill-status">
+        <span class="dot" id="dot-status"></span>
+        <span id="txt-status">Connecting…</span>
+      </div>
+      <div class="pill">
+        <span class="pill-lbl">Round</span>
+        <span class="pill-val mono" id="txt-round">—/—</span>
+      </div>
+      <div class="pill">
+        <span class="pill-lbl">ε&thinsp;(DP)</span>
+        <span class="pill-val mono" id="txt-eps">—</span>
+      </div>
+      <div class="pill pill--accent">
+        <span class="pill-lbl">Accuracy</span>
+        <span class="pill-val mono" id="txt-acc">—</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── MAIN ───────────────────────────────────────────────────────────────── -->
+  <main>
+
+    <!-- Row 1: Ring topology + Accuracy chart -->
+    <div class="row row--2col">
+
+      <!-- Ring Topology -->
+      <section class="card" id="card-ring">
+        <div class="card-hdr">
+          <h2>Ring Topology</h2>
+          <span class="badge" id="badge-nodes">5 nodes</span>
+        </div>
+        <div id="ring-wrap">
+          <div class="ring-loading">Polling nodes…</div>
+        </div>
+        <div id="ring-legend" class="ring-legend"></div>
+      </section>
+
+      <!-- Accuracy Chart -->
+      <section class="card" id="card-acc">
+        <div class="card-hdr">
+          <h2>Training Accuracy</h2>
+          <span class="badge badge--live" id="badge-acc">Live</span>
+        </div>
+        <div class="chart-wrap" id="acc-chart-wrap" style="display:none">
+          <canvas id="acc-chart"></canvas>
+        </div>
+        <div class="empty-state" id="acc-empty">
+          <div class="empty-icon">◌</div>
+          <p>Training not started yet.</p>
+          <p class="dim">Accuracy data will appear here once the ring begins.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Row 2: Hospital Distribution -->
+    <section class="card" id="card-dist">
+      <div class="card-hdr">
+        <h2>Hospital Data Distribution</h2>
+        <span class="badge">Non-IID Dirichlet α=0.3</span>
+      </div>
+      <div class="chart-wrap chart-wrap--dist">
+        <canvas id="dist-chart"></canvas>
+      </div>
+    </section>
+
+    <!-- Row 3: Prediction -->
+    <section class="card" id="card-predict">
+      <div class="card-hdr">
+        <h2>Patient Prediction</h2>
+        <div class="card-hdr-actions">
+          <button class="btn btn--ghost btn--sm" onclick="loadExample('healthy')">
+            Load Healthy Example
+          </button>
+          <button class="btn btn--ghost btn--sm" onclick="loadExample('diabetic')">
+            Load Diabetic Example
+          </button>
+        </div>
+      </div>
+
+      <div class="predict-layout">
+        <!-- Input form -->
+        <div class="predict-form">
+          <div class="form-note">
+            Enter 8 clinical vitals and run inference against the federated model.
+          </div>
+          <div class="form-grid">
+            <label class="field">
+              <span class="field-name">Pregnancies</span>
+              <span class="field-unit">count</span>
+              <input type="number" id="f0" min="0" max="20" step="1" placeholder="e.g. 6">
+            </label>
+            <label class="field">
+              <span class="field-name">Glucose</span>
+              <span class="field-unit">mg/dL</span>
+              <input type="number" id="f1" min="0" max="250" placeholder="e.g. 148">
+            </label>
+            <label class="field">
+              <span class="field-name">Blood Pressure</span>
+              <span class="field-unit">mm Hg</span>
+              <input type="number" id="f2" min="0" max="150" placeholder="e.g. 72">
+            </label>
+            <label class="field">
+              <span class="field-name">Skin Thickness</span>
+              <span class="field-unit">mm</span>
+              <input type="number" id="f3" min="0" max="100" placeholder="e.g. 35">
+            </label>
+            <label class="field">
+              <span class="field-name">Insulin</span>
+              <span class="field-unit">μU/mL</span>
+              <input type="number" id="f4" min="0" max="900" placeholder="e.g. 0">
+            </label>
+            <label class="field">
+              <span class="field-name">BMI</span>
+              <span class="field-unit">kg/m²</span>
+              <input type="number" id="f5" min="0" max="80" step="0.1" placeholder="e.g. 33.6">
+            </label>
+            <label class="field">
+              <span class="field-name">Pedigree Function</span>
+              <span class="field-unit">score</span>
+              <input type="number" id="f6" min="0" max="3" step="0.001" placeholder="e.g. 0.627">
+            </label>
+            <label class="field">
+              <span class="field-name">Age</span>
+              <span class="field-unit">years</span>
+              <input type="number" id="f7" min="1" max="120" placeholder="e.g. 50">
+            </label>
+          </div>
+
+          <button class="btn btn--primary btn--full" id="btn-predict" onclick="runPrediction()">
+            Run Prediction
+          </button>
+        </div>
+
+        <!-- Result panel -->
+        <div id="predict-result" class="predict-result">
+          <div class="result-empty">
+            <div class="empty-icon">⬡</div>
+            <p>Prediction result will appear here.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Row 4: Audit Log -->
+    <section class="card" id="card-audit">
+      <div class="card-hdr">
+        <h2>Audit Log</h2>
+        <div class="card-hdr-actions">
+          <span class="badge" id="audit-count">0 entries</span>
+          <button class="btn btn--ghost btn--sm" onclick="refreshAudit()">↻ Refresh</button>
+        </div>
+      </div>
+      <div id="audit-log" class="audit-log">
+        <div class="empty-state">No log entries yet.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
