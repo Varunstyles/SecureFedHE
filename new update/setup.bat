@@ -127,7 +127,7 @@ echo [3/6] Installing Python dependencies...
 echo  This may take 2-5 minutes on first run.
 echo.
 py -m pip install --upgrade pip --quiet
-py -m pip install -r requirements.txt --quiet
+py -m pip install -r "%~dp0requirements.txt" --quiet
 if errorlevel 1 (
     echo.
     echo  ERROR: pip install failed. Check your internet connection.
