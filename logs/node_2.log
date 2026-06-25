@@ -689,3 +689,4 @@
 {"time":"2026-06-26 03:38:44,827","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
 {"time":"2026-06-26 03:38:47,661","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
 {"time":"2026-06-26 03:38:53,998","level":"INFO","node":2,"msg":"Synced weights from master for round 19"}
+{"time":"2026-06-26 03:40:37,520","level":"INFO","node":2,"msg":"Starting node 2: Rural Health Centre"}

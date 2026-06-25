@@ -685,3 +685,4 @@
 {"time":"2026-06-26 03:38:47,712","level":"INFO","node":3,"msg":"ZKP ACCEPTED from node 2"}
 {"time":"2026-06-26 03:38:50,792","level":"INFO","node":3,"msg":"Forwarded to http://127.0.0.1:8004"}
 {"time":"2026-06-26 03:38:54,026","level":"INFO","node":3,"msg":"Synced weights from master for round 19"}
+{"time":"2026-06-26 03:40:37,976","level":"INFO","node":3,"msg":"Starting node 3: University Research Hospital"}

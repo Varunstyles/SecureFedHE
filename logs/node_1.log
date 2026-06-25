@@ -694,3 +694,4 @@
 {"time":"2026-06-26 03:38:41,512","level":"INFO","node":1,"msg":"ZKP ACCEPTED from node 0"}
 {"time":"2026-06-26 03:38:44,756","level":"INFO","node":1,"msg":"Forwarded to http://127.0.0.1:8002"}
 {"time":"2026-06-26 03:38:53,972","level":"INFO","node":1,"msg":"Synced weights from master for round 19"}
+{"time":"2026-06-26 03:40:37,151","level":"INFO","node":1,"msg":"Starting node 1: Suburban Medical Clinic"}

@@ -681,3 +681,4 @@
 {"time":"2026-06-26 03:38:50,859","level":"INFO","node":4,"msg":"ZKP ACCEPTED from node 3"}
 {"time":"2026-06-26 03:38:53,965","level":"INFO","node":4,"msg":"Forwarded to http://127.0.0.1:8000"}
 {"time":"2026-06-26 03:38:54,066","level":"INFO","node":4,"msg":"Synced weights from master for round 19"}
+{"time":"2026-06-26 03:40:38,492","level":"INFO","node":4,"msg":"Starting node 4: Private Wellness Clinic"}
