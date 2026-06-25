@@ -15,9 +15,9 @@
   },
 
   "privacy": {
-    "dp_epsilon": 3.0,
+    "dp_epsilon": 10.0,
     "dp_delta": 1e-5,
-    "dp_sensitivity": 0.1,
+    "dp_sensitivity": 0.01,
     "clip_threshold": 0.5
   },
 
@@ -43,7 +43,7 @@
   "dashboard": {
     "port": 8080,
     "host": "127.0.0.1",
-    "claude_api_key": ""
+    "claude_api_key": "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"
   },
 
   "model": {

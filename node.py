@@ -92,12 +92,17 @@ def make_tls_session(config: dict) -> requests.Session:
 
 # ── DP noise ───────────────────────────────────────────────────────────────────
 def add_dp_noise(params: dict, epsilon: float, delta: float, sensitivity: float) -> dict:
-    """Add Gaussian DP noise to model parameters (applied to all layers except fc2)."""
+    """
+    Apply DP noise only to trainable weight/bias parameters.
+    Skip fc2 (CKKS-protected), BatchNorm running stats, and num_batches_tracked.
+    """
     sigma = sensitivity * np.sqrt(2 * np.log(1.25 / delta)) / epsilon
     noised = {}
     for k, v in params.items():
-        if k in ("fc2.weight", "fc2.bias"):
-            noised[k] = v  # fc2 is handled by HE, no DP noise
+        if "fc2" in k:
+            noised[k] = v  # CKKS-protected
+        elif "running_mean" in k or "running_var" in k or "num_batches" in k:
+            noised[k] = v  # BatchNorm buffers — never add noise
         else:
             noised[k] = v + np.random.normal(0, sigma, v.shape).astype(np.float32)
     return noised
@@ -273,7 +278,7 @@ def execute_round():
     )
 
     # DP noise on non-fc2 layers
-    noised = params  # DP noise disabled temporarily for debugging
+    noised = add_dp_noise(params, dp["dp_epsilon"], dp["dp_delta"], dp["dp_sensitivity"])
 
     # ZKP commitment on fc2 weights
     fc2_flat = noised["fc2.weight"].flatten().tolist()

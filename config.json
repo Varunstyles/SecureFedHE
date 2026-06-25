@@ -42,7 +42,8 @@
 
   "dashboard": {
     "port": 8080,
-    "host": "0.0.0.0"
+    "host": "0.0.0.0",
+    "claude_api_key": "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"
   },
 
   "model": {

@@ -300,24 +300,23 @@ async def api_explain(req: ExplainRequest):
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
             resp = await client.post(
-                "https://api.anthropic.com/v1/messages",
+                "https://api.groq.com/openai/v1/chat/completions",
                 headers={
-                    "x-api-key":         api_key,
-                    "anthropic-version": "2023-06-01",
-                    "content-type":      "application/json",
+                    "Authorization": f"Bearer {api_key}",
+                    "content-type":  "application/json",
                 },
                 json={
-                    "model":    "claude-sonnet-4-6",
+                    "model": "llama-3.1-8b-instant",
                     "max_tokens": 300,
-                    "messages": [{"role": "user", "content": prompt}],
+                    "messages":   [{"role": "user", "content": prompt}],
                 },
             )
             data = resp.json()
             if "error" in data:
                 raise HTTPException(
-                    502, detail=f"Claude API error: {data['error']['message']}"
+                    502, detail=f"Groq API error: {data['error']['message']}"
                 )
-            return {"explanation": data["content"][0]["text"]}
+            return {"explanation": data["choices"][0]["message"]["content"].strip()}
 
     except HTTPException:
         raise
