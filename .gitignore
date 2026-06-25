@@ -22,3 +22,6 @@ data/cifar10/
 __pycache__/
 *.pyc
 securefedhe/
+
+config.json
+config_dev.json
