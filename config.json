@@ -9,13 +9,13 @@
       { "id": 3, "name": "University Research Hospital", "ip": "192.168.1.104", "port": 8000 },
       { "id": 4, "name": "Private Wellness Clinic",      "ip": "192.168.1.105", "port": 8000 }
     ],
-    "rounds": 20,
+    "rounds": 50,
     "timeout_s": 30,
     "skip_on_timeout": true
   },
 
   "privacy": {
-    "dp_epsilon": 10.0,
+    "dp_epsilon": 3.0,
     "dp_delta": 1e-5,
     "dp_sensitivity": 0.01,
     "clip_threshold": 0.5
@@ -43,7 +43,7 @@
   "dashboard": {
     "port": 8080,
     "host": "0.0.0.0",
-    "claude_api_key": ""
+    "claude_api_key": "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"
   },
 
   "model": {

@@ -1481,3 +1481,1098 @@
 {"time":"2026-06-26 03:38:54,068","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
 {"time":"2026-06-26 03:38:54,075","level":"INFO","node":0,"msg":"Round 20 complete | accuracy=0.7455"}
 {"time":"2026-06-26 03:38:54,075","level":"INFO","node":0,"msg":"Training complete after 20 rounds"}
+{"time":"2026-06-26 04:23:48,599","level":"INFO","node":0,"msg":"Starting node 0: City General Hospital"}
+{"time":"2026-06-26 04:24:03,130","level":"WARNING","node":0,"msg":"DEV MODE: running without TLS"}
+{"time":"2026-06-26 04:24:03,131","level":"INFO","node":0,"msg":"Listening on 127.0.0.1:8000 | TLS=False"}
+{"time":"2026-06-26 04:24:04,610","level":"INFO","node":0,"msg":"Starting round 1"}
+{"time":"2026-06-26 04:24:11,186","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=38293796284806 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-06-26 04:24:20,894","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:25:28,456","level":"INFO","node":0,"msg":"Received update from node 4, round 0"}
+{"time":"2026-06-26 04:25:28,457","level":"INFO","node":0,"msg":"Round 1 complete — aggregating"}
+{"time":"2026-06-26 04:25:28,496","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:25:28,554","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:25:28,618","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:25:28,672","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:25:28,688","level":"INFO","node":0,"msg":"Round 1 complete | accuracy=0.6909"}
+{"time":"2026-06-26 04:25:29,190","level":"INFO","node":0,"msg":"Starting round 2"}
+{"time":"2026-06-26 04:25:38,329","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:26:01,513","level":"INFO","node":0,"msg":"Received update from node 4, round 1"}
+{"time":"2026-06-26 04:26:01,513","level":"INFO","node":0,"msg":"Round 2 complete — aggregating"}
+{"time":"2026-06-26 04:26:01,521","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:26:01,534","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:26:01,560","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:26:01,580","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:26:01,588","level":"INFO","node":0,"msg":"Round 2 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:26:02,090","level":"INFO","node":0,"msg":"Starting round 3"}
+{"time":"2026-06-26 04:26:04,781","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:26:17,141","level":"INFO","node":0,"msg":"Received update from node 4, round 2"}
+{"time":"2026-06-26 04:26:17,141","level":"INFO","node":0,"msg":"Round 3 complete — aggregating"}
+{"time":"2026-06-26 04:26:17,151","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:26:17,163","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:26:17,173","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:26:17,205","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:26:17,214","level":"INFO","node":0,"msg":"Round 3 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:26:17,716","level":"INFO","node":0,"msg":"Starting round 4"}
+{"time":"2026-06-26 04:26:20,563","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:26:32,315","level":"INFO","node":0,"msg":"Received update from node 4, round 3"}
+{"time":"2026-06-26 04:26:32,315","level":"INFO","node":0,"msg":"Round 4 complete — aggregating"}
+{"time":"2026-06-26 04:26:32,337","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:26:32,352","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:26:32,382","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:26:32,408","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:26:32,420","level":"INFO","node":0,"msg":"Round 4 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:26:32,922","level":"INFO","node":0,"msg":"Starting round 5"}
+{"time":"2026-06-26 04:26:35,968","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:26:48,299","level":"INFO","node":0,"msg":"Received update from node 4, round 4"}
+{"time":"2026-06-26 04:26:48,299","level":"INFO","node":0,"msg":"Round 5 complete — aggregating"}
+{"time":"2026-06-26 04:26:48,313","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:26:48,323","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:26:48,335","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:26:48,361","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:26:48,370","level":"INFO","node":0,"msg":"Round 5 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:26:48,872","level":"INFO","node":0,"msg":"Starting round 6"}
+{"time":"2026-06-26 04:26:52,022","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:27:04,569","level":"INFO","node":0,"msg":"Received update from node 4, round 5"}
+{"time":"2026-06-26 04:27:04,569","level":"INFO","node":0,"msg":"Round 6 complete — aggregating"}
+{"time":"2026-06-26 04:27:04,578","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:27:04,587","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:27:04,605","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:27:04,619","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:27:04,628","level":"INFO","node":0,"msg":"Round 6 complete | accuracy=0.6909"}
+{"time":"2026-06-26 04:27:05,129","level":"INFO","node":0,"msg":"Starting round 7"}
+{"time":"2026-06-26 04:27:07,964","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:27:20,241","level":"INFO","node":0,"msg":"Received update from node 4, round 6"}
+{"time":"2026-06-26 04:27:20,242","level":"INFO","node":0,"msg":"Round 7 complete — aggregating"}
+{"time":"2026-06-26 04:27:20,251","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:27:20,276","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:27:20,288","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:27:20,307","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:27:20,314","level":"INFO","node":0,"msg":"Round 7 complete | accuracy=0.7091"}
+{"time":"2026-06-26 04:27:20,816","level":"INFO","node":0,"msg":"Starting round 8"}
+{"time":"2026-06-26 04:27:23,659","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:27:35,581","level":"INFO","node":0,"msg":"Received update from node 4, round 7"}
+{"time":"2026-06-26 04:27:35,581","level":"INFO","node":0,"msg":"Round 8 complete — aggregating"}
+{"time":"2026-06-26 04:27:35,595","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:27:35,611","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:27:35,644","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:27:35,674","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:27:35,684","level":"INFO","node":0,"msg":"Round 8 complete | accuracy=0.7091"}
+{"time":"2026-06-26 04:27:36,186","level":"INFO","node":0,"msg":"Starting round 9"}
+{"time":"2026-06-26 04:27:39,103","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:27:50,841","level":"INFO","node":0,"msg":"Received update from node 4, round 8"}
+{"time":"2026-06-26 04:27:50,842","level":"INFO","node":0,"msg":"Round 9 complete — aggregating"}
+{"time":"2026-06-26 04:27:50,853","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:27:50,863","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:27:50,874","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:27:50,885","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:27:50,889","level":"INFO","node":0,"msg":"Round 9 complete | accuracy=0.7091"}
+{"time":"2026-06-26 04:27:51,391","level":"INFO","node":0,"msg":"Starting round 10"}
+{"time":"2026-06-26 04:27:54,284","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:28:06,411","level":"INFO","node":0,"msg":"Received update from node 4, round 9"}
+{"time":"2026-06-26 04:28:06,412","level":"INFO","node":0,"msg":"Round 10 complete — aggregating"}
+{"time":"2026-06-26 04:28:06,421","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:28:06,450","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:28:06,473","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:28:06,511","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:28:06,518","level":"INFO","node":0,"msg":"Round 10 complete | accuracy=0.7091"}
+{"time":"2026-06-26 04:28:07,020","level":"INFO","node":0,"msg":"Starting round 11"}
+{"time":"2026-06-26 04:28:09,939","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:28:21,961","level":"INFO","node":0,"msg":"Received update from node 4, round 10"}
+{"time":"2026-06-26 04:28:21,961","level":"INFO","node":0,"msg":"Round 11 complete — aggregating"}
+{"time":"2026-06-26 04:28:21,974","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:28:21,987","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:28:22,005","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:28:22,019","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:28:22,027","level":"INFO","node":0,"msg":"Round 11 complete | accuracy=0.7364"}
+{"time":"2026-06-26 04:28:22,529","level":"INFO","node":0,"msg":"Starting round 12"}
+{"time":"2026-06-26 04:28:25,430","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:28:37,468","level":"INFO","node":0,"msg":"Received update from node 4, round 11"}
+{"time":"2026-06-26 04:28:37,468","level":"INFO","node":0,"msg":"Round 12 complete — aggregating"}
+{"time":"2026-06-26 04:28:37,477","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:28:37,504","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:28:37,513","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:28:37,522","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:28:37,529","level":"INFO","node":0,"msg":"Round 12 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:28:38,031","level":"INFO","node":0,"msg":"Starting round 13"}
+{"time":"2026-06-26 04:28:40,866","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:28:52,835","level":"INFO","node":0,"msg":"Received update from node 4, round 12"}
+{"time":"2026-06-26 04:28:52,835","level":"INFO","node":0,"msg":"Round 13 complete — aggregating"}
+{"time":"2026-06-26 04:28:52,844","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:28:52,851","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:28:52,872","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:28:52,894","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:28:52,899","level":"INFO","node":0,"msg":"Round 13 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:28:53,401","level":"INFO","node":0,"msg":"Starting round 14"}
+{"time":"2026-06-26 04:28:56,367","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:29:08,651","level":"INFO","node":0,"msg":"Received update from node 4, round 13"}
+{"time":"2026-06-26 04:29:08,652","level":"INFO","node":0,"msg":"Round 14 complete — aggregating"}
+{"time":"2026-06-26 04:29:08,665","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:29:08,676","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:29:08,687","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:29:08,699","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:29:08,704","level":"INFO","node":0,"msg":"Round 14 complete | accuracy=0.7455"}
+{"time":"2026-06-26 04:29:09,206","level":"INFO","node":0,"msg":"Starting round 15"}
+{"time":"2026-06-26 04:29:12,191","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:29:24,362","level":"INFO","node":0,"msg":"Received update from node 4, round 14"}
+{"time":"2026-06-26 04:29:24,362","level":"INFO","node":0,"msg":"Round 15 complete — aggregating"}
+{"time":"2026-06-26 04:29:24,370","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:29:24,380","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:29:24,405","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:29:24,419","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:29:24,431","level":"INFO","node":0,"msg":"Round 15 complete | accuracy=0.7455"}
+{"time":"2026-06-26 04:29:24,933","level":"INFO","node":0,"msg":"Starting round 16"}
+{"time":"2026-06-26 04:29:27,813","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:29:40,189","level":"INFO","node":0,"msg":"Received update from node 4, round 15"}
+{"time":"2026-06-26 04:29:40,189","level":"INFO","node":0,"msg":"Round 16 complete — aggregating"}
+{"time":"2026-06-26 04:29:40,215","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:29:40,234","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:29:40,268","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:29:40,303","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:29:40,310","level":"INFO","node":0,"msg":"Round 16 complete | accuracy=0.7455"}
+{"time":"2026-06-26 04:29:40,811","level":"INFO","node":0,"msg":"Starting round 17"}
+{"time":"2026-06-26 04:29:43,806","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:29:56,064","level":"INFO","node":0,"msg":"Received update from node 4, round 16"}
+{"time":"2026-06-26 04:29:56,064","level":"INFO","node":0,"msg":"Round 17 complete — aggregating"}
+{"time":"2026-06-26 04:29:56,073","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:29:56,081","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:29:56,094","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:29:56,110","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:29:56,116","level":"INFO","node":0,"msg":"Round 17 complete | accuracy=0.7455"}
+{"time":"2026-06-26 04:29:56,618","level":"INFO","node":0,"msg":"Starting round 18"}
+{"time":"2026-06-26 04:29:59,508","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:30:12,077","level":"INFO","node":0,"msg":"Received update from node 4, round 17"}
+{"time":"2026-06-26 04:30:12,077","level":"INFO","node":0,"msg":"Round 18 complete — aggregating"}
+{"time":"2026-06-26 04:30:12,087","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:30:12,118","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:30:12,133","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:30:12,149","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:30:12,155","level":"INFO","node":0,"msg":"Round 18 complete | accuracy=0.7455"}
+{"time":"2026-06-26 04:30:12,657","level":"INFO","node":0,"msg":"Starting round 19"}
+{"time":"2026-06-26 04:30:15,576","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:30:28,064","level":"INFO","node":0,"msg":"Received update from node 4, round 18"}
+{"time":"2026-06-26 04:30:28,065","level":"INFO","node":0,"msg":"Round 19 complete — aggregating"}
+{"time":"2026-06-26 04:30:28,094","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:30:28,127","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:30:28,162","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:30:28,197","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:30:28,210","level":"INFO","node":0,"msg":"Round 19 complete | accuracy=0.7636"}
+{"time":"2026-06-26 04:30:28,711","level":"INFO","node":0,"msg":"Starting round 20"}
+{"time":"2026-06-26 04:30:31,737","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:30:44,280","level":"INFO","node":0,"msg":"Received update from node 4, round 19"}
+{"time":"2026-06-26 04:30:44,281","level":"INFO","node":0,"msg":"Round 20 complete — aggregating"}
+{"time":"2026-06-26 04:30:44,290","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:30:44,313","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:30:44,326","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:30:44,338","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:30:44,347","level":"INFO","node":0,"msg":"Round 20 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:30:44,848","level":"INFO","node":0,"msg":"Starting round 21"}
+{"time":"2026-06-26 04:30:47,819","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:31:00,459","level":"INFO","node":0,"msg":"Received update from node 4, round 20"}
+{"time":"2026-06-26 04:31:00,460","level":"INFO","node":0,"msg":"Round 21 complete — aggregating"}
+{"time":"2026-06-26 04:31:00,470","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:31:00,486","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:31:00,515","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:31:00,526","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:31:00,533","level":"INFO","node":0,"msg":"Round 21 complete | accuracy=0.7636"}
+{"time":"2026-06-26 04:31:01,035","level":"INFO","node":0,"msg":"Starting round 22"}
+{"time":"2026-06-26 04:31:03,984","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:31:16,362","level":"INFO","node":0,"msg":"Received update from node 4, round 21"}
+{"time":"2026-06-26 04:31:16,362","level":"INFO","node":0,"msg":"Round 22 complete — aggregating"}
+{"time":"2026-06-26 04:31:16,391","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:31:16,425","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:31:16,456","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:31:16,466","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:31:16,480","level":"INFO","node":0,"msg":"Round 22 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:31:16,982","level":"INFO","node":0,"msg":"Starting round 23"}
+{"time":"2026-06-26 04:31:19,914","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:31:32,036","level":"INFO","node":0,"msg":"Received update from node 4, round 22"}
+{"time":"2026-06-26 04:31:32,036","level":"INFO","node":0,"msg":"Round 23 complete — aggregating"}
+{"time":"2026-06-26 04:31:32,044","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:31:32,074","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:31:32,098","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:31:32,144","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:31:32,152","level":"INFO","node":0,"msg":"Round 23 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:31:32,652","level":"INFO","node":0,"msg":"Starting round 24"}
+{"time":"2026-06-26 04:31:35,696","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:31:48,219","level":"INFO","node":0,"msg":"Received update from node 4, round 23"}
+{"time":"2026-06-26 04:31:48,220","level":"INFO","node":0,"msg":"Round 24 complete — aggregating"}
+{"time":"2026-06-26 04:31:48,233","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:31:48,258","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:31:48,278","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:31:48,316","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:31:48,323","level":"INFO","node":0,"msg":"Round 24 complete | accuracy=0.7455"}
+{"time":"2026-06-26 04:31:48,825","level":"INFO","node":0,"msg":"Starting round 25"}
+{"time":"2026-06-26 04:31:51,744","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:32:04,076","level":"INFO","node":0,"msg":"Received update from node 4, round 24"}
+{"time":"2026-06-26 04:32:04,077","level":"INFO","node":0,"msg":"Round 25 complete — aggregating"}
+{"time":"2026-06-26 04:32:04,090","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:32:04,104","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:32:04,127","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:32:04,141","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:32:04,148","level":"INFO","node":0,"msg":"Round 25 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:32:04,650","level":"INFO","node":0,"msg":"Starting round 26"}
+{"time":"2026-06-26 04:32:07,566","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:32:20,287","level":"INFO","node":0,"msg":"Received update from node 4, round 25"}
+{"time":"2026-06-26 04:32:20,288","level":"INFO","node":0,"msg":"Round 26 complete — aggregating"}
+{"time":"2026-06-26 04:32:20,320","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:32:20,356","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:32:20,391","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:32:20,423","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:32:20,429","level":"INFO","node":0,"msg":"Round 26 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:32:20,930","level":"INFO","node":0,"msg":"Starting round 27"}
+{"time":"2026-06-26 04:32:23,753","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:32:36,285","level":"INFO","node":0,"msg":"Received update from node 4, round 26"}
+{"time":"2026-06-26 04:32:36,286","level":"INFO","node":0,"msg":"Round 27 complete — aggregating"}
+{"time":"2026-06-26 04:32:36,294","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:32:36,325","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:32:36,337","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:32:36,360","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:32:36,366","level":"INFO","node":0,"msg":"Round 27 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:32:36,868","level":"INFO","node":0,"msg":"Starting round 28"}
+{"time":"2026-06-26 04:32:40,198","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:32:54,378","level":"INFO","node":0,"msg":"Received update from node 4, round 27"}
+{"time":"2026-06-26 04:32:54,378","level":"INFO","node":0,"msg":"Round 28 complete — aggregating"}
+{"time":"2026-06-26 04:32:54,384","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:32:54,432","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:32:54,437","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:32:54,455","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:32:54,461","level":"INFO","node":0,"msg":"Round 28 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:32:54,962","level":"INFO","node":0,"msg":"Starting round 29"}
+{"time":"2026-06-26 04:32:56,923","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:33:05,240","level":"INFO","node":0,"msg":"Received update from node 4, round 28"}
+{"time":"2026-06-26 04:33:05,240","level":"INFO","node":0,"msg":"Round 29 complete — aggregating"}
+{"time":"2026-06-26 04:33:05,246","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:33:05,270","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:33:05,277","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:33:05,284","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:33:05,290","level":"INFO","node":0,"msg":"Round 29 complete | accuracy=0.7455"}
+{"time":"2026-06-26 04:33:05,791","level":"INFO","node":0,"msg":"Starting round 30"}
+{"time":"2026-06-26 04:33:07,670","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:33:16,134","level":"INFO","node":0,"msg":"Received update from node 4, round 29"}
+{"time":"2026-06-26 04:33:16,135","level":"INFO","node":0,"msg":"Round 30 complete — aggregating"}
+{"time":"2026-06-26 04:33:16,142","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:33:16,147","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:33:16,158","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:33:16,170","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:33:16,178","level":"INFO","node":0,"msg":"Round 30 complete | accuracy=0.7364"}
+{"time":"2026-06-26 04:33:16,680","level":"INFO","node":0,"msg":"Starting round 31"}
+{"time":"2026-06-26 04:33:18,742","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:33:28,244","level":"INFO","node":0,"msg":"Received update from node 4, round 30"}
+{"time":"2026-06-26 04:33:28,244","level":"INFO","node":0,"msg":"Round 31 complete — aggregating"}
+{"time":"2026-06-26 04:33:28,253","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:33:28,260","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:33:28,270","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:33:28,282","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:33:28,292","level":"INFO","node":0,"msg":"Round 31 complete | accuracy=0.7455"}
+{"time":"2026-06-26 04:33:28,794","level":"INFO","node":0,"msg":"Starting round 32"}
+{"time":"2026-06-26 04:33:30,859","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:33:40,254","level":"INFO","node":0,"msg":"Received update from node 4, round 31"}
+{"time":"2026-06-26 04:33:40,254","level":"INFO","node":0,"msg":"Round 32 complete — aggregating"}
+{"time":"2026-06-26 04:33:40,266","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:33:40,274","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:33:40,298","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:33:40,312","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:33:40,319","level":"INFO","node":0,"msg":"Round 32 complete | accuracy=0.7364"}
+{"time":"2026-06-26 04:33:40,821","level":"INFO","node":0,"msg":"Starting round 33"}
+{"time":"2026-06-26 04:33:43,368","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:33:52,065","level":"INFO","node":0,"msg":"Received update from node 4, round 32"}
+{"time":"2026-06-26 04:33:52,065","level":"INFO","node":0,"msg":"Round 33 complete — aggregating"}
+{"time":"2026-06-26 04:33:52,074","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:33:52,084","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:33:52,095","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:33:52,105","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:33:52,112","level":"INFO","node":0,"msg":"Round 33 complete | accuracy=0.7182"}
+{"time":"2026-06-26 04:33:52,614","level":"INFO","node":0,"msg":"Starting round 34"}
+{"time":"2026-06-26 04:33:54,820","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:34:04,139","level":"INFO","node":0,"msg":"Received update from node 4, round 33"}
+{"time":"2026-06-26 04:34:04,139","level":"INFO","node":0,"msg":"Round 34 complete — aggregating"}
+{"time":"2026-06-26 04:34:04,150","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:34:04,159","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:34:04,167","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:34:04,179","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:34:04,186","level":"INFO","node":0,"msg":"Round 34 complete | accuracy=0.7364"}
+{"time":"2026-06-26 04:34:04,688","level":"INFO","node":0,"msg":"Starting round 35"}
+{"time":"2026-06-26 04:34:06,793","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:34:15,915","level":"INFO","node":0,"msg":"Received update from node 4, round 34"}
+{"time":"2026-06-26 04:34:15,915","level":"INFO","node":0,"msg":"Round 35 complete — aggregating"}
+{"time":"2026-06-26 04:34:15,927","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:34:15,936","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:34:15,970","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:34:15,993","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:34:15,999","level":"INFO","node":0,"msg":"Round 35 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:34:16,500","level":"INFO","node":0,"msg":"Starting round 36"}
+{"time":"2026-06-26 04:34:18,825","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:34:28,015","level":"INFO","node":0,"msg":"Received update from node 4, round 35"}
+{"time":"2026-06-26 04:34:28,015","level":"INFO","node":0,"msg":"Round 36 complete — aggregating"}
+{"time":"2026-06-26 04:34:28,021","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:34:28,030","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:34:28,055","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:34:28,061","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:34:28,066","level":"INFO","node":0,"msg":"Round 36 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:34:28,568","level":"INFO","node":0,"msg":"Starting round 37"}
+{"time":"2026-06-26 04:34:30,757","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:34:39,914","level":"INFO","node":0,"msg":"Received update from node 4, round 36"}
+{"time":"2026-06-26 04:34:39,914","level":"INFO","node":0,"msg":"Round 37 complete — aggregating"}
+{"time":"2026-06-26 04:34:39,920","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:34:39,927","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:34:39,936","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:34:39,962","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:34:39,967","level":"INFO","node":0,"msg":"Round 37 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:34:40,469","level":"INFO","node":0,"msg":"Starting round 38"}
+{"time":"2026-06-26 04:34:42,639","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:34:51,612","level":"INFO","node":0,"msg":"Received update from node 4, round 37"}
+{"time":"2026-06-26 04:34:51,612","level":"INFO","node":0,"msg":"Round 38 complete — aggregating"}
+{"time":"2026-06-26 04:34:51,617","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:34:51,623","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:34:51,631","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:34:51,642","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:34:51,652","level":"INFO","node":0,"msg":"Round 38 complete | accuracy=0.7364"}
+{"time":"2026-06-26 04:34:52,154","level":"INFO","node":0,"msg":"Starting round 39"}
+{"time":"2026-06-26 04:34:54,203","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:35:03,702","level":"INFO","node":0,"msg":"Received update from node 4, round 38"}
+{"time":"2026-06-26 04:35:03,702","level":"INFO","node":0,"msg":"Round 39 complete — aggregating"}
+{"time":"2026-06-26 04:35:03,707","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:35:03,740","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:35:03,747","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:35:03,754","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:35:03,764","level":"INFO","node":0,"msg":"Round 39 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:35:04,265","level":"INFO","node":0,"msg":"Starting round 40"}
+{"time":"2026-06-26 04:35:06,333","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:35:15,639","level":"INFO","node":0,"msg":"Received update from node 4, round 39"}
+{"time":"2026-06-26 04:35:15,639","level":"INFO","node":0,"msg":"Round 40 complete — aggregating"}
+{"time":"2026-06-26 04:35:15,644","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:35:15,652","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:35:15,659","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:35:15,688","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:35:15,695","level":"INFO","node":0,"msg":"Round 40 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:35:16,197","level":"INFO","node":0,"msg":"Starting round 41"}
+{"time":"2026-06-26 04:35:18,475","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:35:28,462","level":"INFO","node":0,"msg":"Received update from node 4, round 40"}
+{"time":"2026-06-26 04:35:28,462","level":"INFO","node":0,"msg":"Round 41 complete — aggregating"}
+{"time":"2026-06-26 04:35:28,468","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:35:28,477","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:35:28,485","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:35:28,494","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:35:28,503","level":"INFO","node":0,"msg":"Round 41 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:35:29,004","level":"INFO","node":0,"msg":"Starting round 42"}
+{"time":"2026-06-26 04:35:31,230","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:35:40,441","level":"INFO","node":0,"msg":"Received update from node 4, round 41"}
+{"time":"2026-06-26 04:35:40,442","level":"INFO","node":0,"msg":"Round 42 complete — aggregating"}
+{"time":"2026-06-26 04:35:40,451","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:35:40,459","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:35:40,476","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:35:40,492","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:35:40,505","level":"INFO","node":0,"msg":"Round 42 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:35:41,006","level":"INFO","node":0,"msg":"Starting round 43"}
+{"time":"2026-06-26 04:35:43,308","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:35:52,572","level":"INFO","node":0,"msg":"Received update from node 4, round 42"}
+{"time":"2026-06-26 04:35:52,572","level":"INFO","node":0,"msg":"Round 43 complete — aggregating"}
+{"time":"2026-06-26 04:35:52,589","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:35:52,596","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:35:52,622","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:35:52,643","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:35:52,651","level":"INFO","node":0,"msg":"Round 43 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:35:53,152","level":"INFO","node":0,"msg":"Starting round 44"}
+{"time":"2026-06-26 04:35:55,322","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:36:04,964","level":"INFO","node":0,"msg":"Received update from node 4, round 43"}
+{"time":"2026-06-26 04:36:04,965","level":"INFO","node":0,"msg":"Round 44 complete — aggregating"}
+{"time":"2026-06-26 04:36:04,971","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:36:04,992","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:36:05,005","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:36:05,023","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:36:05,033","level":"INFO","node":0,"msg":"Round 44 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:36:05,534","level":"INFO","node":0,"msg":"Starting round 45"}
+{"time":"2026-06-26 04:36:08,043","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:36:17,966","level":"INFO","node":0,"msg":"Received update from node 4, round 44"}
+{"time":"2026-06-26 04:36:17,966","level":"INFO","node":0,"msg":"Round 45 complete — aggregating"}
+{"time":"2026-06-26 04:36:17,972","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:36:17,980","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:36:18,009","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:36:18,036","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:36:18,047","level":"INFO","node":0,"msg":"Round 45 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:36:18,548","level":"INFO","node":0,"msg":"Starting round 46"}
+{"time":"2026-06-26 04:36:20,944","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:36:31,136","level":"INFO","node":0,"msg":"Received update from node 4, round 45"}
+{"time":"2026-06-26 04:36:31,137","level":"INFO","node":0,"msg":"Round 46 complete — aggregating"}
+{"time":"2026-06-26 04:36:31,157","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:36:31,169","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:36:31,180","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:36:31,210","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:36:31,217","level":"INFO","node":0,"msg":"Round 46 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:36:31,718","level":"INFO","node":0,"msg":"Starting round 47"}
+{"time":"2026-06-26 04:36:34,212","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:36:43,468","level":"INFO","node":0,"msg":"Received update from node 4, round 46"}
+{"time":"2026-06-26 04:36:43,468","level":"INFO","node":0,"msg":"Round 47 complete — aggregating"}
+{"time":"2026-06-26 04:36:43,474","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:36:43,482","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:36:43,497","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:36:43,508","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:36:43,519","level":"INFO","node":0,"msg":"Round 47 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:36:44,020","level":"INFO","node":0,"msg":"Starting round 48"}
+{"time":"2026-06-26 04:36:46,088","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:36:54,785","level":"INFO","node":0,"msg":"Received update from node 4, round 47"}
+{"time":"2026-06-26 04:36:54,785","level":"INFO","node":0,"msg":"Round 48 complete — aggregating"}
+{"time":"2026-06-26 04:36:54,791","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:36:54,797","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:36:54,818","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:36:54,862","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:36:54,869","level":"INFO","node":0,"msg":"Round 48 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:36:55,370","level":"INFO","node":0,"msg":"Starting round 49"}
+{"time":"2026-06-26 04:36:57,460","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:37:05,981","level":"INFO","node":0,"msg":"Received update from node 4, round 48"}
+{"time":"2026-06-26 04:37:05,981","level":"INFO","node":0,"msg":"Round 49 complete — aggregating"}
+{"time":"2026-06-26 04:37:05,987","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:37:05,994","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:37:06,005","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:37:06,040","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:37:06,045","level":"INFO","node":0,"msg":"Round 49 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:37:06,546","level":"INFO","node":0,"msg":"Starting round 50"}
+{"time":"2026-06-26 04:37:08,592","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:37:17,106","level":"INFO","node":0,"msg":"Received update from node 4, round 49"}
+{"time":"2026-06-26 04:37:17,107","level":"INFO","node":0,"msg":"Round 50 complete — aggregating"}
+{"time":"2026-06-26 04:37:17,112","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:37:17,119","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:37:17,149","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:37:17,159","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:37:17,167","level":"INFO","node":0,"msg":"Round 50 complete | accuracy=0.7364"}
+{"time":"2026-06-26 04:37:17,168","level":"INFO","node":0,"msg":"Training complete after 50 rounds"}
+{"time":"2026-06-26 04:40:57,331","level":"INFO","node":0,"msg":"Starting node 0: City General Hospital"}
+{"time":"2026-06-26 04:40:59,962","level":"WARNING","node":0,"msg":"DEV MODE: running without TLS"}
+{"time":"2026-06-26 04:40:59,963","level":"INFO","node":0,"msg":"Listening on 127.0.0.1:8000 | TLS=False"}
+{"time":"2026-06-26 04:41:01,448","level":"INFO","node":0,"msg":"Starting round 1"}
+{"time":"2026-06-26 04:41:02,644","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=28079938554010 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-06-26 04:41:04,254","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:41:16,760","level":"INFO","node":0,"msg":"Received update from node 4, round 0"}
+{"time":"2026-06-26 04:41:16,760","level":"INFO","node":0,"msg":"Round 1 complete — aggregating"}
+{"time":"2026-06-26 04:41:16,766","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:41:16,784","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:41:16,803","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:41:16,836","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:41:16,840","level":"INFO","node":0,"msg":"Round 1 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:41:17,342","level":"INFO","node":0,"msg":"Starting round 2"}
+{"time":"2026-06-26 04:41:19,465","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:41:27,510","level":"INFO","node":0,"msg":"Received update from node 4, round 1"}
+{"time":"2026-06-26 04:41:27,510","level":"INFO","node":0,"msg":"Round 2 complete — aggregating"}
+{"time":"2026-06-26 04:41:27,516","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:41:27,523","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:41:27,548","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:41:27,576","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:41:27,582","level":"INFO","node":0,"msg":"Round 2 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:41:28,084","level":"INFO","node":0,"msg":"Starting round 3"}
+{"time":"2026-06-26 04:41:29,828","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:41:37,734","level":"INFO","node":0,"msg":"Received update from node 4, round 2"}
+{"time":"2026-06-26 04:41:37,735","level":"INFO","node":0,"msg":"Round 3 complete — aggregating"}
+{"time":"2026-06-26 04:41:37,741","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:41:37,747","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:41:37,756","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:41:37,765","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:41:37,773","level":"INFO","node":0,"msg":"Round 3 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:41:38,274","level":"INFO","node":0,"msg":"Starting round 4"}
+{"time":"2026-06-26 04:41:39,949","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:41:47,592","level":"INFO","node":0,"msg":"Received update from node 4, round 3"}
+{"time":"2026-06-26 04:41:47,592","level":"INFO","node":0,"msg":"Round 4 complete — aggregating"}
+{"time":"2026-06-26 04:41:47,598","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:41:47,604","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:41:47,614","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:41:47,622","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:41:47,629","level":"INFO","node":0,"msg":"Round 4 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:41:48,130","level":"INFO","node":0,"msg":"Starting round 5"}
+{"time":"2026-06-26 04:41:49,905","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:41:57,393","level":"INFO","node":0,"msg":"Received update from node 4, round 4"}
+{"time":"2026-06-26 04:41:57,393","level":"INFO","node":0,"msg":"Round 5 complete — aggregating"}
+{"time":"2026-06-26 04:41:57,414","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:41:57,431","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:41:57,449","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:41:57,478","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:41:57,484","level":"INFO","node":0,"msg":"Round 5 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:41:57,985","level":"INFO","node":0,"msg":"Starting round 6"}
+{"time":"2026-06-26 04:41:59,891","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:42:07,479","level":"INFO","node":0,"msg":"Received update from node 4, round 5"}
+{"time":"2026-06-26 04:42:07,479","level":"INFO","node":0,"msg":"Round 6 complete — aggregating"}
+{"time":"2026-06-26 04:42:07,497","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:42:07,506","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:42:07,531","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:42:07,541","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:42:07,547","level":"INFO","node":0,"msg":"Round 6 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:42:08,048","level":"INFO","node":0,"msg":"Starting round 7"}
+{"time":"2026-06-26 04:42:10,001","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:42:17,863","level":"INFO","node":0,"msg":"Received update from node 4, round 6"}
+{"time":"2026-06-26 04:42:17,863","level":"INFO","node":0,"msg":"Round 7 complete — aggregating"}
+{"time":"2026-06-26 04:42:17,869","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:42:17,875","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:42:17,884","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:42:17,893","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:42:17,898","level":"INFO","node":0,"msg":"Round 7 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:42:18,400","level":"INFO","node":0,"msg":"Starting round 8"}
+{"time":"2026-06-26 04:42:20,319","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:42:28,674","level":"INFO","node":0,"msg":"Received update from node 4, round 7"}
+{"time":"2026-06-26 04:42:28,675","level":"INFO","node":0,"msg":"Round 8 complete — aggregating"}
+{"time":"2026-06-26 04:42:28,692","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:42:28,711","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:42:28,718","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:42:28,727","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:42:28,733","level":"INFO","node":0,"msg":"Round 8 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:42:29,235","level":"INFO","node":0,"msg":"Starting round 9"}
+{"time":"2026-06-26 04:42:31,197","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:42:39,456","level":"INFO","node":0,"msg":"Received update from node 4, round 8"}
+{"time":"2026-06-26 04:42:39,457","level":"INFO","node":0,"msg":"Round 9 complete — aggregating"}
+{"time":"2026-06-26 04:42:39,466","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:42:39,475","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:42:39,503","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:42:39,511","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:42:39,516","level":"INFO","node":0,"msg":"Round 9 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:42:40,017","level":"INFO","node":0,"msg":"Starting round 10"}
+{"time":"2026-06-26 04:42:42,142","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:42:50,480","level":"INFO","node":0,"msg":"Received update from node 4, round 9"}
+{"time":"2026-06-26 04:42:50,480","level":"INFO","node":0,"msg":"Round 10 complete — aggregating"}
+{"time":"2026-06-26 04:42:50,486","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:42:50,491","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:42:50,512","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:42:50,519","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:42:50,527","level":"INFO","node":0,"msg":"Round 10 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:42:51,029","level":"INFO","node":0,"msg":"Starting round 11"}
+{"time":"2026-06-26 04:42:53,076","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:43:01,319","level":"INFO","node":0,"msg":"Received update from node 4, round 10"}
+{"time":"2026-06-26 04:43:01,319","level":"INFO","node":0,"msg":"Round 11 complete — aggregating"}
+{"time":"2026-06-26 04:43:01,325","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:43:01,333","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:43:01,345","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:43:01,353","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:43:01,359","level":"INFO","node":0,"msg":"Round 11 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:43:01,861","level":"INFO","node":0,"msg":"Starting round 12"}
+{"time":"2026-06-26 04:43:03,873","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:43:12,056","level":"INFO","node":0,"msg":"Received update from node 4, round 11"}
+{"time":"2026-06-26 04:43:12,056","level":"INFO","node":0,"msg":"Round 12 complete — aggregating"}
+{"time":"2026-06-26 04:43:12,070","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:43:12,095","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:43:12,121","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:43:12,133","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:43:12,138","level":"INFO","node":0,"msg":"Round 12 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:43:12,639","level":"INFO","node":0,"msg":"Starting round 13"}
+{"time":"2026-06-26 04:43:14,726","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:43:23,168","level":"INFO","node":0,"msg":"Received update from node 4, round 12"}
+{"time":"2026-06-26 04:43:23,168","level":"INFO","node":0,"msg":"Round 13 complete — aggregating"}
+{"time":"2026-06-26 04:43:23,178","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:43:23,192","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:43:23,211","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:43:23,230","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:43:23,238","level":"INFO","node":0,"msg":"Round 13 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:43:23,740","level":"INFO","node":0,"msg":"Starting round 14"}
+{"time":"2026-06-26 04:43:25,771","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:43:34,572","level":"INFO","node":0,"msg":"Received update from node 4, round 13"}
+{"time":"2026-06-26 04:43:34,572","level":"INFO","node":0,"msg":"Round 14 complete — aggregating"}
+{"time":"2026-06-26 04:43:34,578","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:43:34,586","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:43:34,597","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:43:34,622","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:43:34,632","level":"INFO","node":0,"msg":"Round 14 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:43:35,134","level":"INFO","node":0,"msg":"Starting round 15"}
+{"time":"2026-06-26 04:43:37,253","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:43:45,769","level":"INFO","node":0,"msg":"Received update from node 4, round 14"}
+{"time":"2026-06-26 04:43:45,769","level":"INFO","node":0,"msg":"Round 15 complete — aggregating"}
+{"time":"2026-06-26 04:43:45,778","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:43:45,784","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:43:45,795","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:43:45,804","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:43:45,809","level":"INFO","node":0,"msg":"Round 15 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:43:46,311","level":"INFO","node":0,"msg":"Starting round 16"}
+{"time":"2026-06-26 04:43:48,374","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:43:56,906","level":"INFO","node":0,"msg":"Received update from node 4, round 15"}
+{"time":"2026-06-26 04:43:56,906","level":"INFO","node":0,"msg":"Round 16 complete — aggregating"}
+{"time":"2026-06-26 04:43:56,912","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:43:56,919","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:43:56,940","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:43:56,954","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:43:56,963","level":"INFO","node":0,"msg":"Round 16 complete | accuracy=0.7091"}
+{"time":"2026-06-26 04:43:57,464","level":"INFO","node":0,"msg":"Starting round 17"}
+{"time":"2026-06-26 04:43:59,569","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:44:08,160","level":"INFO","node":0,"msg":"Received update from node 4, round 16"}
+{"time":"2026-06-26 04:44:08,160","level":"INFO","node":0,"msg":"Round 17 complete — aggregating"}
+{"time":"2026-06-26 04:44:08,166","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:44:08,189","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:44:08,212","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:44:08,229","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:44:08,234","level":"INFO","node":0,"msg":"Round 17 complete | accuracy=0.7091"}
+{"time":"2026-06-26 04:44:08,735","level":"INFO","node":0,"msg":"Starting round 18"}
+{"time":"2026-06-26 04:44:10,793","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:44:19,374","level":"INFO","node":0,"msg":"Received update from node 4, round 17"}
+{"time":"2026-06-26 04:44:19,374","level":"INFO","node":0,"msg":"Round 18 complete — aggregating"}
+{"time":"2026-06-26 04:44:19,380","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:44:19,387","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:44:19,395","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:44:19,404","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:44:19,412","level":"INFO","node":0,"msg":"Round 18 complete | accuracy=0.7182"}
+{"time":"2026-06-26 04:44:19,913","level":"INFO","node":0,"msg":"Starting round 19"}
+{"time":"2026-06-26 04:44:21,990","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:44:30,514","level":"INFO","node":0,"msg":"Received update from node 4, round 18"}
+{"time":"2026-06-26 04:44:30,514","level":"INFO","node":0,"msg":"Round 19 complete — aggregating"}
+{"time":"2026-06-26 04:44:30,521","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:44:30,545","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:44:30,552","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:44:30,570","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:44:30,581","level":"INFO","node":0,"msg":"Round 19 complete | accuracy=0.7182"}
+{"time":"2026-06-26 04:44:31,083","level":"INFO","node":0,"msg":"Starting round 20"}
+{"time":"2026-06-26 04:44:33,165","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:44:41,700","level":"INFO","node":0,"msg":"Received update from node 4, round 19"}
+{"time":"2026-06-26 04:44:41,700","level":"INFO","node":0,"msg":"Round 20 complete — aggregating"}
+{"time":"2026-06-26 04:44:41,706","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:44:41,714","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:44:41,721","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:44:41,730","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:44:41,738","level":"INFO","node":0,"msg":"Round 20 complete | accuracy=0.7364"}
+{"time":"2026-06-26 04:44:41,739","level":"INFO","node":0,"msg":"Training complete after 20 rounds"}
+{"time":"2026-06-26 04:47:02,608","level":"INFO","node":0,"msg":"Starting node 0: City General Hospital"}
+{"time":"2026-06-26 04:47:05,217","level":"WARNING","node":0,"msg":"DEV MODE: running without TLS"}
+{"time":"2026-06-26 04:47:05,217","level":"INFO","node":0,"msg":"Listening on 127.0.0.1:8000 | TLS=False"}
+{"time":"2026-06-26 04:47:05,310","level":"INFO","node":0,"msg":"Starting round 1"}
+{"time":"2026-06-26 04:47:06,360","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=46074035334637 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-06-26 04:47:08,082","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:47:20,178","level":"INFO","node":0,"msg":"Received update from node 4, round 0"}
+{"time":"2026-06-26 04:47:20,178","level":"INFO","node":0,"msg":"Round 1 complete — aggregating"}
+{"time":"2026-06-26 04:47:20,185","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:47:20,194","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:47:20,202","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:47:20,224","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:47:20,231","level":"INFO","node":0,"msg":"Round 1 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:47:20,733","level":"INFO","node":0,"msg":"Starting round 2"}
+{"time":"2026-06-26 04:47:22,568","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:47:30,823","level":"INFO","node":0,"msg":"Received update from node 4, round 1"}
+{"time":"2026-06-26 04:47:30,823","level":"INFO","node":0,"msg":"Round 2 complete — aggregating"}
+{"time":"2026-06-26 04:47:30,830","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:47:30,858","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:47:30,866","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:47:30,889","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:47:30,899","level":"INFO","node":0,"msg":"Round 2 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:47:31,401","level":"INFO","node":0,"msg":"Starting round 3"}
+{"time":"2026-06-26 04:47:33,356","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:47:41,272","level":"INFO","node":0,"msg":"Received update from node 4, round 2"}
+{"time":"2026-06-26 04:47:41,272","level":"INFO","node":0,"msg":"Round 3 complete — aggregating"}
+{"time":"2026-06-26 04:47:41,291","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:47:41,299","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:47:41,324","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:47:41,345","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:47:41,353","level":"INFO","node":0,"msg":"Round 3 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:47:41,855","level":"INFO","node":0,"msg":"Starting round 4"}
+{"time":"2026-06-26 04:47:43,966","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:47:52,192","level":"INFO","node":0,"msg":"Received update from node 4, round 3"}
+{"time":"2026-06-26 04:47:52,192","level":"INFO","node":0,"msg":"Round 4 complete — aggregating"}
+{"time":"2026-06-26 04:47:52,198","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:47:52,209","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:47:52,228","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:47:52,239","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:47:52,248","level":"INFO","node":0,"msg":"Round 4 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:47:52,749","level":"INFO","node":0,"msg":"Starting round 5"}
+{"time":"2026-06-26 04:47:55,064","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:48:03,594","level":"INFO","node":0,"msg":"Received update from node 4, round 4"}
+{"time":"2026-06-26 04:48:03,594","level":"INFO","node":0,"msg":"Round 5 complete — aggregating"}
+{"time":"2026-06-26 04:48:03,630","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:48:03,669","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:48:03,682","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:48:03,709","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:48:03,715","level":"INFO","node":0,"msg":"Round 5 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:48:04,217","level":"INFO","node":0,"msg":"Starting round 6"}
+{"time":"2026-06-26 04:48:06,360","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:48:15,155","level":"INFO","node":0,"msg":"Received update from node 4, round 5"}
+{"time":"2026-06-26 04:48:15,156","level":"INFO","node":0,"msg":"Round 6 complete — aggregating"}
+{"time":"2026-06-26 04:48:15,162","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:48:15,167","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:48:15,188","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:48:15,216","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:48:15,221","level":"INFO","node":0,"msg":"Round 6 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:48:15,723","level":"INFO","node":0,"msg":"Starting round 7"}
+{"time":"2026-06-26 04:48:17,870","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:48:26,537","level":"INFO","node":0,"msg":"Received update from node 4, round 6"}
+{"time":"2026-06-26 04:48:26,537","level":"INFO","node":0,"msg":"Round 7 complete — aggregating"}
+{"time":"2026-06-26 04:48:26,543","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:48:26,570","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:48:26,611","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:48:26,636","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:48:26,643","level":"INFO","node":0,"msg":"Round 7 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:48:27,145","level":"INFO","node":0,"msg":"Starting round 8"}
+{"time":"2026-06-26 04:48:29,080","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:48:37,539","level":"INFO","node":0,"msg":"Received update from node 4, round 7"}
+{"time":"2026-06-26 04:48:37,540","level":"INFO","node":0,"msg":"Round 8 complete — aggregating"}
+{"time":"2026-06-26 04:48:37,545","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:48:37,578","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:48:37,611","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:48:37,644","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:48:37,653","level":"INFO","node":0,"msg":"Round 8 complete | accuracy=0.6818"}
+{"time":"2026-06-26 04:48:38,155","level":"INFO","node":0,"msg":"Starting round 9"}
+{"time":"2026-06-26 04:48:40,228","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:48:48,782","level":"INFO","node":0,"msg":"Received update from node 4, round 8"}
+{"time":"2026-06-26 04:48:48,782","level":"INFO","node":0,"msg":"Round 9 complete — aggregating"}
+{"time":"2026-06-26 04:48:48,788","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:48:48,817","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:48:48,824","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:48:48,831","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:48:48,837","level":"INFO","node":0,"msg":"Round 9 complete | accuracy=0.7000"}
+{"time":"2026-06-26 04:48:49,339","level":"INFO","node":0,"msg":"Starting round 10"}
+{"time":"2026-06-26 04:48:51,262","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:48:59,593","level":"INFO","node":0,"msg":"Received update from node 4, round 9"}
+{"time":"2026-06-26 04:48:59,593","level":"INFO","node":0,"msg":"Round 10 complete — aggregating"}
+{"time":"2026-06-26 04:48:59,599","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:48:59,605","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:48:59,621","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:48:59,633","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:48:59,645","level":"INFO","node":0,"msg":"Round 10 complete | accuracy=0.7000"}
+{"time":"2026-06-26 04:49:00,147","level":"INFO","node":0,"msg":"Starting round 11"}
+{"time":"2026-06-26 04:49:02,284","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:49:10,470","level":"INFO","node":0,"msg":"Received update from node 4, round 10"}
+{"time":"2026-06-26 04:49:10,470","level":"INFO","node":0,"msg":"Round 11 complete — aggregating"}
+{"time":"2026-06-26 04:49:10,479","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:49:10,484","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:49:10,490","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:49:10,512","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:49:10,516","level":"INFO","node":0,"msg":"Round 11 complete | accuracy=0.7091"}
+{"time":"2026-06-26 04:49:11,018","level":"INFO","node":0,"msg":"Starting round 12"}
+{"time":"2026-06-26 04:49:13,011","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:49:21,177","level":"INFO","node":0,"msg":"Received update from node 4, round 11"}
+{"time":"2026-06-26 04:49:21,177","level":"INFO","node":0,"msg":"Round 12 complete — aggregating"}
+{"time":"2026-06-26 04:49:21,208","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:49:21,215","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:49:21,235","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:49:21,245","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:49:21,254","level":"INFO","node":0,"msg":"Round 12 complete | accuracy=0.7182"}
+{"time":"2026-06-26 04:49:21,755","level":"INFO","node":0,"msg":"Starting round 13"}
+{"time":"2026-06-26 04:49:23,712","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:49:31,826","level":"INFO","node":0,"msg":"Received update from node 4, round 12"}
+{"time":"2026-06-26 04:49:31,827","level":"INFO","node":0,"msg":"Round 13 complete — aggregating"}
+{"time":"2026-06-26 04:49:31,832","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:49:31,838","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:49:31,843","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:49:31,852","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:49:31,858","level":"INFO","node":0,"msg":"Round 13 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:49:32,360","level":"INFO","node":0,"msg":"Starting round 14"}
+{"time":"2026-06-26 04:49:34,309","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:49:42,349","level":"INFO","node":0,"msg":"Received update from node 4, round 13"}
+{"time":"2026-06-26 04:49:42,349","level":"INFO","node":0,"msg":"Round 14 complete — aggregating"}
+{"time":"2026-06-26 04:49:42,355","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:49:42,361","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:49:42,368","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:49:42,390","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:49:42,399","level":"INFO","node":0,"msg":"Round 14 complete | accuracy=0.7364"}
+{"time":"2026-06-26 04:49:42,901","level":"INFO","node":0,"msg":"Starting round 15"}
+{"time":"2026-06-26 04:49:44,905","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:49:52,865","level":"INFO","node":0,"msg":"Received update from node 4, round 14"}
+{"time":"2026-06-26 04:49:52,865","level":"INFO","node":0,"msg":"Round 15 complete — aggregating"}
+{"time":"2026-06-26 04:49:52,871","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:49:52,902","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:49:52,931","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:49:52,952","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:49:52,961","level":"INFO","node":0,"msg":"Round 15 complete | accuracy=0.7727"}
+{"time":"2026-06-26 04:49:53,462","level":"INFO","node":0,"msg":"Starting round 16"}
+{"time":"2026-06-26 04:49:55,385","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:50:03,370","level":"INFO","node":0,"msg":"Received update from node 4, round 15"}
+{"time":"2026-06-26 04:50:03,370","level":"INFO","node":0,"msg":"Round 16 complete — aggregating"}
+{"time":"2026-06-26 04:50:03,376","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:50:03,381","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:50:03,393","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:50:03,401","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:50:03,409","level":"INFO","node":0,"msg":"Round 16 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:50:03,910","level":"INFO","node":0,"msg":"Starting round 17"}
+{"time":"2026-06-26 04:50:05,825","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:50:13,845","level":"INFO","node":0,"msg":"Received update from node 4, round 16"}
+{"time":"2026-06-26 04:50:13,845","level":"INFO","node":0,"msg":"Round 17 complete — aggregating"}
+{"time":"2026-06-26 04:50:13,851","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:50:13,867","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:50:13,873","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:50:13,895","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:50:13,904","level":"INFO","node":0,"msg":"Round 17 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:50:14,406","level":"INFO","node":0,"msg":"Starting round 18"}
+{"time":"2026-06-26 04:50:16,319","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:50:24,502","level":"INFO","node":0,"msg":"Received update from node 4, round 17"}
+{"time":"2026-06-26 04:50:24,502","level":"INFO","node":0,"msg":"Round 18 complete — aggregating"}
+{"time":"2026-06-26 04:50:24,508","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:50:24,513","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:50:24,523","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:50:24,533","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:50:24,541","level":"INFO","node":0,"msg":"Round 18 complete | accuracy=0.7636"}
+{"time":"2026-06-26 04:50:25,043","level":"INFO","node":0,"msg":"Starting round 19"}
+{"time":"2026-06-26 04:50:26,966","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:50:35,081","level":"INFO","node":0,"msg":"Received update from node 4, round 18"}
+{"time":"2026-06-26 04:50:35,082","level":"INFO","node":0,"msg":"Round 19 complete — aggregating"}
+{"time":"2026-06-26 04:50:35,087","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:50:35,095","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:50:35,103","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:50:35,124","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:50:35,129","level":"INFO","node":0,"msg":"Round 19 complete | accuracy=0.7727"}
+{"time":"2026-06-26 04:50:35,631","level":"INFO","node":0,"msg":"Starting round 20"}
+{"time":"2026-06-26 04:50:37,559","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:50:45,536","level":"INFO","node":0,"msg":"Received update from node 4, round 19"}
+{"time":"2026-06-26 04:50:45,536","level":"INFO","node":0,"msg":"Round 20 complete — aggregating"}
+{"time":"2026-06-26 04:50:45,542","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:50:45,560","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:50:45,586","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:50:45,609","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:50:45,613","level":"INFO","node":0,"msg":"Round 20 complete | accuracy=0.7364"}
+{"time":"2026-06-26 04:50:46,114","level":"INFO","node":0,"msg":"Starting round 21"}
+{"time":"2026-06-26 04:50:48,085","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:50:56,283","level":"INFO","node":0,"msg":"Received update from node 4, round 20"}
+{"time":"2026-06-26 04:50:56,283","level":"INFO","node":0,"msg":"Round 21 complete — aggregating"}
+{"time":"2026-06-26 04:50:56,289","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:50:56,297","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:50:56,311","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:50:56,325","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:50:56,337","level":"INFO","node":0,"msg":"Round 21 complete | accuracy=0.7455"}
+{"time":"2026-06-26 04:50:56,838","level":"INFO","node":0,"msg":"Starting round 22"}
+{"time":"2026-06-26 04:50:58,906","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:51:07,320","level":"INFO","node":0,"msg":"Received update from node 4, round 21"}
+{"time":"2026-06-26 04:51:07,320","level":"INFO","node":0,"msg":"Round 22 complete — aggregating"}
+{"time":"2026-06-26 04:51:07,338","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:51:07,347","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:51:07,356","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:51:07,366","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:51:07,376","level":"INFO","node":0,"msg":"Round 22 complete | accuracy=0.7364"}
+{"time":"2026-06-26 04:51:07,878","level":"INFO","node":0,"msg":"Starting round 23"}
+{"time":"2026-06-26 04:51:10,025","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:51:18,313","level":"INFO","node":0,"msg":"Received update from node 4, round 22"}
+{"time":"2026-06-26 04:51:18,314","level":"INFO","node":0,"msg":"Round 23 complete — aggregating"}
+{"time":"2026-06-26 04:51:18,319","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:51:18,325","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:51:18,346","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:51:18,355","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:51:18,362","level":"INFO","node":0,"msg":"Round 23 complete | accuracy=0.7455"}
+{"time":"2026-06-26 04:51:18,864","level":"INFO","node":0,"msg":"Starting round 24"}
+{"time":"2026-06-26 04:51:20,932","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:51:29,064","level":"INFO","node":0,"msg":"Received update from node 4, round 23"}
+{"time":"2026-06-26 04:51:29,064","level":"INFO","node":0,"msg":"Round 24 complete — aggregating"}
+{"time":"2026-06-26 04:51:29,070","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:51:29,076","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:51:29,084","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:51:29,092","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:51:29,101","level":"INFO","node":0,"msg":"Round 24 complete | accuracy=0.7909"}
+{"time":"2026-06-26 04:51:29,602","level":"INFO","node":0,"msg":"Starting round 25"}
+{"time":"2026-06-26 04:51:31,647","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:51:40,048","level":"INFO","node":0,"msg":"Received update from node 4, round 24"}
+{"time":"2026-06-26 04:51:40,049","level":"INFO","node":0,"msg":"Round 25 complete — aggregating"}
+{"time":"2026-06-26 04:51:40,054","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:51:40,061","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:51:40,082","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:51:40,106","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:51:40,110","level":"INFO","node":0,"msg":"Round 25 complete | accuracy=0.7818"}
+{"time":"2026-06-26 04:51:40,611","level":"INFO","node":0,"msg":"Starting round 26"}
+{"time":"2026-06-26 04:51:42,715","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:51:51,254","level":"INFO","node":0,"msg":"Received update from node 4, round 25"}
+{"time":"2026-06-26 04:51:51,254","level":"INFO","node":0,"msg":"Round 26 complete — aggregating"}
+{"time":"2026-06-26 04:51:51,261","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:51:51,267","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:51:51,276","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:51:51,286","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:51:51,297","level":"INFO","node":0,"msg":"Round 26 complete | accuracy=0.7909"}
+{"time":"2026-06-26 04:51:51,799","level":"INFO","node":0,"msg":"Starting round 27"}
+{"time":"2026-06-26 04:51:53,859","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:52:02,520","level":"INFO","node":0,"msg":"Received update from node 4, round 26"}
+{"time":"2026-06-26 04:52:02,520","level":"INFO","node":0,"msg":"Round 27 complete — aggregating"}
+{"time":"2026-06-26 04:52:02,525","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:52:02,533","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:52:02,541","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:52:02,550","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:52:02,559","level":"INFO","node":0,"msg":"Round 27 complete | accuracy=0.7364"}
+{"time":"2026-06-26 04:52:03,060","level":"INFO","node":0,"msg":"Starting round 28"}
+{"time":"2026-06-26 04:52:05,125","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:52:13,876","level":"INFO","node":0,"msg":"Received update from node 4, round 27"}
+{"time":"2026-06-26 04:52:13,876","level":"INFO","node":0,"msg":"Round 28 complete — aggregating"}
+{"time":"2026-06-26 04:52:13,882","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:52:13,904","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:52:13,922","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:52:13,931","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:52:13,939","level":"INFO","node":0,"msg":"Round 28 complete | accuracy=0.7364"}
+{"time":"2026-06-26 04:52:14,441","level":"INFO","node":0,"msg":"Starting round 29"}
+{"time":"2026-06-26 04:52:16,525","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:52:24,954","level":"INFO","node":0,"msg":"Received update from node 4, round 28"}
+{"time":"2026-06-26 04:52:24,955","level":"INFO","node":0,"msg":"Round 29 complete — aggregating"}
+{"time":"2026-06-26 04:52:24,962","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:52:24,987","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:52:25,007","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:52:25,020","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:52:25,030","level":"INFO","node":0,"msg":"Round 29 complete | accuracy=0.7364"}
+{"time":"2026-06-26 04:52:25,531","level":"INFO","node":0,"msg":"Starting round 30"}
+{"time":"2026-06-26 04:52:27,606","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:52:36,354","level":"INFO","node":0,"msg":"Received update from node 4, round 29"}
+{"time":"2026-06-26 04:52:36,355","level":"INFO","node":0,"msg":"Round 30 complete — aggregating"}
+{"time":"2026-06-26 04:52:36,360","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:52:36,366","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:52:36,372","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:52:36,381","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:52:36,390","level":"INFO","node":0,"msg":"Round 30 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:52:36,892","level":"INFO","node":0,"msg":"Starting round 31"}
+{"time":"2026-06-26 04:52:38,946","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:52:47,532","level":"INFO","node":0,"msg":"Received update from node 4, round 30"}
+{"time":"2026-06-26 04:52:47,532","level":"INFO","node":0,"msg":"Round 31 complete — aggregating"}
+{"time":"2026-06-26 04:52:47,538","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:52:47,555","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:52:47,564","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:52:47,592","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:52:47,597","level":"INFO","node":0,"msg":"Round 31 complete | accuracy=0.7636"}
+{"time":"2026-06-26 04:52:48,099","level":"INFO","node":0,"msg":"Starting round 32"}
+{"time":"2026-06-26 04:52:50,138","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:52:58,617","level":"INFO","node":0,"msg":"Received update from node 4, round 31"}
+{"time":"2026-06-26 04:52:58,617","level":"INFO","node":0,"msg":"Round 32 complete — aggregating"}
+{"time":"2026-06-26 04:52:58,623","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:52:58,629","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:52:58,637","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:52:58,648","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:52:58,654","level":"INFO","node":0,"msg":"Round 32 complete | accuracy=0.7636"}
+{"time":"2026-06-26 04:52:59,156","level":"INFO","node":0,"msg":"Starting round 33"}
+{"time":"2026-06-26 04:53:01,205","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:53:09,907","level":"INFO","node":0,"msg":"Received update from node 4, round 32"}
+{"time":"2026-06-26 04:53:09,908","level":"INFO","node":0,"msg":"Round 33 complete — aggregating"}
+{"time":"2026-06-26 04:53:09,917","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:53:09,923","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:53:09,957","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:53:09,984","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:53:09,993","level":"INFO","node":0,"msg":"Round 33 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:53:10,494","level":"INFO","node":0,"msg":"Starting round 34"}
+{"time":"2026-06-26 04:53:12,544","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:53:21,308","level":"INFO","node":0,"msg":"Received update from node 4, round 33"}
+{"time":"2026-06-26 04:53:21,309","level":"INFO","node":0,"msg":"Round 34 complete — aggregating"}
+{"time":"2026-06-26 04:53:21,314","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:53:21,320","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:53:21,352","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:53:21,358","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:53:21,362","level":"INFO","node":0,"msg":"Round 34 complete | accuracy=0.7273"}
+{"time":"2026-06-26 04:53:21,864","level":"INFO","node":0,"msg":"Starting round 35"}
+{"time":"2026-06-26 04:53:23,893","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:53:32,481","level":"INFO","node":0,"msg":"Received update from node 4, round 34"}
+{"time":"2026-06-26 04:53:32,481","level":"INFO","node":0,"msg":"Round 35 complete — aggregating"}
+{"time":"2026-06-26 04:53:32,487","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:53:32,493","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:53:32,500","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:53:32,523","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:53:32,532","level":"INFO","node":0,"msg":"Round 35 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:53:33,033","level":"INFO","node":0,"msg":"Starting round 36"}
+{"time":"2026-06-26 04:53:35,147","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:53:44,125","level":"INFO","node":0,"msg":"Received update from node 4, round 35"}
+{"time":"2026-06-26 04:53:44,126","level":"INFO","node":0,"msg":"Round 36 complete — aggregating"}
+{"time":"2026-06-26 04:53:44,133","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:53:44,142","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:53:44,165","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:53:44,224","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:53:44,230","level":"INFO","node":0,"msg":"Round 36 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:53:44,731","level":"INFO","node":0,"msg":"Starting round 37"}
+{"time":"2026-06-26 04:53:46,798","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:53:55,631","level":"INFO","node":0,"msg":"Received update from node 4, round 36"}
+{"time":"2026-06-26 04:53:55,631","level":"INFO","node":0,"msg":"Round 37 complete — aggregating"}
+{"time":"2026-06-26 04:53:55,637","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:53:55,644","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:53:55,654","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:53:55,666","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:53:55,676","level":"INFO","node":0,"msg":"Round 37 complete | accuracy=0.7455"}
+{"time":"2026-06-26 04:53:56,177","level":"INFO","node":0,"msg":"Starting round 38"}
+{"time":"2026-06-26 04:53:58,267","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:54:06,739","level":"INFO","node":0,"msg":"Received update from node 4, round 37"}
+{"time":"2026-06-26 04:54:06,739","level":"INFO","node":0,"msg":"Round 38 complete — aggregating"}
+{"time":"2026-06-26 04:54:06,745","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:54:06,751","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:54:06,760","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:54:06,771","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:54:06,777","level":"INFO","node":0,"msg":"Round 38 complete | accuracy=0.7364"}
+{"time":"2026-06-26 04:54:07,279","level":"INFO","node":0,"msg":"Starting round 39"}
+{"time":"2026-06-26 04:54:09,354","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:54:18,174","level":"INFO","node":0,"msg":"Received update from node 4, round 38"}
+{"time":"2026-06-26 04:54:18,174","level":"INFO","node":0,"msg":"Round 39 complete — aggregating"}
+{"time":"2026-06-26 04:54:18,182","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:54:18,189","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:54:18,203","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:54:18,229","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:54:18,238","level":"INFO","node":0,"msg":"Round 39 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:54:18,739","level":"INFO","node":0,"msg":"Starting round 40"}
+{"time":"2026-06-26 04:54:20,787","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:54:29,544","level":"INFO","node":0,"msg":"Received update from node 4, round 39"}
+{"time":"2026-06-26 04:54:29,544","level":"INFO","node":0,"msg":"Round 40 complete — aggregating"}
+{"time":"2026-06-26 04:54:29,550","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:54:29,558","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:54:29,581","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:54:29,604","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:54:29,610","level":"INFO","node":0,"msg":"Round 40 complete | accuracy=0.7636"}
+{"time":"2026-06-26 04:54:30,111","level":"INFO","node":0,"msg":"Starting round 41"}
+{"time":"2026-06-26 04:54:32,199","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:54:40,780","level":"INFO","node":0,"msg":"Received update from node 4, round 40"}
+{"time":"2026-06-26 04:54:40,780","level":"INFO","node":0,"msg":"Round 41 complete — aggregating"}
+{"time":"2026-06-26 04:54:40,786","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:54:40,791","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:54:40,800","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:54:40,809","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:54:40,816","level":"INFO","node":0,"msg":"Round 41 complete | accuracy=0.7455"}
+{"time":"2026-06-26 04:54:41,319","level":"INFO","node":0,"msg":"Starting round 42"}
+{"time":"2026-06-26 04:54:43,381","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:54:51,841","level":"INFO","node":0,"msg":"Received update from node 4, round 41"}
+{"time":"2026-06-26 04:54:51,841","level":"INFO","node":0,"msg":"Round 42 complete — aggregating"}
+{"time":"2026-06-26 04:54:51,847","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:54:51,853","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:54:51,858","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:54:51,866","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:54:51,872","level":"INFO","node":0,"msg":"Round 42 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:54:52,373","level":"INFO","node":0,"msg":"Starting round 43"}
+{"time":"2026-06-26 04:54:54,438","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:55:02,811","level":"INFO","node":0,"msg":"Received update from node 4, round 42"}
+{"time":"2026-06-26 04:55:02,812","level":"INFO","node":0,"msg":"Round 43 complete — aggregating"}
+{"time":"2026-06-26 04:55:02,817","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:55:02,841","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:55:02,864","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:55:02,873","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:55:02,877","level":"INFO","node":0,"msg":"Round 43 complete | accuracy=0.7455"}
+{"time":"2026-06-26 04:55:03,379","level":"INFO","node":0,"msg":"Starting round 44"}
+{"time":"2026-06-26 04:55:05,455","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:55:14,015","level":"INFO","node":0,"msg":"Received update from node 4, round 43"}
+{"time":"2026-06-26 04:55:14,016","level":"INFO","node":0,"msg":"Round 44 complete — aggregating"}
+{"time":"2026-06-26 04:55:14,026","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:55:14,061","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:55:14,093","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:55:14,120","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:55:14,124","level":"INFO","node":0,"msg":"Round 44 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:55:14,625","level":"INFO","node":0,"msg":"Starting round 45"}
+{"time":"2026-06-26 04:55:16,672","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:55:25,205","level":"INFO","node":0,"msg":"Received update from node 4, round 44"}
+{"time":"2026-06-26 04:55:25,206","level":"INFO","node":0,"msg":"Round 45 complete — aggregating"}
+{"time":"2026-06-26 04:55:25,220","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:55:25,230","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:55:25,252","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:55:25,260","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:55:25,264","level":"INFO","node":0,"msg":"Round 45 complete | accuracy=0.7364"}
+{"time":"2026-06-26 04:55:25,765","level":"INFO","node":0,"msg":"Starting round 46"}
+{"time":"2026-06-26 04:55:27,832","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:55:36,360","level":"INFO","node":0,"msg":"Received update from node 4, round 45"}
+{"time":"2026-06-26 04:55:36,361","level":"INFO","node":0,"msg":"Round 46 complete — aggregating"}
+{"time":"2026-06-26 04:55:36,367","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:55:36,375","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:55:36,410","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:55:36,434","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:55:36,442","level":"INFO","node":0,"msg":"Round 46 complete | accuracy=0.7455"}
+{"time":"2026-06-26 04:55:36,944","level":"INFO","node":0,"msg":"Starting round 47"}
+{"time":"2026-06-26 04:55:38,974","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:55:47,458","level":"INFO","node":0,"msg":"Received update from node 4, round 46"}
+{"time":"2026-06-26 04:55:47,458","level":"INFO","node":0,"msg":"Round 47 complete — aggregating"}
+{"time":"2026-06-26 04:55:47,464","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:55:47,470","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:55:47,478","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:55:47,499","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:55:47,504","level":"INFO","node":0,"msg":"Round 47 complete | accuracy=0.7727"}
+{"time":"2026-06-26 04:55:48,006","level":"INFO","node":0,"msg":"Starting round 48"}
+{"time":"2026-06-26 04:55:50,077","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:55:58,576","level":"INFO","node":0,"msg":"Received update from node 4, round 47"}
+{"time":"2026-06-26 04:55:58,576","level":"INFO","node":0,"msg":"Round 48 complete — aggregating"}
+{"time":"2026-06-26 04:55:58,584","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:55:58,604","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:55:58,615","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:55:58,635","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:55:58,642","level":"INFO","node":0,"msg":"Round 48 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:55:59,144","level":"INFO","node":0,"msg":"Starting round 49"}
+{"time":"2026-06-26 04:56:01,238","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:56:09,839","level":"INFO","node":0,"msg":"Received update from node 4, round 48"}
+{"time":"2026-06-26 04:56:09,840","level":"INFO","node":0,"msg":"Round 49 complete — aggregating"}
+{"time":"2026-06-26 04:56:09,845","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:56:09,851","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:56:09,860","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:56:09,868","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:56:09,878","level":"INFO","node":0,"msg":"Round 49 complete | accuracy=0.7545"}
+{"time":"2026-06-26 04:56:10,379","level":"INFO","node":0,"msg":"Starting round 50"}
+{"time":"2026-06-26 04:56:12,480","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-06-26 04:56:21,046","level":"INFO","node":0,"msg":"Received update from node 4, round 49"}
+{"time":"2026-06-26 04:56:21,046","level":"INFO","node":0,"msg":"Round 50 complete — aggregating"}
+{"time":"2026-06-26 04:56:21,052","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-06-26 04:56:21,060","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-06-26 04:56:21,070","level":"INFO","node":0,"msg":"Broadcast weights to node 3"}
+{"time":"2026-06-26 04:56:21,079","level":"INFO","node":0,"msg":"Broadcast weights to node 4"}
+{"time":"2026-06-26 04:56:21,087","level":"INFO","node":0,"msg":"Round 50 complete | accuracy=0.7455"}
+{"time":"2026-06-26 04:56:21,087","level":"INFO","node":0,"msg":"Training complete after 50 rounds"}
