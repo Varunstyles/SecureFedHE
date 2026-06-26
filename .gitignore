@@ -25,3 +25,6 @@ securefedhe/
 
 config.json
 config_dev.json
+config.json
+config_dev.json
+config_dev_tmp.json
