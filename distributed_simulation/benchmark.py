@@ -151,7 +151,7 @@ def validate_exploit_closed(gradient_dim: int = 10):
     from zkp_commitment import zkp_ring_setup, generate_commitment, verify_commitment
     import os
     os.makedirs("/tmp/exploit_keys", exist_ok=True)
-    zkp_ring_setup(n_nodes=5, gradient_dim=gradient_dim, keys_dir="/tmp/exploit_keys")
+    zkp_ring_setup(n_nodes=3, gradient_dim=gradient_dim, keys_dir="/tmp/exploit_keys")
 
     print(f"\n{'='*60}")
     print(f"  Exploit Validation  (Blocker 2 Attacks)")

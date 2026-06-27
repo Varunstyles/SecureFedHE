@@ -1,7 +1,7 @@
 """
 dev_run.py — SecureFedHE Single-PC Dev Runner
 ===============================================
-Starts all 5 hospital nodes in one terminal window.
+Starts all 3 hospital nodes in one terminal window.
 Each node runs as a background subprocess.
 Master (Node 0) waits for all others, then fires the ring.
 

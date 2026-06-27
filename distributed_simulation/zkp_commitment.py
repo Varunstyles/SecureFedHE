@@ -28,7 +28,7 @@ Integration points in distributed_node.py:
 Usage:
     # In launch_distributed.py (ring init):
     from zkp_commitment import zkp_ring_setup, generate_node_keypair
-    zkp_ring_setup(n_nodes=5, gradient_dim=128)
+    zkp_ring_setup(n_nodes=3, gradient_dim=128)
     
     # In distributed_node.py (sender):
     from zkp_commitment import generate_commitment
@@ -63,7 +63,7 @@ logger = logging.getLogger("SecureFedHE.ZKP")
 
 _engine: Optional[ZKPEngine] = None
 _vk_path: str = "keys/verification_key.json"
-_gradient_dim: int = 128       # fc2 layer size — matches your architecture
+_gradient_dim: int = 32       # fc2 layer size — matches your architecture
 _clipping_C: float = 0.5       # from Section 3.1 of paper
 
 
@@ -335,7 +335,7 @@ if __name__ == "__main__":
     print("=" * 60)
     
     # Simulate ring setup (normally called from launch_distributed.py)
-    vk_path = zkp_ring_setup(n_nodes=5, gradient_dim=10, keys_dir="/tmp/zkp_keys")
+    vk_path = zkp_ring_setup(n_nodes=3, gradient_dim=10, keys_dir="/tmp/zkp_keys")
     
     # Simulate node keypair generation
     kp = generate_node_keypair()

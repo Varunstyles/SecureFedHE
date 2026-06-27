@@ -110,7 +110,11 @@ def add_dp_noise(params: dict, epsilon: float, delta: float, sensitivity: float)
 
 # ── Simulated CKKS (Windows-compatible) ───────────────────────────────────────
 class SimulatedHE:
-    """Lightweight CKKS simulation — encrypts by storing plaintext + noise tag."""
+    """
+    SIMULATION ONLY — NOT REAL ENCRYPTION.
+    Stores plaintext as-is. Used for Windows compatibility where tenseal is unavailable.
+    Provides NO confidentiality. For real deployment, replace with tenseal.CKKS.
+    """
 
     def encrypt(self, arr: np.ndarray) -> dict:
         return {"data": arr.tolist(), "encrypted": True}
@@ -454,6 +458,15 @@ def _finalize_round(data: dict):
     new_params = {**plain, "fc2.weight": fc2_w, "fc2.bias": fc2_b}
     set_params(model, new_params)
     _broadcast_weights(new_params)
+
+    # Save checkpoint for dashboard
+    try:
+        import pathlib
+        ckpt_path = ROOT / "dashboard" / "model_latest.pt"
+        torch.save(model.state_dict(), ckpt_path)
+        log.info(f'"Checkpoint saved to {ckpt_path}"')
+    except Exception as e:
+        log.warning(f'"Checkpoint save failed: {e}"')    
 
     # Evaluate
     acc = evaluate(model, STATE["test_loader"], STATE["device"])

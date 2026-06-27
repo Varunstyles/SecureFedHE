@@ -5,9 +5,7 @@
     "nodes": [
       { "id": 0, "name": "City General Hospital",        "ip": "192.168.1.101", "port": 8000 },
       { "id": 1, "name": "Suburban Medical Clinic",      "ip": "192.168.1.102", "port": 8000 },
-      { "id": 2, "name": "Rural Health Centre",          "ip": "192.168.1.103", "port": 8000 },
-      { "id": 3, "name": "University Research Hospital", "ip": "192.168.1.104", "port": 8000 },
-      { "id": 4, "name": "Private Wellness Clinic",      "ip": "192.168.1.105", "port": 8000 }
+      { "id": 2, "name": "Rural Health Centre",          "ip": "192.168.1.103", "port": 8000 }
     ],
     "rounds": 50,
     "timeout_s": 30,
