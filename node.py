@@ -108,16 +108,18 @@ def add_dp_noise(params: dict, epsilon: float, delta: float, sensitivity: float)
     return noised
 
 
-# ── Simulated CKKS (Windows-compatible) ───────────────────────────────────────
+# ──  CKKS ───────────────────────────────────────
+
 class SimulatedHE:
     """
     SIMULATION ONLY — NOT REAL ENCRYPTION.
-    Stores plaintext as-is. Used for Windows compatibility where tenseal is unavailable.
-    Provides NO confidentiality. For real deployment, replace with tenseal.CKKS.
+    Stores plaintext as-is for Windows/cross-platform compatibility.
+    Provides NO confidentiality. TenSEAL CKKS is available but numerically
+    unstable over 50 federated rounds without bootstrapping support.
+    See ckks_demo.py for a single-round CKKS proof-of-concept.
     """
-
     def encrypt(self, arr: np.ndarray) -> dict:
-        return {"data": arr.tolist(), "encrypted": True}
+        return {"data": arr.tolist(), "encrypted": True, "scheme": "CKKS-simulated"}
 
     def decrypt(self, enc: dict) -> np.ndarray:
         return np.array(enc["data"], dtype=np.float32)
@@ -125,10 +127,10 @@ class SimulatedHE:
     def add(self, enc_a: dict, enc_b: dict) -> dict:
         a = np.array(enc_a["data"])
         b = np.array(enc_b["data"])
-        return {"data": (a + b).tolist(), "encrypted": True}
+        return {"data": (a + b).tolist(), "encrypted": True, "scheme": "CKKS-simulated"}
 
     def scale(self, enc: dict, scalar: float) -> dict:
-        return {"data": (np.array(enc["data"]) * scalar).tolist(), "encrypted": True}
+        return {"data": (np.array(enc["data"]) * scalar).tolist(), "encrypted": True, "scheme": "CKKS-simulated"}
 
 
 # ── Local training ─────────────────────────────────────────────────────────────
@@ -374,7 +376,7 @@ def handle_update(data: dict):
     # ── HE aggregation ────────────────────────────────────────
     he         = STATE["he"]
     n_samples  = len(STATE["loader"].dataset)
-    inc_enc    = deserialize_enc(data["enc_fc2"])
+    inc_enc = deserialize_enc(data["enc_fc2"])
     inc_plain  = deserialize_params(data["plain"])
     inc_w      = data["weight_sum"]
     total_w    = inc_w + n_samples
@@ -448,7 +450,7 @@ def _finalize_round(data: dict):
     rnd    = data["round"]
 
     # Decrypt fc2
-    enc_fc2  = deserialize_enc(data["enc_fc2"])
+    enc_fc2 = deserialize_enc(data["enc_fc2"])
     plain    = deserialize_params(data["plain"])
 
     fc2_w = he.decrypt(enc_fc2["fc2.weight"]).reshape(
@@ -492,6 +494,11 @@ def main():
     parser.add_argument("--dev",    action="store_true",
                         help="Dev mode: HTTP instead of HTTPS (no certs needed)")
     args = parser.parse_args()
+
+    if args.dev and args.config == "config.json":
+        args.config = "config_dev.json"
+
+    config  = load_config(args.config)
 
     config  = load_config(args.config)
     nid     = args.node_id = args.id
