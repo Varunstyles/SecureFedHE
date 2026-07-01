@@ -108,60 +108,18 @@ def add_dp_noise(params: dict, epsilon: float, delta: float, sensitivity: float)
     return noised
 
 
-# ── Secure Aggregation ─────────────────────────────────────────────────────────
+# ──  CKKS ───────────────────────────────────────
 
-import hashlib
-from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
-from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
-
-class SecureAggregator:
+class SimulatedHE:
     """
-    Real Secure Aggregation using Diffie-Hellman shared secrets.
-    Each node pair derives a shared secret and generates correlated
-    random masks. Masks cancel during aggregation at the master,
-    so the master gets the correct sum without seeing individual weights.
+    SIMULATION ONLY — NOT REAL ENCRYPTION.
+    Stores plaintext as-is for Windows/cross-platform compatibility.
+    Provides NO confidentiality. TenSEAL CKKS is available but numerically
+    unstable over 50 federated rounds without bootstrapping support.
+    See ckks_demo.py for a single-round CKKS proof-of-concept.
     """
-    def __init__(self, node_id: int, all_node_ids: list):
-        self.node_id = node_id
-        self.all_node_ids = [n for n in all_node_ids if n != node_id]
-        self._private_key = X25519PrivateKey.generate()
-        self._public_key_bytes = self._private_key.public_key().public_bytes(
-            Encoding.Raw, PublicFormat.Raw
-        )
-        self._shared_secrets = {}
-
-    def get_public_key(self) -> bytes:
-        return self._public_key_bytes
-
-    def add_peer_public_key(self, peer_id: int, peer_pub_bytes: bytes):
-        from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PublicKey
-        peer_pub = X25519PublicKey.from_public_bytes(peer_pub_bytes)
-        shared = self._private_key.exchange(peer_pub)
-        self._shared_secrets[peer_id] = shared
-
-    def _get_mask(self, peer_id: int, length: int, round_num: int) -> np.ndarray:
-        secret = self._shared_secrets[peer_id]
-        seed_material = secret + round_num.to_bytes(4, 'big')
-        seed = int.from_bytes(hashlib.sha256(seed_material).digest()[:4], 'big')
-        rng = np.random.default_rng(seed)
-        return rng.standard_normal(length).astype(np.float32) * 0.01
-
-    def mask(self, arr: np.ndarray, round_num: int) -> np.ndarray:
-        masked = arr.flatten().copy()
-        for peer_id in self.all_node_ids:
-            if peer_id not in self._shared_secrets:
-                continue
-            mask = self._get_mask(peer_id, len(masked), round_num)
-            if peer_id > self.node_id:
-                masked += mask
-            else:
-                masked -= mask
-        return masked
-
     def encrypt(self, arr: np.ndarray) -> dict:
-        round_num = STATE.get("current_round", 0)
-        masked = self.mask(arr.flatten(), round_num)
-        return {"data": masked.tolist(), "encrypted": True, "scheme": "SecureAggregation-DH"}
+        return {"data": arr.tolist(), "encrypted": True, "scheme": "CKKS-simulated"}
 
     def decrypt(self, enc: dict) -> np.ndarray:
         return np.array(enc["data"], dtype=np.float32)
@@ -169,11 +127,10 @@ class SecureAggregator:
     def add(self, enc_a: dict, enc_b: dict) -> dict:
         a = np.array(enc_a["data"])
         b = np.array(enc_b["data"])
-        return {"data": (a + b).tolist(), "encrypted": True, "scheme": "SecureAggregation-DH"}
+        return {"data": (a + b).tolist(), "encrypted": True, "scheme": "CKKS-simulated"}
 
     def scale(self, enc: dict, scalar: float) -> dict:
-        return {"data": (np.array(enc["data"]) * scalar).tolist(), "encrypted": True, "scheme": "SecureAggregation-DH"}
-    
+        return {"data": (np.array(enc["data"]) * scalar).tolist(), "encrypted": True, "scheme": "CKKS-simulated"}
 
 
 # ── Local training ─────────────────────────────────────────────────────────────
@@ -282,8 +239,6 @@ async def status():
 async def start_ring():
     if not STATE["is_master"]:
         raise HTTPException(400, "Only master node can start the ring")
-    _exchange_keys()
-    time.sleep(2)
     threading.Thread(target=execute_round, daemon=True).start()
     return {"status": "Ring started"}
 
@@ -295,16 +250,6 @@ async def sync_weights(request: Request):
     set_params(STATE["model"], params)
     STATE["logger"].info(f'"Synced weights from master for round {data["round"]}"')
     return {"status": "synced"}
-
-@app.post("/exchange_keys")
-async def exchange_keys(request: Request):
-    """Receive a peer's DH public key and register it."""
-    data = await request.json()
-    peer_id = data["node_id"]
-    pub_bytes = bytes.fromhex(data["public_key"])
-    STATE["he"].add_peer_public_key(peer_id, pub_bytes)
-    STATE["logger"].info(f'"Key exchange complete with node {peer_id}"')
-    return {"status": "ok"}
 
 @app.post("/receive_update")
 async def receive_update(request: Request):
@@ -320,24 +265,6 @@ async def shutdown():
 
 
 # ── Ring logic ─────────────────────────────────────────────────────────────────
-
-def _exchange_keys():
-    """Push our DH public key to all peer nodes."""
-    log     = STATE["logger"]
-    nid     = STATE["node_id"]
-    nodes   = STATE["config"]["ring"]["nodes"]
-    sess    = STATE["session"]
-    scheme  = "http" if STATE.get("dev_mode") else "https"
-    pub_hex = STATE["he"].get_public_key().hex()
-    for node in nodes:
-        if node["id"] == nid:
-            continue
-        url = f"{scheme}://{node['ip']}:{node['port']}/exchange_keys"
-        try:
-            sess.post(url, json={"node_id": nid, "public_key": pub_hex}, timeout=10)
-            log.info(f'"Sent public key to node {node["id"]}"')
-        except Exception as e:
-            log.warning(f'"Key exchange failed with node {node["id"]}: {e}"')
 
 def execute_round():
     """Master node: train locally, encrypt fc2, send to successor."""
@@ -617,7 +544,7 @@ def main():
         "model":       model,
         "loader":      my_loader,
         "test_loader": test_loader,
-        "he":          SecureAggregator(nid, [n["id"] for n in nodes]),
+        "he":          SimulatedHE(),
         "device":      device,
         "logger":      logger,
         "session":     make_tls_session(config) if not args.dev else requests.Session(),
@@ -639,8 +566,6 @@ def main():
     port = node_cfg["port"]
 
     logger.info(f'"Listening on {host}:{port} | TLS={not args.dev}"')
-    if nid != 0:
-        threading.Timer(5.0, _exchange_keys).start()
     print(f"\n{'='*55}")
     print(f"  SecureFedHE — {node_cfg['name']}")
     print(f"  Node {nid} | {host}:{port}")

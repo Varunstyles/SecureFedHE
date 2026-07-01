@@ -437,3 +437,459 @@
 {"time":"2026-06-29 13:39:45,665","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
 {"time":"2026-06-29 13:39:45,672","level":"INFO","node":0,"msg":"Round 50 complete | accuracy=0.8273"}
 {"time":"2026-06-29 13:39:45,672","level":"INFO","node":0,"msg":"Training complete after 50 rounds"}
+{"time":"2026-07-01 17:02:56,907","level":"INFO","node":0,"msg":"Starting node 0: City General Hospital"}
+{"time":"2026-07-01 17:03:00,730","level":"WARNING","node":0,"msg":"DEV MODE: running without TLS"}
+{"time":"2026-07-01 17:03:00,731","level":"INFO","node":0,"msg":"Listening on 127.0.0.1:8000 | TLS=False"}
+{"time":"2026-07-01 17:03:01,219","level":"INFO","node":0,"msg":"Sent public key to node 1"}
+{"time":"2026-07-01 17:03:01,240","level":"INFO","node":0,"msg":"Sent public key to node 2"}
+{"time":"2026-07-01 17:03:03,242","level":"INFO","node":0,"msg":"Starting round 1"}
+{"time":"2026-07-01 17:03:05,904","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=31458536241554 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:03:08,795","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:03:18,205","level":"INFO","node":0,"msg":"Received update from node 2, round 0"}
+{"time":"2026-07-01 17:03:18,205","level":"INFO","node":0,"msg":"Round 1 complete — aggregating"}
+{"time":"2026-07-01 17:03:18,237","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:03:18,252","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:03:18,311","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:03:18,330","level":"INFO","node":0,"msg":"Round 1 complete | accuracy=0.7455"}
+{"time":"2026-07-01 17:03:18,832","level":"INFO","node":0,"msg":"Starting round 2"}
+{"time":"2026-07-01 17:03:21,913","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:03:28,528","level":"INFO","node":0,"msg":"Received update from node 2, round 1"}
+{"time":"2026-07-01 17:03:28,529","level":"INFO","node":0,"msg":"Round 2 complete — aggregating"}
+{"time":"2026-07-01 17:03:28,538","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:03:28,549","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:03:28,552","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:03:28,560","level":"INFO","node":0,"msg":"Round 2 complete | accuracy=0.6818"}
+{"time":"2026-07-01 17:03:29,062","level":"INFO","node":0,"msg":"Starting round 3"}
+{"time":"2026-07-01 17:03:32,517","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:03:40,510","level":"INFO","node":0,"msg":"Received update from node 2, round 2"}
+{"time":"2026-07-01 17:03:40,510","level":"INFO","node":0,"msg":"Round 3 complete — aggregating"}
+{"time":"2026-07-01 17:03:40,531","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:03:40,561","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:03:40,577","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:03:40,598","level":"INFO","node":0,"msg":"Round 3 complete | accuracy=0.7000"}
+{"time":"2026-07-01 17:03:41,100","level":"INFO","node":0,"msg":"Starting round 4"}
+{"time":"2026-07-01 17:03:44,496","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:03:51,693","level":"INFO","node":0,"msg":"Received update from node 2, round 3"}
+{"time":"2026-07-01 17:03:51,694","level":"INFO","node":0,"msg":"Round 4 complete — aggregating"}
+{"time":"2026-07-01 17:03:51,742","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:03:51,798","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:03:51,803","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:03:51,812","level":"INFO","node":0,"msg":"Round 4 complete | accuracy=0.7545"}
+{"time":"2026-07-01 17:03:52,313","level":"INFO","node":0,"msg":"Starting round 5"}
+{"time":"2026-07-01 17:03:55,648","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:04:03,078","level":"INFO","node":0,"msg":"Received update from node 2, round 4"}
+{"time":"2026-07-01 17:04:03,078","level":"INFO","node":0,"msg":"Round 5 complete — aggregating"}
+{"time":"2026-07-01 17:04:03,089","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:04:03,099","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:04:03,103","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:04:03,111","level":"INFO","node":0,"msg":"Round 5 complete | accuracy=0.7727"}
+{"time":"2026-07-01 17:04:03,613","level":"INFO","node":0,"msg":"Starting round 6"}
+{"time":"2026-07-01 17:04:06,984","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:04:14,875","level":"INFO","node":0,"msg":"Received update from node 2, round 5"}
+{"time":"2026-07-01 17:04:14,876","level":"INFO","node":0,"msg":"Round 6 complete — aggregating"}
+{"time":"2026-07-01 17:04:14,885","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:04:14,895","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:04:14,898","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:04:14,903","level":"INFO","node":0,"msg":"Round 6 complete | accuracy=0.7909"}
+{"time":"2026-07-01 17:04:15,405","level":"INFO","node":0,"msg":"Starting round 7"}
+{"time":"2026-07-01 17:04:18,853","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:04:26,070","level":"INFO","node":0,"msg":"Received update from node 2, round 6"}
+{"time":"2026-07-01 17:04:26,071","level":"INFO","node":0,"msg":"Round 7 complete — aggregating"}
+{"time":"2026-07-01 17:04:26,080","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:04:26,106","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:04:26,111","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:04:26,121","level":"INFO","node":0,"msg":"Round 7 complete | accuracy=0.8455"}
+{"time":"2026-07-01 17:04:26,624","level":"INFO","node":0,"msg":"Starting round 8"}
+{"time":"2026-07-01 17:04:30,459","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:04:37,696","level":"INFO","node":0,"msg":"Received update from node 2, round 7"}
+{"time":"2026-07-01 17:04:37,697","level":"INFO","node":0,"msg":"Round 8 complete — aggregating"}
+{"time":"2026-07-01 17:04:37,712","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:04:37,736","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:04:37,743","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:04:37,753","level":"INFO","node":0,"msg":"Round 8 complete | accuracy=0.8273"}
+{"time":"2026-07-01 17:04:38,255","level":"INFO","node":0,"msg":"Starting round 9"}
+{"time":"2026-07-01 17:04:41,825","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:04:48,727","level":"INFO","node":0,"msg":"Received update from node 2, round 8"}
+{"time":"2026-07-01 17:04:48,727","level":"INFO","node":0,"msg":"Round 9 complete — aggregating"}
+{"time":"2026-07-01 17:04:48,746","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:04:48,767","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:04:48,772","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:04:48,782","level":"INFO","node":0,"msg":"Round 9 complete | accuracy=0.8000"}
+{"time":"2026-07-01 17:04:49,284","level":"INFO","node":0,"msg":"Starting round 10"}
+{"time":"2026-07-01 17:04:52,399","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:04:59,639","level":"INFO","node":0,"msg":"Received update from node 2, round 9"}
+{"time":"2026-07-01 17:04:59,639","level":"INFO","node":0,"msg":"Round 10 complete — aggregating"}
+{"time":"2026-07-01 17:04:59,680","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:04:59,696","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:04:59,701","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:04:59,709","level":"INFO","node":0,"msg":"Round 10 complete | accuracy=0.8091"}
+{"time":"2026-07-01 17:05:00,211","level":"INFO","node":0,"msg":"Starting round 11"}
+{"time":"2026-07-01 17:05:03,209","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:05:10,040","level":"INFO","node":0,"msg":"Received update from node 2, round 10"}
+{"time":"2026-07-01 17:05:10,041","level":"INFO","node":0,"msg":"Round 11 complete — aggregating"}
+{"time":"2026-07-01 17:05:10,080","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:05:10,097","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:05:10,103","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:05:10,113","level":"INFO","node":0,"msg":"Round 11 complete | accuracy=0.8000"}
+{"time":"2026-07-01 17:05:10,615","level":"INFO","node":0,"msg":"Starting round 12"}
+{"time":"2026-07-01 17:05:13,469","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:05:20,123","level":"INFO","node":0,"msg":"Received update from node 2, round 11"}
+{"time":"2026-07-01 17:05:20,124","level":"INFO","node":0,"msg":"Round 12 complete — aggregating"}
+{"time":"2026-07-01 17:05:20,153","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:05:20,203","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:05:20,208","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:05:20,215","level":"INFO","node":0,"msg":"Round 12 complete | accuracy=0.8273"}
+{"time":"2026-07-01 17:05:20,717","level":"INFO","node":0,"msg":"Starting round 13"}
+{"time":"2026-07-01 17:05:23,596","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:05:36,959","level":"INFO","node":0,"msg":"Received update from node 2, round 12"}
+{"time":"2026-07-01 17:05:36,960","level":"INFO","node":0,"msg":"Round 13 complete — aggregating"}
+{"time":"2026-07-01 17:05:36,979","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:05:36,999","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:05:37,006","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:05:37,022","level":"INFO","node":0,"msg":"Round 13 complete | accuracy=0.8636"}
+{"time":"2026-07-01 17:05:37,525","level":"INFO","node":0,"msg":"Starting round 14"}
+{"time":"2026-07-01 17:05:41,591","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:05:50,982","level":"INFO","node":0,"msg":"Received update from node 2, round 13"}
+{"time":"2026-07-01 17:05:50,983","level":"INFO","node":0,"msg":"Round 14 complete — aggregating"}
+{"time":"2026-07-01 17:05:51,015","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:05:51,042","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:05:51,052","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:05:51,065","level":"INFO","node":0,"msg":"Round 14 complete | accuracy=0.8182"}
+{"time":"2026-07-01 17:05:51,568","level":"INFO","node":0,"msg":"Starting round 15"}
+{"time":"2026-07-01 17:05:58,669","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:06:16,732","level":"INFO","node":0,"msg":"Received update from node 2, round 14"}
+{"time":"2026-07-01 17:06:16,734","level":"INFO","node":0,"msg":"Round 15 complete — aggregating"}
+{"time":"2026-07-01 17:06:16,765","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:06:16,790","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:06:16,799","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:06:16,815","level":"INFO","node":0,"msg":"Round 15 complete | accuracy=0.8273"}
+{"time":"2026-07-01 17:06:17,317","level":"INFO","node":0,"msg":"Starting round 16"}
+{"time":"2026-07-01 17:06:25,279","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:06:44,061","level":"INFO","node":0,"msg":"Received update from node 2, round 15"}
+{"time":"2026-07-01 17:06:44,062","level":"INFO","node":0,"msg":"Round 16 complete — aggregating"}
+{"time":"2026-07-01 17:06:44,109","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:06:44,158","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:06:44,168","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:06:44,182","level":"INFO","node":0,"msg":"Round 16 complete | accuracy=0.8818"}
+{"time":"2026-07-01 17:06:44,684","level":"INFO","node":0,"msg":"Starting round 17"}
+{"time":"2026-07-01 17:06:52,933","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:07:11,821","level":"INFO","node":0,"msg":"Received update from node 2, round 16"}
+{"time":"2026-07-01 17:07:11,821","level":"INFO","node":0,"msg":"Round 17 complete — aggregating"}
+{"time":"2026-07-01 17:07:11,844","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:07:11,863","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:07:11,868","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:07:11,879","level":"INFO","node":0,"msg":"Round 17 complete | accuracy=0.8636"}
+{"time":"2026-07-01 17:07:12,382","level":"INFO","node":0,"msg":"Starting round 18"}
+{"time":"2026-07-01 17:07:20,121","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:07:37,979","level":"INFO","node":0,"msg":"Received update from node 2, round 17"}
+{"time":"2026-07-01 17:07:37,979","level":"INFO","node":0,"msg":"Round 18 complete — aggregating"}
+{"time":"2026-07-01 17:07:38,000","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:07:38,026","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:07:38,031","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:07:38,040","level":"INFO","node":0,"msg":"Round 18 complete | accuracy=0.8455"}
+{"time":"2026-07-01 17:07:38,542","level":"INFO","node":0,"msg":"Starting round 19"}
+{"time":"2026-07-01 17:07:41,081","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:07:46,187","level":"INFO","node":0,"msg":"Received update from node 2, round 18"}
+{"time":"2026-07-01 17:07:46,188","level":"INFO","node":0,"msg":"Round 19 complete — aggregating"}
+{"time":"2026-07-01 17:07:46,219","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:07:46,240","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:07:46,245","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:07:46,256","level":"INFO","node":0,"msg":"Round 19 complete | accuracy=0.8545"}
+{"time":"2026-07-01 17:07:46,758","level":"INFO","node":0,"msg":"Starting round 20"}
+{"time":"2026-07-01 17:07:49,339","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:07:54,070","level":"INFO","node":0,"msg":"Received update from node 2, round 19"}
+{"time":"2026-07-01 17:07:54,071","level":"INFO","node":0,"msg":"Round 20 complete — aggregating"}
+{"time":"2026-07-01 17:07:54,079","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:07:54,090","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:07:54,093","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:07:54,103","level":"INFO","node":0,"msg":"Round 20 complete | accuracy=0.8182"}
+{"time":"2026-07-01 17:07:54,605","level":"INFO","node":0,"msg":"Starting round 21"}
+{"time":"2026-07-01 17:07:57,077","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:08:01,939","level":"INFO","node":0,"msg":"Received update from node 2, round 20"}
+{"time":"2026-07-01 17:08:01,939","level":"INFO","node":0,"msg":"Round 21 complete — aggregating"}
+{"time":"2026-07-01 17:08:01,951","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:08:01,966","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:08:01,971","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:08:01,978","level":"INFO","node":0,"msg":"Round 21 complete | accuracy=0.8182"}
+{"time":"2026-07-01 17:08:02,479","level":"INFO","node":0,"msg":"Starting round 22"}
+{"time":"2026-07-01 17:08:04,758","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:08:10,176","level":"INFO","node":0,"msg":"Received update from node 2, round 21"}
+{"time":"2026-07-01 17:08:10,176","level":"INFO","node":0,"msg":"Round 22 complete — aggregating"}
+{"time":"2026-07-01 17:08:10,186","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:08:10,196","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:08:10,200","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:08:10,207","level":"INFO","node":0,"msg":"Round 22 complete | accuracy=0.8273"}
+{"time":"2026-07-01 17:08:10,709","level":"INFO","node":0,"msg":"Starting round 23"}
+{"time":"2026-07-01 17:08:13,114","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:08:18,111","level":"INFO","node":0,"msg":"Received update from node 2, round 22"}
+{"time":"2026-07-01 17:08:18,112","level":"INFO","node":0,"msg":"Round 23 complete — aggregating"}
+{"time":"2026-07-01 17:08:18,124","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:08:18,135","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:08:18,139","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:08:18,148","level":"INFO","node":0,"msg":"Round 23 complete | accuracy=0.8727"}
+{"time":"2026-07-01 17:08:18,651","level":"INFO","node":0,"msg":"Starting round 24"}
+{"time":"2026-07-01 17:08:21,018","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:08:26,372","level":"INFO","node":0,"msg":"Received update from node 2, round 23"}
+{"time":"2026-07-01 17:08:26,372","level":"INFO","node":0,"msg":"Round 24 complete — aggregating"}
+{"time":"2026-07-01 17:08:26,380","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:08:26,397","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:08:26,402","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:08:26,409","level":"INFO","node":0,"msg":"Round 24 complete | accuracy=0.8091"}
+{"time":"2026-07-01 17:08:26,912","level":"INFO","node":0,"msg":"Starting round 25"}
+{"time":"2026-07-01 17:08:29,244","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:08:34,479","level":"INFO","node":0,"msg":"Received update from node 2, round 24"}
+{"time":"2026-07-01 17:08:34,480","level":"INFO","node":0,"msg":"Round 25 complete — aggregating"}
+{"time":"2026-07-01 17:08:34,489","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:08:34,499","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:08:34,501","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:08:34,506","level":"INFO","node":0,"msg":"Round 25 complete | accuracy=0.8364"}
+{"time":"2026-07-01 17:08:35,008","level":"INFO","node":0,"msg":"Starting round 26"}
+{"time":"2026-07-01 17:08:37,414","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:08:42,660","level":"INFO","node":0,"msg":"Received update from node 2, round 25"}
+{"time":"2026-07-01 17:08:42,660","level":"INFO","node":0,"msg":"Round 26 complete — aggregating"}
+{"time":"2026-07-01 17:08:42,701","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:08:42,716","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:08:42,720","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:08:42,730","level":"INFO","node":0,"msg":"Round 26 complete | accuracy=0.8545"}
+{"time":"2026-07-01 17:08:43,232","level":"INFO","node":0,"msg":"Starting round 27"}
+{"time":"2026-07-01 17:08:45,610","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:08:50,513","level":"INFO","node":0,"msg":"Received update from node 2, round 26"}
+{"time":"2026-07-01 17:08:50,514","level":"INFO","node":0,"msg":"Round 27 complete — aggregating"}
+{"time":"2026-07-01 17:08:50,526","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:08:50,558","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:08:50,563","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:08:50,572","level":"INFO","node":0,"msg":"Round 27 complete | accuracy=0.8455"}
+{"time":"2026-07-01 17:08:51,073","level":"INFO","node":0,"msg":"Starting round 28"}
+{"time":"2026-07-01 17:08:53,421","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:08:58,472","level":"INFO","node":0,"msg":"Received update from node 2, round 27"}
+{"time":"2026-07-01 17:08:58,472","level":"INFO","node":0,"msg":"Round 28 complete — aggregating"}
+{"time":"2026-07-01 17:08:58,483","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:08:58,491","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:08:58,494","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:08:58,498","level":"INFO","node":0,"msg":"Round 28 complete | accuracy=0.8000"}
+{"time":"2026-07-01 17:08:59,001","level":"INFO","node":0,"msg":"Starting round 29"}
+{"time":"2026-07-01 17:09:01,350","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:09:06,383","level":"INFO","node":0,"msg":"Received update from node 2, round 28"}
+{"time":"2026-07-01 17:09:06,383","level":"INFO","node":0,"msg":"Round 29 complete — aggregating"}
+{"time":"2026-07-01 17:09:06,393","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:09:06,401","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:09:06,403","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:09:06,411","level":"INFO","node":0,"msg":"Round 29 complete | accuracy=0.7909"}
+{"time":"2026-07-01 17:09:06,913","level":"INFO","node":0,"msg":"Starting round 30"}
+{"time":"2026-07-01 17:09:09,277","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:09:14,323","level":"INFO","node":0,"msg":"Received update from node 2, round 29"}
+{"time":"2026-07-01 17:09:14,323","level":"INFO","node":0,"msg":"Round 30 complete — aggregating"}
+{"time":"2026-07-01 17:09:14,333","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:09:14,367","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:09:14,375","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:09:14,385","level":"INFO","node":0,"msg":"Round 30 complete | accuracy=0.8364"}
+{"time":"2026-07-01 17:09:14,887","level":"INFO","node":0,"msg":"Starting round 31"}
+{"time":"2026-07-01 17:09:17,376","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:09:22,578","level":"INFO","node":0,"msg":"Received update from node 2, round 30"}
+{"time":"2026-07-01 17:09:22,578","level":"INFO","node":0,"msg":"Round 31 complete — aggregating"}
+{"time":"2026-07-01 17:09:22,586","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:09:22,595","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:09:22,597","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:09:22,601","level":"INFO","node":0,"msg":"Round 31 complete | accuracy=0.8091"}
+{"time":"2026-07-01 17:09:23,103","level":"INFO","node":0,"msg":"Starting round 32"}
+{"time":"2026-07-01 17:09:25,490","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:09:30,538","level":"INFO","node":0,"msg":"Received update from node 2, round 31"}
+{"time":"2026-07-01 17:09:30,538","level":"INFO","node":0,"msg":"Round 32 complete — aggregating"}
+{"time":"2026-07-01 17:09:30,557","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:09:30,569","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:09:30,574","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:09:30,582","level":"INFO","node":0,"msg":"Round 32 complete | accuracy=0.8273"}
+{"time":"2026-07-01 17:09:31,084","level":"INFO","node":0,"msg":"Starting round 33"}
+{"time":"2026-07-01 17:09:33,406","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:09:38,521","level":"INFO","node":0,"msg":"Received update from node 2, round 32"}
+{"time":"2026-07-01 17:09:38,521","level":"INFO","node":0,"msg":"Round 33 complete — aggregating"}
+{"time":"2026-07-01 17:09:38,530","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:09:38,562","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:09:38,565","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:09:38,573","level":"INFO","node":0,"msg":"Round 33 complete | accuracy=0.8545"}
+{"time":"2026-07-01 17:09:39,075","level":"INFO","node":0,"msg":"Starting round 34"}
+{"time":"2026-07-01 17:09:41,459","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:09:46,531","level":"INFO","node":0,"msg":"Received update from node 2, round 33"}
+{"time":"2026-07-01 17:09:46,531","level":"INFO","node":0,"msg":"Round 34 complete — aggregating"}
+{"time":"2026-07-01 17:09:46,539","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:09:46,547","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:09:46,549","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:09:46,556","level":"INFO","node":0,"msg":"Round 34 complete | accuracy=0.8455"}
+{"time":"2026-07-01 17:09:47,058","level":"INFO","node":0,"msg":"Starting round 35"}
+{"time":"2026-07-01 17:09:49,476","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:09:54,511","level":"INFO","node":0,"msg":"Received update from node 2, round 34"}
+{"time":"2026-07-01 17:09:54,512","level":"INFO","node":0,"msg":"Round 35 complete — aggregating"}
+{"time":"2026-07-01 17:09:54,525","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:09:54,534","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:09:54,536","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:09:54,540","level":"INFO","node":0,"msg":"Round 35 complete | accuracy=0.8636"}
+{"time":"2026-07-01 17:09:55,042","level":"INFO","node":0,"msg":"Starting round 36"}
+{"time":"2026-07-01 17:09:57,391","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:10:02,580","level":"INFO","node":0,"msg":"Received update from node 2, round 35"}
+{"time":"2026-07-01 17:10:02,581","level":"INFO","node":0,"msg":"Round 36 complete — aggregating"}
+{"time":"2026-07-01 17:10:02,599","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:10:02,623","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:10:02,626","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:10:02,632","level":"INFO","node":0,"msg":"Round 36 complete | accuracy=0.8636"}
+{"time":"2026-07-01 17:10:03,133","level":"INFO","node":0,"msg":"Starting round 37"}
+{"time":"2026-07-01 17:10:05,445","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:10:10,574","level":"INFO","node":0,"msg":"Received update from node 2, round 36"}
+{"time":"2026-07-01 17:10:10,574","level":"INFO","node":0,"msg":"Round 37 complete — aggregating"}
+{"time":"2026-07-01 17:10:10,582","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:10:10,590","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:10:10,593","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:10:10,596","level":"INFO","node":0,"msg":"Round 37 complete | accuracy=0.8727"}
+{"time":"2026-07-01 17:10:11,098","level":"INFO","node":0,"msg":"Starting round 38"}
+{"time":"2026-07-01 17:10:13,519","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:10:18,924","level":"INFO","node":0,"msg":"Received update from node 2, round 37"}
+{"time":"2026-07-01 17:10:18,924","level":"INFO","node":0,"msg":"Round 38 complete — aggregating"}
+{"time":"2026-07-01 17:10:18,940","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:10:18,950","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:10:18,952","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:10:18,956","level":"INFO","node":0,"msg":"Round 38 complete | accuracy=0.8364"}
+{"time":"2026-07-01 17:10:19,457","level":"INFO","node":0,"msg":"Starting round 39"}
+{"time":"2026-07-01 17:10:21,925","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:10:27,471","level":"INFO","node":0,"msg":"Received update from node 2, round 38"}
+{"time":"2026-07-01 17:10:27,471","level":"INFO","node":0,"msg":"Round 39 complete — aggregating"}
+{"time":"2026-07-01 17:10:27,489","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:10:27,517","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:10:27,525","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:10:27,534","level":"INFO","node":0,"msg":"Round 39 complete | accuracy=0.8636"}
+{"time":"2026-07-01 17:10:28,041","level":"INFO","node":0,"msg":"Starting round 40"}
+{"time":"2026-07-01 17:10:30,897","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:10:36,298","level":"INFO","node":0,"msg":"Received update from node 2, round 39"}
+{"time":"2026-07-01 17:10:36,299","level":"INFO","node":0,"msg":"Round 40 complete — aggregating"}
+{"time":"2026-07-01 17:10:36,308","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:10:36,335","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:10:36,340","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:10:36,350","level":"INFO","node":0,"msg":"Round 40 complete | accuracy=0.8364"}
+{"time":"2026-07-01 17:10:36,852","level":"INFO","node":0,"msg":"Starting round 41"}
+{"time":"2026-07-01 17:10:39,234","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:10:44,623","level":"INFO","node":0,"msg":"Received update from node 2, round 40"}
+{"time":"2026-07-01 17:10:44,623","level":"INFO","node":0,"msg":"Round 41 complete — aggregating"}
+{"time":"2026-07-01 17:10:44,637","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:10:44,653","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:10:44,658","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:10:44,668","level":"INFO","node":0,"msg":"Round 41 complete | accuracy=0.8727"}
+{"time":"2026-07-01 17:10:45,170","level":"INFO","node":0,"msg":"Starting round 42"}
+{"time":"2026-07-01 17:10:47,748","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:10:53,261","level":"INFO","node":0,"msg":"Received update from node 2, round 41"}
+{"time":"2026-07-01 17:10:53,261","level":"INFO","node":0,"msg":"Round 42 complete — aggregating"}
+{"time":"2026-07-01 17:10:53,283","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:10:53,300","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:10:53,306","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:10:53,313","level":"INFO","node":0,"msg":"Round 42 complete | accuracy=0.8545"}
+{"time":"2026-07-01 17:10:53,814","level":"INFO","node":0,"msg":"Starting round 43"}
+{"time":"2026-07-01 17:10:56,300","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:11:01,450","level":"INFO","node":0,"msg":"Received update from node 2, round 42"}
+{"time":"2026-07-01 17:11:01,450","level":"INFO","node":0,"msg":"Round 43 complete — aggregating"}
+{"time":"2026-07-01 17:11:01,458","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:11:01,471","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:11:01,475","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:11:01,483","level":"INFO","node":0,"msg":"Round 43 complete | accuracy=0.8364"}
+{"time":"2026-07-01 17:11:01,985","level":"INFO","node":0,"msg":"Starting round 44"}
+{"time":"2026-07-01 17:11:04,382","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:11:09,584","level":"INFO","node":0,"msg":"Received update from node 2, round 43"}
+{"time":"2026-07-01 17:11:09,584","level":"INFO","node":0,"msg":"Round 44 complete — aggregating"}
+{"time":"2026-07-01 17:11:09,593","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:11:09,624","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:11:09,628","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:11:09,637","level":"INFO","node":0,"msg":"Round 44 complete | accuracy=0.8636"}
+{"time":"2026-07-01 17:11:10,140","level":"INFO","node":0,"msg":"Starting round 45"}
+{"time":"2026-07-01 17:11:12,519","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:11:17,827","level":"INFO","node":0,"msg":"Received update from node 2, round 44"}
+{"time":"2026-07-01 17:11:17,827","level":"INFO","node":0,"msg":"Round 45 complete — aggregating"}
+{"time":"2026-07-01 17:11:17,846","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:11:17,879","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:11:17,884","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:11:17,892","level":"INFO","node":0,"msg":"Round 45 complete | accuracy=0.8545"}
+{"time":"2026-07-01 17:11:18,395","level":"INFO","node":0,"msg":"Starting round 46"}
+{"time":"2026-07-01 17:11:18,425","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=251246367332 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:11:20,710","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:11:25,851","level":"INFO","node":0,"msg":"Received update from node 2, round 45"}
+{"time":"2026-07-01 17:11:25,852","level":"INFO","node":0,"msg":"Round 46 complete — aggregating"}
+{"time":"2026-07-01 17:11:25,860","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:11:25,870","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:11:25,872","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:11:25,877","level":"INFO","node":0,"msg":"Round 46 complete | accuracy=0.8545"}
+{"time":"2026-07-01 17:11:26,379","level":"INFO","node":0,"msg":"Starting round 47"}
+{"time":"2026-07-01 17:11:28,726","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:11:34,093","level":"INFO","node":0,"msg":"Received update from node 2, round 46"}
+{"time":"2026-07-01 17:11:34,093","level":"INFO","node":0,"msg":"Round 47 complete — aggregating"}
+{"time":"2026-07-01 17:11:34,106","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:11:34,118","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:11:34,121","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:11:34,130","level":"INFO","node":0,"msg":"Round 47 complete | accuracy=0.8818"}
+{"time":"2026-07-01 17:11:34,632","level":"INFO","node":0,"msg":"Starting round 48"}
+{"time":"2026-07-01 17:11:37,006","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:11:42,343","level":"INFO","node":0,"msg":"Received update from node 2, round 47"}
+{"time":"2026-07-01 17:11:42,344","level":"INFO","node":0,"msg":"Round 48 complete — aggregating"}
+{"time":"2026-07-01 17:11:42,364","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:11:42,380","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:11:42,386","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:11:42,395","level":"INFO","node":0,"msg":"Round 48 complete | accuracy=0.8273"}
+{"time":"2026-07-01 17:11:42,898","level":"INFO","node":0,"msg":"Starting round 49"}
+{"time":"2026-07-01 17:11:45,331","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:11:51,086","level":"INFO","node":0,"msg":"Received update from node 2, round 48"}
+{"time":"2026-07-01 17:11:51,087","level":"INFO","node":0,"msg":"Round 49 complete — aggregating"}
+{"time":"2026-07-01 17:11:51,094","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:11:51,103","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:11:51,105","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:11:51,109","level":"INFO","node":0,"msg":"Round 49 complete | accuracy=0.8273"}
+{"time":"2026-07-01 17:11:51,610","level":"INFO","node":0,"msg":"Starting round 50"}
+{"time":"2026-07-01 17:11:54,073","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:11:59,846","level":"INFO","node":0,"msg":"Received update from node 2, round 49"}
+{"time":"2026-07-01 17:11:59,847","level":"INFO","node":0,"msg":"Round 50 complete — aggregating"}
+{"time":"2026-07-01 17:11:59,867","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:11:59,898","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:11:59,903","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:11:59,909","level":"INFO","node":0,"msg":"Round 50 complete | accuracy=0.8636"}
+{"time":"2026-07-01 17:11:59,909","level":"INFO","node":0,"msg":"Training complete after 50 rounds"}
+{"time":"2026-07-01 17:16:07,852","level":"INFO","node":0,"msg":"Starting node 0: City General Hospital"}
+{"time":"2026-07-01 17:16:11,679","level":"WARNING","node":0,"msg":"DEV MODE: running without TLS"}
+{"time":"2026-07-01 17:16:11,680","level":"INFO","node":0,"msg":"Listening on 127.0.0.1:8000 | TLS=False"}
+{"time":"2026-07-01 17:16:11,825","level":"INFO","node":0,"msg":"Key exchange complete with node 2"}
+{"time":"2026-07-01 17:16:12,066","level":"INFO","node":0,"msg":"Sent public key to node 1"}
+{"time":"2026-07-01 17:16:12,075","level":"INFO","node":0,"msg":"Sent public key to node 2"}
+{"time":"2026-07-01 17:16:14,077","level":"INFO","node":0,"msg":"Starting round 1"}
+{"time":"2026-07-01 17:16:15,635","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=29484789806897 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:16:18,922","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:16:29,607","level":"INFO","node":0,"msg":"Received update from node 2, round 0"}
+{"time":"2026-07-01 17:16:29,607","level":"INFO","node":0,"msg":"Round 1 complete — aggregating"}
+{"time":"2026-07-01 17:16:29,615","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:16:29,624","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:16:29,638","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:16:29,642","level":"INFO","node":0,"msg":"Round 1 complete | accuracy=0.7545"}
+{"time":"2026-07-01 17:16:30,143","level":"INFO","node":0,"msg":"Starting round 2"}
+{"time":"2026-07-01 17:16:34,355","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:16:42,737","level":"INFO","node":0,"msg":"Received update from node 2, round 1"}
+{"time":"2026-07-01 17:16:42,737","level":"INFO","node":0,"msg":"Round 2 complete — aggregating"}
+{"time":"2026-07-01 17:16:42,744","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:16:42,751","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:16:42,754","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:16:42,757","level":"INFO","node":0,"msg":"Round 2 complete | accuracy=0.7364"}
+{"time":"2026-07-01 17:16:43,259","level":"INFO","node":0,"msg":"Starting round 3"}
+{"time":"2026-07-01 17:16:47,446","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:16:55,653","level":"INFO","node":0,"msg":"Received update from node 2, round 2"}
+{"time":"2026-07-01 17:16:55,654","level":"INFO","node":0,"msg":"Round 3 complete — aggregating"}
+{"time":"2026-07-01 17:16:55,682","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:16:55,699","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:16:55,704","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:16:55,712","level":"INFO","node":0,"msg":"Round 3 complete | accuracy=0.7818"}
+{"time":"2026-07-01 17:16:56,213","level":"INFO","node":0,"msg":"Starting round 4"}
+{"time":"2026-07-01 17:17:00,176","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:17:24,561","level":"INFO","node":0,"msg":"Received update from node 2, round 3"}
+{"time":"2026-07-01 17:17:24,562","level":"INFO","node":0,"msg":"Round 4 complete — aggregating"}
+{"time":"2026-07-01 17:17:24,626","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:17:24,661","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:17:24,675","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:17:24,692","level":"INFO","node":0,"msg":"Round 4 complete | accuracy=0.7818"}
+{"time":"2026-07-01 17:17:25,194","level":"INFO","node":0,"msg":"Starting round 5"}
+{"time":"2026-07-01 17:17:37,131","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:17:44,680","level":"INFO","node":0,"msg":"Received update from node 2, round 4"}
+{"time":"2026-07-01 17:17:44,680","level":"INFO","node":0,"msg":"Round 5 complete — aggregating"}
+{"time":"2026-07-01 17:17:44,717","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:17:44,742","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:17:44,746","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:17:44,752","level":"INFO","node":0,"msg":"Round 5 complete | accuracy=0.7909"}
+{"time":"2026-07-01 17:17:45,254","level":"INFO","node":0,"msg":"Starting round 6"}
