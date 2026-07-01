@@ -229,3 +229,183 @@
 {"time":"2026-07-01 17:17:41,150","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
 {"time":"2026-07-01 17:17:44,681","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
 {"time":"2026-07-01 17:17:44,741","level":"INFO","node":2,"msg":"Synced weights from master for round 4"}
+{"time":"2026-07-01 17:17:58,076","level":"INFO","node":2,"msg":"Received update from node 1, round 5"}
+{"time":"2026-07-01 17:17:58,298","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:18:09,111","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:18:09,216","level":"INFO","node":2,"msg":"Synced weights from master for round 5"}
+{"time":"2026-07-01 17:18:34,364","level":"INFO","node":2,"msg":"Received update from node 1, round 6"}
+{"time":"2026-07-01 17:18:34,490","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:18:37,677","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:18:37,717","level":"INFO","node":2,"msg":"Synced weights from master for round 6"}
+{"time":"2026-07-01 17:18:44,836","level":"INFO","node":2,"msg":"Received update from node 1, round 7"}
+{"time":"2026-07-01 17:18:44,901","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:18:47,826","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:18:47,857","level":"INFO","node":2,"msg":"Synced weights from master for round 7"}
+{"time":"2026-07-01 17:18:59,249","level":"INFO","node":2,"msg":"Received update from node 1, round 8"}
+{"time":"2026-07-01 17:18:59,460","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:19:09,905","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:19:09,963","level":"INFO","node":2,"msg":"Synced weights from master for round 8"}
+{"time":"2026-07-01 17:19:32,173","level":"INFO","node":2,"msg":"Received update from node 1, round 9"}
+{"time":"2026-07-01 17:19:32,405","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:19:42,701","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:19:42,756","level":"INFO","node":2,"msg":"Synced weights from master for round 9"}
+{"time":"2026-07-01 17:20:05,528","level":"INFO","node":2,"msg":"Received update from node 1, round 10"}
+{"time":"2026-07-01 17:20:05,741","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:20:16,204","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:20:16,278","level":"INFO","node":2,"msg":"Synced weights from master for round 10"}
+{"time":"2026-07-01 17:20:37,157","level":"INFO","node":2,"msg":"Received update from node 1, round 11"}
+{"time":"2026-07-01 17:20:37,370","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:20:47,373","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:20:47,468","level":"INFO","node":2,"msg":"Synced weights from master for round 11"}
+{"time":"2026-07-01 17:20:55,377","level":"INFO","node":2,"msg":"Received update from node 1, round 12"}
+{"time":"2026-07-01 17:20:55,456","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:20:58,307","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:20:58,324","level":"INFO","node":2,"msg":"Synced weights from master for round 12"}
+{"time":"2026-07-01 17:21:04,793","level":"INFO","node":2,"msg":"Received update from node 1, round 13"}
+{"time":"2026-07-01 17:21:04,869","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:21:07,671","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:21:07,699","level":"INFO","node":2,"msg":"Synced weights from master for round 13"}
+{"time":"2026-07-01 17:21:14,311","level":"INFO","node":2,"msg":"Received update from node 1, round 14"}
+{"time":"2026-07-01 17:21:14,391","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:21:17,364","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:21:17,397","level":"INFO","node":2,"msg":"Synced weights from master for round 14"}
+{"time":"2026-07-01 17:21:23,920","level":"INFO","node":2,"msg":"Received update from node 1, round 15"}
+{"time":"2026-07-01 17:21:23,996","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:21:26,845","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:21:26,907","level":"INFO","node":2,"msg":"Synced weights from master for round 15"}
+{"time":"2026-07-01 17:21:33,469","level":"INFO","node":2,"msg":"Received update from node 1, round 16"}
+{"time":"2026-07-01 17:21:33,538","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:21:36,359","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:21:36,377","level":"INFO","node":2,"msg":"Synced weights from master for round 16"}
+{"time":"2026-07-01 17:21:42,882","level":"INFO","node":2,"msg":"Received update from node 1, round 17"}
+{"time":"2026-07-01 17:21:42,948","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:21:45,839","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:21:45,861","level":"INFO","node":2,"msg":"Synced weights from master for round 17"}
+{"time":"2026-07-01 17:21:52,163","level":"INFO","node":2,"msg":"Received update from node 1, round 18"}
+{"time":"2026-07-01 17:21:52,230","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:21:55,007","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:21:55,040","level":"INFO","node":2,"msg":"Synced weights from master for round 18"}
+{"time":"2026-07-01 17:22:01,539","level":"INFO","node":2,"msg":"Received update from node 1, round 19"}
+{"time":"2026-07-01 17:22:01,603","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:22:04,389","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:22:04,432","level":"INFO","node":2,"msg":"Synced weights from master for round 19"}
+{"time":"2026-07-01 17:22:11,014","level":"INFO","node":2,"msg":"Received update from node 1, round 20"}
+{"time":"2026-07-01 17:22:11,105","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:22:14,053","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:22:14,092","level":"INFO","node":2,"msg":"Synced weights from master for round 20"}
+{"time":"2026-07-01 17:22:20,530","level":"INFO","node":2,"msg":"Received update from node 1, round 21"}
+{"time":"2026-07-01 17:22:20,609","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:22:23,416","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:22:23,436","level":"INFO","node":2,"msg":"Synced weights from master for round 21"}
+{"time":"2026-07-01 17:22:29,843","level":"INFO","node":2,"msg":"Received update from node 1, round 22"}
+{"time":"2026-07-01 17:22:29,914","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:22:32,730","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:22:32,745","level":"INFO","node":2,"msg":"Synced weights from master for round 22"}
+{"time":"2026-07-01 17:22:38,922","level":"INFO","node":2,"msg":"Received update from node 1, round 23"}
+{"time":"2026-07-01 17:22:38,998","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:22:41,796","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:22:41,822","level":"INFO","node":2,"msg":"Synced weights from master for round 23"}
+{"time":"2026-07-01 17:22:48,085","level":"INFO","node":2,"msg":"Received update from node 1, round 24"}
+{"time":"2026-07-01 17:22:48,150","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:22:50,956","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:22:50,994","level":"INFO","node":2,"msg":"Synced weights from master for round 24"}
+{"time":"2026-07-01 17:22:57,320","level":"INFO","node":2,"msg":"Received update from node 1, round 25"}
+{"time":"2026-07-01 17:22:57,398","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:23:00,302","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:23:00,330","level":"INFO","node":2,"msg":"Synced weights from master for round 25"}
+{"time":"2026-07-01 17:23:06,541","level":"INFO","node":2,"msg":"Received update from node 1, round 26"}
+{"time":"2026-07-01 17:23:06,625","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:23:09,830","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:23:09,845","level":"INFO","node":2,"msg":"Synced weights from master for round 26"}
+{"time":"2026-07-01 17:23:22,508","level":"INFO","node":2,"msg":"Received update from node 1, round 27"}
+{"time":"2026-07-01 17:23:22,703","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:23:32,076","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:23:32,150","level":"INFO","node":2,"msg":"Synced weights from master for round 27"}
+{"time":"2026-07-01 17:23:53,417","level":"INFO","node":2,"msg":"Received update from node 1, round 28"}
+{"time":"2026-07-01 17:23:53,629","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:24:03,159","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:24:03,214","level":"INFO","node":2,"msg":"Synced weights from master for round 28"}
+{"time":"2026-07-01 17:24:12,858","level":"INFO","node":2,"msg":"Received update from node 1, round 29"}
+{"time":"2026-07-01 17:24:12,937","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:24:15,784","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:24:15,826","level":"INFO","node":2,"msg":"Synced weights from master for round 29"}
+{"time":"2026-07-01 17:24:24,061","level":"INFO","node":2,"msg":"Received update from node 1, round 30"}
+{"time":"2026-07-01 17:24:24,270","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:24:33,858","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:24:33,942","level":"INFO","node":2,"msg":"Synced weights from master for round 30"}
+{"time":"2026-07-01 17:24:56,941","level":"INFO","node":2,"msg":"Received update from node 1, round 31"}
+{"time":"2026-07-01 17:24:57,226","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:25:06,814","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:25:06,868","level":"INFO","node":2,"msg":"Synced weights from master for round 31"}
+{"time":"2026-07-01 17:25:28,096","level":"INFO","node":2,"msg":"Received update from node 1, round 32"}
+{"time":"2026-07-01 17:25:28,343","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:25:37,790","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:25:37,843","level":"INFO","node":2,"msg":"Synced weights from master for round 32"}
+{"time":"2026-07-01 17:25:57,792","level":"INFO","node":2,"msg":"Received update from node 1, round 33"}
+{"time":"2026-07-01 17:25:57,866","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:26:01,317","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:26:01,369","level":"INFO","node":2,"msg":"Synced weights from master for round 33"}
+{"time":"2026-07-01 17:26:07,947","level":"INFO","node":2,"msg":"Received update from node 1, round 34"}
+{"time":"2026-07-01 17:26:08,013","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:26:10,770","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:26:10,786","level":"INFO","node":2,"msg":"Synced weights from master for round 34"}
+{"time":"2026-07-01 17:26:17,388","level":"INFO","node":2,"msg":"Received update from node 1, round 35"}
+{"time":"2026-07-01 17:26:17,459","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:26:20,193","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:26:20,208","level":"INFO","node":2,"msg":"Synced weights from master for round 35"}
+{"time":"2026-07-01 17:26:26,849","level":"INFO","node":2,"msg":"Received update from node 1, round 36"}
+{"time":"2026-07-01 17:26:26,916","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:26:29,675","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:26:29,729","level":"INFO","node":2,"msg":"Synced weights from master for round 36"}
+{"time":"2026-07-01 17:26:36,206","level":"INFO","node":2,"msg":"Received update from node 1, round 37"}
+{"time":"2026-07-01 17:26:36,281","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:26:39,050","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:26:39,088","level":"INFO","node":2,"msg":"Synced weights from master for round 37"}
+{"time":"2026-07-01 17:26:45,566","level":"INFO","node":2,"msg":"Received update from node 1, round 38"}
+{"time":"2026-07-01 17:26:45,669","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:26:48,382","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:26:48,406","level":"INFO","node":2,"msg":"Synced weights from master for round 38"}
+{"time":"2026-07-01 17:26:55,213","level":"INFO","node":2,"msg":"Received update from node 1, round 39"}
+{"time":"2026-07-01 17:26:55,277","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:26:58,089","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:26:58,103","level":"INFO","node":2,"msg":"Synced weights from master for round 39"}
+{"time":"2026-07-01 17:27:04,945","level":"INFO","node":2,"msg":"Received update from node 1, round 40"}
+{"time":"2026-07-01 17:27:05,015","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:27:07,752","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:27:07,814","level":"INFO","node":2,"msg":"Synced weights from master for round 40"}
+{"time":"2026-07-01 17:27:14,340","level":"INFO","node":2,"msg":"Received update from node 1, round 41"}
+{"time":"2026-07-01 17:27:14,422","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:27:17,107","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:27:17,171","level":"INFO","node":2,"msg":"Synced weights from master for round 41"}
+{"time":"2026-07-01 17:27:23,919","level":"INFO","node":2,"msg":"Received update from node 1, round 42"}
+{"time":"2026-07-01 17:27:23,982","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:27:26,676","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:27:26,691","level":"INFO","node":2,"msg":"Synced weights from master for round 42"}
+{"time":"2026-07-01 17:27:33,423","level":"INFO","node":2,"msg":"Received update from node 1, round 43"}
+{"time":"2026-07-01 17:27:33,490","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:27:36,223","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:27:36,257","level":"INFO","node":2,"msg":"Synced weights from master for round 43"}
+{"time":"2026-07-01 17:27:43,068","level":"INFO","node":2,"msg":"Received update from node 1, round 44"}
+{"time":"2026-07-01 17:27:43,137","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:27:45,938","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:27:45,987","level":"INFO","node":2,"msg":"Synced weights from master for round 44"}
+{"time":"2026-07-01 17:27:52,549","level":"INFO","node":2,"msg":"Received update from node 1, round 45"}
+{"time":"2026-07-01 17:27:52,616","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:27:55,264","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:27:55,283","level":"INFO","node":2,"msg":"Synced weights from master for round 45"}
+{"time":"2026-07-01 17:28:01,770","level":"INFO","node":2,"msg":"Received update from node 1, round 46"}
+{"time":"2026-07-01 17:28:01,832","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:28:04,511","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:28:04,526","level":"INFO","node":2,"msg":"Synced weights from master for round 46"}
+{"time":"2026-07-01 17:28:10,994","level":"INFO","node":2,"msg":"Received update from node 1, round 47"}
+{"time":"2026-07-01 17:28:11,057","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:28:13,687","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:28:13,701","level":"INFO","node":2,"msg":"Synced weights from master for round 47"}
+{"time":"2026-07-01 17:28:20,225","level":"INFO","node":2,"msg":"Received update from node 1, round 48"}
+{"time":"2026-07-01 17:28:20,295","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:28:23,172","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:28:23,200","level":"INFO","node":2,"msg":"Synced weights from master for round 48"}
+{"time":"2026-07-01 17:28:29,749","level":"INFO","node":2,"msg":"Received update from node 1, round 49"}
+{"time":"2026-07-01 17:28:29,814","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-01 17:28:32,653","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8000"}
+{"time":"2026-07-01 17:28:32,708","level":"INFO","node":2,"msg":"Synced weights from master for round 49"}

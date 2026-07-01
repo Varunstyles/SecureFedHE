@@ -893,3 +893,396 @@
 {"time":"2026-07-01 17:17:44,746","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
 {"time":"2026-07-01 17:17:44,752","level":"INFO","node":0,"msg":"Round 5 complete | accuracy=0.7909"}
 {"time":"2026-07-01 17:17:45,254","level":"INFO","node":0,"msg":"Starting round 6"}
+{"time":"2026-07-01 17:17:49,055","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:18:09,108","level":"INFO","node":0,"msg":"Received update from node 2, round 5"}
+{"time":"2026-07-01 17:18:09,111","level":"INFO","node":0,"msg":"Round 6 complete — aggregating"}
+{"time":"2026-07-01 17:18:09,163","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:18:09,219","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:18:09,234","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:18:09,249","level":"INFO","node":0,"msg":"Round 6 complete | accuracy=0.8091"}
+{"time":"2026-07-01 17:18:09,751","level":"INFO","node":0,"msg":"Starting round 7"}
+{"time":"2026-07-01 17:18:21,062","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:18:37,675","level":"INFO","node":0,"msg":"Received update from node 2, round 6"}
+{"time":"2026-07-01 17:18:37,675","level":"INFO","node":0,"msg":"Round 7 complete — aggregating"}
+{"time":"2026-07-01 17:18:37,694","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:18:37,718","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:18:37,720","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:18:37,724","level":"INFO","node":0,"msg":"Round 7 complete | accuracy=0.8000"}
+{"time":"2026-07-01 17:18:38,226","level":"INFO","node":0,"msg":"Starting round 8"}
+{"time":"2026-07-01 17:18:41,030","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:18:47,825","level":"INFO","node":0,"msg":"Received update from node 2, round 7"}
+{"time":"2026-07-01 17:18:47,825","level":"INFO","node":0,"msg":"Round 8 complete — aggregating"}
+{"time":"2026-07-01 17:18:47,835","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:18:47,858","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:18:47,861","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:18:47,866","level":"INFO","node":0,"msg":"Round 8 complete | accuracy=0.8000"}
+{"time":"2026-07-01 17:18:48,368","level":"INFO","node":0,"msg":"Starting round 9"}
+{"time":"2026-07-01 17:18:51,542","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:19:09,900","level":"INFO","node":0,"msg":"Received update from node 2, round 8"}
+{"time":"2026-07-01 17:19:09,901","level":"INFO","node":0,"msg":"Round 9 complete — aggregating"}
+{"time":"2026-07-01 17:19:09,937","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:19:09,965","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:19:09,977","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:19:09,993","level":"INFO","node":0,"msg":"Round 9 complete | accuracy=0.8182"}
+{"time":"2026-07-01 17:19:10,495","level":"INFO","node":0,"msg":"Starting round 10"}
+{"time":"2026-07-01 17:19:20,905","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:19:42,699","level":"INFO","node":0,"msg":"Received update from node 2, round 9"}
+{"time":"2026-07-01 17:19:42,700","level":"INFO","node":0,"msg":"Round 10 complete — aggregating"}
+{"time":"2026-07-01 17:19:42,734","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:19:42,759","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:19:42,768","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:19:42,782","level":"INFO","node":0,"msg":"Round 10 complete | accuracy=0.8636"}
+{"time":"2026-07-01 17:19:43,285","level":"INFO","node":0,"msg":"Starting round 11"}
+{"time":"2026-07-01 17:19:53,899","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:20:16,202","level":"INFO","node":0,"msg":"Received update from node 2, round 10"}
+{"time":"2026-07-01 17:20:16,203","level":"INFO","node":0,"msg":"Round 11 complete — aggregating"}
+{"time":"2026-07-01 17:20:16,244","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:20:16,280","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:20:16,289","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:20:16,301","level":"INFO","node":0,"msg":"Round 11 complete | accuracy=0.8455"}
+{"time":"2026-07-01 17:20:16,803","level":"INFO","node":0,"msg":"Starting round 12"}
+{"time":"2026-07-01 17:20:26,132","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:20:47,370","level":"INFO","node":0,"msg":"Received update from node 2, round 11"}
+{"time":"2026-07-01 17:20:47,371","level":"INFO","node":0,"msg":"Round 12 complete — aggregating"}
+{"time":"2026-07-01 17:20:47,436","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:20:47,471","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:20:47,486","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:20:47,513","level":"INFO","node":0,"msg":"Round 12 complete | accuracy=0.8091"}
+{"time":"2026-07-01 17:20:48,015","level":"INFO","node":0,"msg":"Starting round 13"}
+{"time":"2026-07-01 17:20:48,140","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=255644362490 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:20:52,148","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:20:58,306","level":"INFO","node":0,"msg":"Received update from node 2, round 12"}
+{"time":"2026-07-01 17:20:58,307","level":"INFO","node":0,"msg":"Round 13 complete — aggregating"}
+{"time":"2026-07-01 17:20:58,315","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:20:58,325","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:20:58,329","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:20:58,334","level":"INFO","node":0,"msg":"Round 13 complete | accuracy=0.8273"}
+{"time":"2026-07-01 17:20:58,835","level":"INFO","node":0,"msg":"Starting round 14"}
+{"time":"2026-07-01 17:21:01,729","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:21:07,670","level":"INFO","node":0,"msg":"Received update from node 2, round 13"}
+{"time":"2026-07-01 17:21:07,671","level":"INFO","node":0,"msg":"Round 14 complete — aggregating"}
+{"time":"2026-07-01 17:21:07,691","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:21:07,700","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:21:07,704","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:21:07,714","level":"INFO","node":0,"msg":"Round 14 complete | accuracy=0.8364"}
+{"time":"2026-07-01 17:21:08,216","level":"INFO","node":0,"msg":"Starting round 15"}
+{"time":"2026-07-01 17:21:08,247","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=253198402800 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:21:11,224","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:21:17,363","level":"INFO","node":0,"msg":"Received update from node 2, round 14"}
+{"time":"2026-07-01 17:21:17,363","level":"INFO","node":0,"msg":"Round 15 complete — aggregating"}
+{"time":"2026-07-01 17:21:17,372","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:21:17,398","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:21:17,402","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:21:17,408","level":"INFO","node":0,"msg":"Round 15 complete | accuracy=0.8364"}
+{"time":"2026-07-01 17:21:17,910","level":"INFO","node":0,"msg":"Starting round 16"}
+{"time":"2026-07-01 17:21:20,811","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:21:26,844","level":"INFO","node":0,"msg":"Received update from node 2, round 15"}
+{"time":"2026-07-01 17:21:26,844","level":"INFO","node":0,"msg":"Round 16 complete — aggregating"}
+{"time":"2026-07-01 17:21:26,864","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:21:26,909","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:21:26,914","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:21:26,921","level":"INFO","node":0,"msg":"Round 16 complete | accuracy=0.8364"}
+{"time":"2026-07-01 17:21:27,422","level":"INFO","node":0,"msg":"Starting round 17"}
+{"time":"2026-07-01 17:21:27,459","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=256608342735 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:21:30,398","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:21:36,357","level":"INFO","node":0,"msg":"Received update from node 2, round 16"}
+{"time":"2026-07-01 17:21:36,358","level":"INFO","node":0,"msg":"Round 17 complete — aggregating"}
+{"time":"2026-07-01 17:21:36,367","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:21:36,378","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:21:36,382","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:21:36,388","level":"INFO","node":0,"msg":"Round 17 complete | accuracy=0.8364"}
+{"time":"2026-07-01 17:21:36,890","level":"INFO","node":0,"msg":"Starting round 18"}
+{"time":"2026-07-01 17:21:39,790","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:21:45,837","level":"INFO","node":0,"msg":"Received update from node 2, round 17"}
+{"time":"2026-07-01 17:21:45,838","level":"INFO","node":0,"msg":"Round 18 complete — aggregating"}
+{"time":"2026-07-01 17:21:45,851","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:21:45,863","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:21:45,868","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:21:45,882","level":"INFO","node":0,"msg":"Round 18 complete | accuracy=0.8273"}
+{"time":"2026-07-01 17:21:46,385","level":"INFO","node":0,"msg":"Starting round 19"}
+{"time":"2026-07-01 17:21:46,420","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=259375449523 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:21:49,154","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:21:55,006","level":"INFO","node":0,"msg":"Received update from node 2, round 18"}
+{"time":"2026-07-01 17:21:55,006","level":"INFO","node":0,"msg":"Round 19 complete — aggregating"}
+{"time":"2026-07-01 17:21:55,028","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:21:55,043","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:21:55,048","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:21:55,056","level":"INFO","node":0,"msg":"Round 19 complete | accuracy=0.8182"}
+{"time":"2026-07-01 17:21:55,558","level":"INFO","node":0,"msg":"Starting round 20"}
+{"time":"2026-07-01 17:21:58,495","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:22:04,387","level":"INFO","node":0,"msg":"Received update from node 2, round 19"}
+{"time":"2026-07-01 17:22:04,388","level":"INFO","node":0,"msg":"Round 20 complete — aggregating"}
+{"time":"2026-07-01 17:22:04,407","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:22:04,435","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:22:04,440","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:22:04,450","level":"INFO","node":0,"msg":"Round 20 complete | accuracy=0.8364"}
+{"time":"2026-07-01 17:22:04,952","level":"INFO","node":0,"msg":"Starting round 21"}
+{"time":"2026-07-01 17:22:04,991","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=261461602831 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:22:07,753","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:22:14,051","level":"INFO","node":0,"msg":"Received update from node 2, round 20"}
+{"time":"2026-07-01 17:22:14,051","level":"INFO","node":0,"msg":"Round 21 complete — aggregating"}
+{"time":"2026-07-01 17:22:14,071","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:22:14,094","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:22:14,098","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:22:14,108","level":"INFO","node":0,"msg":"Round 21 complete | accuracy=0.8182"}
+{"time":"2026-07-01 17:22:14,610","level":"INFO","node":0,"msg":"Starting round 22"}
+{"time":"2026-07-01 17:22:14,649","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=250007788791 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:22:17,426","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:22:23,415","level":"INFO","node":0,"msg":"Received update from node 2, round 21"}
+{"time":"2026-07-01 17:22:23,416","level":"INFO","node":0,"msg":"Round 22 complete — aggregating"}
+{"time":"2026-07-01 17:22:23,427","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:22:23,437","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:22:23,441","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:22:23,446","level":"INFO","node":0,"msg":"Round 22 complete | accuracy=0.8455"}
+{"time":"2026-07-01 17:22:23,947","level":"INFO","node":0,"msg":"Starting round 23"}
+{"time":"2026-07-01 17:22:26,802","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:22:32,729","level":"INFO","node":0,"msg":"Received update from node 2, round 22"}
+{"time":"2026-07-01 17:22:32,729","level":"INFO","node":0,"msg":"Round 23 complete — aggregating"}
+{"time":"2026-07-01 17:22:32,737","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:22:32,746","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:22:32,750","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:22:32,759","level":"INFO","node":0,"msg":"Round 23 complete | accuracy=0.8545"}
+{"time":"2026-07-01 17:22:33,260","level":"INFO","node":0,"msg":"Starting round 24"}
+{"time":"2026-07-01 17:22:33,290","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=261498324696 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:22:35,946","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:22:41,795","level":"INFO","node":0,"msg":"Received update from node 2, round 23"}
+{"time":"2026-07-01 17:22:41,795","level":"INFO","node":0,"msg":"Round 24 complete — aggregating"}
+{"time":"2026-07-01 17:22:41,810","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:22:41,823","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:22:41,827","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:22:41,834","level":"INFO","node":0,"msg":"Round 24 complete | accuracy=0.8545"}
+{"time":"2026-07-01 17:22:42,335","level":"INFO","node":0,"msg":"Starting round 25"}
+{"time":"2026-07-01 17:22:42,369","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=254099137538 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:22:45,142","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:22:50,954","level":"INFO","node":0,"msg":"Received update from node 2, round 24"}
+{"time":"2026-07-01 17:22:50,954","level":"INFO","node":0,"msg":"Round 25 complete — aggregating"}
+{"time":"2026-07-01 17:22:50,965","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:22:50,997","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:22:51,003","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:22:51,015","level":"INFO","node":0,"msg":"Round 25 complete | accuracy=0.8545"}
+{"time":"2026-07-01 17:22:51,517","level":"INFO","node":0,"msg":"Starting round 26"}
+{"time":"2026-07-01 17:22:51,551","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=253917800110 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:22:54,357","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:23:00,302","level":"INFO","node":0,"msg":"Received update from node 2, round 25"}
+{"time":"2026-07-01 17:23:00,302","level":"INFO","node":0,"msg":"Round 26 complete — aggregating"}
+{"time":"2026-07-01 17:23:00,322","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:23:00,331","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:23:00,335","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:23:00,346","level":"INFO","node":0,"msg":"Round 26 complete | accuracy=0.8273"}
+{"time":"2026-07-01 17:23:00,848","level":"INFO","node":0,"msg":"Starting round 27"}
+{"time":"2026-07-01 17:23:00,886","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=253119636000 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:23:03,560","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:23:09,829","level":"INFO","node":0,"msg":"Received update from node 2, round 26"}
+{"time":"2026-07-01 17:23:09,830","level":"INFO","node":0,"msg":"Round 27 complete — aggregating"}
+{"time":"2026-07-01 17:23:09,838","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:23:09,845","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:23:09,848","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:23:09,851","level":"INFO","node":0,"msg":"Round 27 complete | accuracy=0.8636"}
+{"time":"2026-07-01 17:23:10,353","level":"INFO","node":0,"msg":"Starting round 28"}
+{"time":"2026-07-01 17:23:10,388","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=253835176734 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:23:13,287","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:23:32,074","level":"INFO","node":0,"msg":"Received update from node 2, round 27"}
+{"time":"2026-07-01 17:23:32,075","level":"INFO","node":0,"msg":"Round 28 complete — aggregating"}
+{"time":"2026-07-01 17:23:32,109","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:23:32,152","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:23:32,161","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:23:32,174","level":"INFO","node":0,"msg":"Round 28 complete | accuracy=0.8273"}
+{"time":"2026-07-01 17:23:32,677","level":"INFO","node":0,"msg":"Starting round 29"}
+{"time":"2026-07-01 17:23:32,803","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=252909847591 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:23:42,835","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:24:03,157","level":"INFO","node":0,"msg":"Received update from node 2, round 28"}
+{"time":"2026-07-01 17:24:03,159","level":"INFO","node":0,"msg":"Round 29 complete — aggregating"}
+{"time":"2026-07-01 17:24:03,190","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:24:03,218","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:24:03,229","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:24:03,246","level":"INFO","node":0,"msg":"Round 29 complete | accuracy=0.8364"}
+{"time":"2026-07-01 17:24:03,749","level":"INFO","node":0,"msg":"Starting round 30"}
+{"time":"2026-07-01 17:24:03,880","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=256588506658 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:24:09,819","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:24:15,782","level":"INFO","node":0,"msg":"Received update from node 2, round 29"}
+{"time":"2026-07-01 17:24:15,783","level":"INFO","node":0,"msg":"Round 30 complete — aggregating"}
+{"time":"2026-07-01 17:24:15,803","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:24:15,828","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:24:15,833","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:24:15,843","level":"INFO","node":0,"msg":"Round 30 complete | accuracy=0.8273"}
+{"time":"2026-07-01 17:24:16,344","level":"INFO","node":0,"msg":"Starting round 31"}
+{"time":"2026-07-01 17:24:16,375","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=253331578401 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:24:19,799","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:24:33,856","level":"INFO","node":0,"msg":"Received update from node 2, round 30"}
+{"time":"2026-07-01 17:24:33,857","level":"INFO","node":0,"msg":"Round 31 complete — aggregating"}
+{"time":"2026-07-01 17:24:33,891","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:24:33,945","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:24:33,958","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:24:33,972","level":"INFO","node":0,"msg":"Round 31 complete | accuracy=0.8182"}
+{"time":"2026-07-01 17:24:34,474","level":"INFO","node":0,"msg":"Starting round 32"}
+{"time":"2026-07-01 17:24:34,598","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=257301479882 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:24:45,416","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:25:06,812","level":"INFO","node":0,"msg":"Received update from node 2, round 31"}
+{"time":"2026-07-01 17:25:06,814","level":"INFO","node":0,"msg":"Round 32 complete — aggregating"}
+{"time":"2026-07-01 17:25:06,844","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:25:06,870","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:25:06,880","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:25:06,893","level":"INFO","node":0,"msg":"Round 32 complete | accuracy=0.8727"}
+{"time":"2026-07-01 17:25:07,395","level":"INFO","node":0,"msg":"Starting round 33"}
+{"time":"2026-07-01 17:25:07,509","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=257390876645 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:25:17,076","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:25:37,787","level":"INFO","node":0,"msg":"Received update from node 2, round 32"}
+{"time":"2026-07-01 17:25:37,789","level":"INFO","node":0,"msg":"Round 33 complete — aggregating"}
+{"time":"2026-07-01 17:25:37,820","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:25:37,846","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:25:37,856","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:25:37,869","level":"INFO","node":0,"msg":"Round 33 complete | accuracy=0.8455"}
+{"time":"2026-07-01 17:25:38,371","level":"INFO","node":0,"msg":"Starting round 34"}
+{"time":"2026-07-01 17:25:38,493","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=255907817346 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:25:48,194","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:26:01,315","level":"INFO","node":0,"msg":"Received update from node 2, round 33"}
+{"time":"2026-07-01 17:26:01,316","level":"INFO","node":0,"msg":"Round 34 complete — aggregating"}
+{"time":"2026-07-01 17:26:01,336","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:26:01,371","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:26:01,377","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:26:01,396","level":"INFO","node":0,"msg":"Round 34 complete | accuracy=0.8636"}
+{"time":"2026-07-01 17:26:01,898","level":"INFO","node":0,"msg":"Starting round 35"}
+{"time":"2026-07-01 17:26:01,931","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=256010802327 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:26:04,803","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:26:10,770","level":"INFO","node":0,"msg":"Received update from node 2, round 34"}
+{"time":"2026-07-01 17:26:10,770","level":"INFO","node":0,"msg":"Round 35 complete — aggregating"}
+{"time":"2026-07-01 17:26:10,778","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:26:10,787","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:26:10,792","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:26:10,796","level":"INFO","node":0,"msg":"Round 35 complete | accuracy=0.8455"}
+{"time":"2026-07-01 17:26:11,298","level":"INFO","node":0,"msg":"Starting round 36"}
+{"time":"2026-07-01 17:26:11,339","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=255325342974 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:26:14,176","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:26:20,192","level":"INFO","node":0,"msg":"Received update from node 2, round 35"}
+{"time":"2026-07-01 17:26:20,192","level":"INFO","node":0,"msg":"Round 36 complete — aggregating"}
+{"time":"2026-07-01 17:26:20,200","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:26:20,209","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:26:20,211","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:26:20,215","level":"INFO","node":0,"msg":"Round 36 complete | accuracy=0.8636"}
+{"time":"2026-07-01 17:26:20,716","level":"INFO","node":0,"msg":"Starting round 37"}
+{"time":"2026-07-01 17:26:20,755","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=258064128289 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:26:23,648","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:26:29,674","level":"INFO","node":0,"msg":"Received update from node 2, round 36"}
+{"time":"2026-07-01 17:26:29,674","level":"INFO","node":0,"msg":"Round 37 complete — aggregating"}
+{"time":"2026-07-01 17:26:29,694","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:26:29,731","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:26:29,739","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:26:29,748","level":"INFO","node":0,"msg":"Round 37 complete | accuracy=0.8636"}
+{"time":"2026-07-01 17:26:30,252","level":"INFO","node":0,"msg":"Starting round 38"}
+{"time":"2026-07-01 17:26:30,298","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=252373441296 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:26:33,149","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:26:39,048","level":"INFO","node":0,"msg":"Received update from node 2, round 37"}
+{"time":"2026-07-01 17:26:39,049","level":"INFO","node":0,"msg":"Round 38 complete — aggregating"}
+{"time":"2026-07-01 17:26:39,058","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:26:39,090","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:26:39,096","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:26:39,105","level":"INFO","node":0,"msg":"Round 38 complete | accuracy=0.8364"}
+{"time":"2026-07-01 17:26:39,606","level":"INFO","node":0,"msg":"Starting round 39"}
+{"time":"2026-07-01 17:26:39,649","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=257908604952 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:26:42,549","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:26:48,382","level":"INFO","node":0,"msg":"Received update from node 2, round 38"}
+{"time":"2026-07-01 17:26:48,382","level":"INFO","node":0,"msg":"Round 39 complete — aggregating"}
+{"time":"2026-07-01 17:26:48,395","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:26:48,408","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:26:48,412","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:26:48,421","level":"INFO","node":0,"msg":"Round 39 complete | accuracy=0.8273"}
+{"time":"2026-07-01 17:26:48,923","level":"INFO","node":0,"msg":"Starting round 40"}
+{"time":"2026-07-01 17:26:48,951","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=255735549427 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:26:51,885","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:26:58,088","level":"INFO","node":0,"msg":"Received update from node 2, round 39"}
+{"time":"2026-07-01 17:26:58,089","level":"INFO","node":0,"msg":"Round 40 complete — aggregating"}
+{"time":"2026-07-01 17:26:58,096","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:26:58,104","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:26:58,107","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:26:58,111","level":"INFO","node":0,"msg":"Round 40 complete | accuracy=0.8273"}
+{"time":"2026-07-01 17:26:58,613","level":"INFO","node":0,"msg":"Starting round 41"}
+{"time":"2026-07-01 17:26:58,651","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=254709232688 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:27:01,620","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:27:07,750","level":"INFO","node":0,"msg":"Received update from node 2, round 40"}
+{"time":"2026-07-01 17:27:07,750","level":"INFO","node":0,"msg":"Round 41 complete — aggregating"}
+{"time":"2026-07-01 17:27:07,784","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:27:07,815","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:27:07,819","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:27:07,831","level":"INFO","node":0,"msg":"Round 41 complete | accuracy=0.8273"}
+{"time":"2026-07-01 17:27:08,333","level":"INFO","node":0,"msg":"Starting round 42"}
+{"time":"2026-07-01 17:27:08,370","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=257065936217 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:27:11,141","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:27:17,106","level":"INFO","node":0,"msg":"Received update from node 2, round 41"}
+{"time":"2026-07-01 17:27:17,107","level":"INFO","node":0,"msg":"Round 42 complete — aggregating"}
+{"time":"2026-07-01 17:27:17,135","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:27:17,173","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:27:17,177","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:27:17,184","level":"INFO","node":0,"msg":"Round 42 complete | accuracy=0.8636"}
+{"time":"2026-07-01 17:27:17,686","level":"INFO","node":0,"msg":"Starting round 43"}
+{"time":"2026-07-01 17:27:17,736","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=258919912658 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:27:20,696","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:27:26,676","level":"INFO","node":0,"msg":"Received update from node 2, round 42"}
+{"time":"2026-07-01 17:27:26,676","level":"INFO","node":0,"msg":"Round 43 complete — aggregating"}
+{"time":"2026-07-01 17:27:26,684","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:27:26,692","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:27:26,695","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:27:26,698","level":"INFO","node":0,"msg":"Round 43 complete | accuracy=0.8273"}
+{"time":"2026-07-01 17:27:27,200","level":"INFO","node":0,"msg":"Starting round 44"}
+{"time":"2026-07-01 17:27:27,228","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=259114625566 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:27:30,227","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:27:36,222","level":"INFO","node":0,"msg":"Received update from node 2, round 43"}
+{"time":"2026-07-01 17:27:36,222","level":"INFO","node":0,"msg":"Round 44 complete — aggregating"}
+{"time":"2026-07-01 17:27:36,231","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:27:36,258","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:27:36,261","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:27:36,265","level":"INFO","node":0,"msg":"Round 44 complete | accuracy=0.8364"}
+{"time":"2026-07-01 17:27:36,768","level":"INFO","node":0,"msg":"Starting round 45"}
+{"time":"2026-07-01 17:27:36,817","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=260186491049 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:27:39,767","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:27:45,936","level":"INFO","node":0,"msg":"Received update from node 2, round 44"}
+{"time":"2026-07-01 17:27:45,937","level":"INFO","node":0,"msg":"Round 45 complete — aggregating"}
+{"time":"2026-07-01 17:27:45,957","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:27:45,989","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:27:45,996","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:27:46,004","level":"INFO","node":0,"msg":"Round 45 complete | accuracy=0.8455"}
+{"time":"2026-07-01 17:27:46,506","level":"INFO","node":0,"msg":"Starting round 46"}
+{"time":"2026-07-01 17:27:46,551","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=257814782814 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:27:49,472","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:27:55,264","level":"INFO","node":0,"msg":"Received update from node 2, round 45"}
+{"time":"2026-07-01 17:27:55,264","level":"INFO","node":0,"msg":"Round 46 complete — aggregating"}
+{"time":"2026-07-01 17:27:55,274","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:27:55,284","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:27:55,287","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:27:55,293","level":"INFO","node":0,"msg":"Round 46 complete | accuracy=0.8455"}
+{"time":"2026-07-01 17:27:55,795","level":"INFO","node":0,"msg":"Starting round 47"}
+{"time":"2026-07-01 17:27:55,831","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=257824425851 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:27:58,732","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:28:04,509","level":"INFO","node":0,"msg":"Received update from node 2, round 46"}
+{"time":"2026-07-01 17:28:04,509","level":"INFO","node":0,"msg":"Round 47 complete — aggregating"}
+{"time":"2026-07-01 17:28:04,518","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:28:04,526","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:28:04,529","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:28:04,532","level":"INFO","node":0,"msg":"Round 47 complete | accuracy=0.8636"}
+{"time":"2026-07-01 17:28:05,034","level":"INFO","node":0,"msg":"Starting round 48"}
+{"time":"2026-07-01 17:28:05,069","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=258546937447 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:28:07,899","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:28:13,686","level":"INFO","node":0,"msg":"Received update from node 2, round 47"}
+{"time":"2026-07-01 17:28:13,687","level":"INFO","node":0,"msg":"Round 48 complete — aggregating"}
+{"time":"2026-07-01 17:28:13,695","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:28:13,702","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:28:13,704","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:28:13,709","level":"INFO","node":0,"msg":"Round 48 complete | accuracy=0.8364"}
+{"time":"2026-07-01 17:28:14,213","level":"INFO","node":0,"msg":"Starting round 49"}
+{"time":"2026-07-01 17:28:14,248","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=263471945575 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:28:17,193","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:28:23,172","level":"INFO","node":0,"msg":"Received update from node 2, round 48"}
+{"time":"2026-07-01 17:28:23,172","level":"INFO","node":0,"msg":"Round 49 complete — aggregating"}
+{"time":"2026-07-01 17:28:23,179","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:28:23,202","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:28:23,206","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:28:23,214","level":"INFO","node":0,"msg":"Round 49 complete | accuracy=0.8636"}
+{"time":"2026-07-01 17:28:23,716","level":"INFO","node":0,"msg":"Starting round 50"}
+{"time":"2026-07-01 17:28:23,753","level":"WARNING","node":0,"msg":"ZKP norm violation (clipping applied): Gradient norm violation: norm_sq=261322339756 > bound=250000000000. Apply gradient clipping (C=0.5) before proving."}
+{"time":"2026-07-01 17:28:26,506","level":"INFO","node":0,"msg":"Forwarded to http://127.0.0.1:8001"}
+{"time":"2026-07-01 17:28:32,652","level":"INFO","node":0,"msg":"Received update from node 2, round 49"}
+{"time":"2026-07-01 17:28:32,652","level":"INFO","node":0,"msg":"Round 50 complete — aggregating"}
+{"time":"2026-07-01 17:28:32,674","level":"INFO","node":0,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-01 17:28:32,710","level":"INFO","node":0,"msg":"Broadcast weights to node 2"}
+{"time":"2026-07-01 17:28:32,714","level":"INFO","node":0,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-01 17:28:32,723","level":"INFO","node":0,"msg":"Round 50 complete | accuracy=0.8455"}
+{"time":"2026-07-01 17:28:32,723","level":"INFO","node":0,"msg":"Training complete after 50 rounds"}
