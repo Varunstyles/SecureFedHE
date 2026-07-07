@@ -39,6 +39,38 @@ class Groth16ProofV2:
     def __repr__(self):
         return f"Groth16ProofV2(public_inputs={self.public_inputs})"
 
+    def to_json(self) -> dict:
+        def g1_to_list(pt):
+            return [int(pt[0].n), int(pt[1].n)]
+
+        def g2_to_list(pt):
+            return [
+                [int(c) for c in pt[0].coeffs],
+                [int(c) for c in pt[1].coeffs],
+            ]
+
+        return {
+            "A": g1_to_list(self.A),
+            "B": g2_to_list(self.B),
+            "C": g1_to_list(self.C),
+            "public_inputs": [int(x) for x in self.public_inputs],
+        }
+
+    @classmethod
+    def from_json(cls, data: dict) -> "Groth16ProofV2":
+        from py_ecc.fields import bn128_FQ as FQ, bn128_FQ2 as FQ2
+
+        a0, a1 = data["A"]
+        A = (FQ(a0), FQ(a1))
+
+        c0, c1 = data["C"]
+        C = (FQ(c0), FQ(c1))
+
+        b0, b1 = data["B"]
+        B = (FQ2(b0), FQ2(b1))
+
+        return cls(A=A, B=B, C=C, public_inputs=list(data["public_inputs"]))
+
 
 def _srs_eval_g1(tau_powers_g1: List[tuple], poly: List[int]) -> tuple:
     """Evaluate `poly` at the (secret, unknown-to-us) tau, as a G1 point,

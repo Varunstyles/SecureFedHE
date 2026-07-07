@@ -379,7 +379,7 @@ def execute_round():
         ns = norm_sq_int(fc2_fr)
         slack = bound - ns
     proof = zkp_prove_v2(STATE["zkp_pk"], STATE["zkp_dim"], fc2_fr, slack, bound, rnd)
-    commitment = {"proof": proof, "public_inputs": proof.public_inputs}
+    commitment = {"proof": proof.to_json()}
 
     # HE encrypt fc2
     he   = STATE["he"]
@@ -425,9 +425,11 @@ def handle_update(data: dict):
         return
 
     # ── ZKP verification (real Groth16 pairing check) ───────────
+    from distributed_simulation.prover_v2 import Groth16ProofV2
     commitment = data.get("commitment", {})
     if commitment:
-        ok = zkp_verify_v2(STATE["zkp_vk"], commitment["proof"])
+        proof_obj = Groth16ProofV2.from_json(commitment["proof"])
+        ok = zkp_verify_v2(STATE["zkp_vk"], proof_obj)
         if not ok:
             log.warning(f'"ZKP REJECTED from node {sender}: pairing check failed"')
             _forward(data)  # skip: forward unchanged (Fix-1 protocol)
@@ -460,7 +462,7 @@ def handle_update(data: dict):
         ns = norm_sq_int(fc2_fr)
         slack = bound - ns
     proof = zkp_prove_v2(STATE["zkp_pk"], STATE["zkp_dim"], fc2_fr, slack, bound, rnd)
-    my_commitment = {"proof": proof, "public_inputs": proof.public_inputs}
+    my_commitment = {"proof": proof.to_json()}
 
     # ── HE aggregation ────────────────────────────────────────
     he         = STATE["he"]
@@ -590,6 +592,7 @@ def main():
     config  = load_config(args.config)
 
     config  = load_config(args.config)
+    threading.stack_size(64 * 1024 * 1024)  # fixes py_ecc recursive pow() stack overflow on Windows
     nid     = args.node_id = args.id
     nodes   = config["ring"]["nodes"]
     node_cfg = nodes[nid]
@@ -599,8 +602,14 @@ def main():
     logger.info(f'"Starting node {nid}: {node_name}"')
 
     # ── ZKP setup (real Groth16, norm-bound circuit) ────────────
+    # Load the SHARED trusted setup from disk (generated once via
+    # generate_setup.py and copied to every node) instead of each
+    # node generating its own — otherwise pk/vk would be incompatible
+    # across nodes and every proof would fail verification.
+    from distributed_simulation.trusted_setup import load_setup
     zkp_cfg = config["zkp"]
-    zkp_pk, zkp_vk = zkp_setup_v2(zkp_cfg["gradient_dim"])
+    setup_path = zkp_cfg.get("setup_file", "zkp_setup.json")
+    zkp_pk, zkp_vk = load_setup(setup_path)
     STATE["zkp_pk"] = zkp_pk
     STATE["zkp_vk"] = zkp_vk
     STATE["zkp_dim"] = zkp_cfg["gradient_dim"]

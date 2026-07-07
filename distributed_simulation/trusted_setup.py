@@ -174,6 +174,105 @@ def setup(n: int) -> Tuple[ProvingKeyV2, VerificationKeyV2]:
     # tau, alpha, beta, gamma, delta fall out of scope here — not stored anywhere.
     return pk, vk
 
+def _g1_to_list(pt):
+    if pt is None:
+        return None  # point at infinity
+    return [int(pt[0].n), int(pt[1].n)]
+
+def _g1_from_list(data):
+    if data is None:
+        return None
+    from py_ecc.fields import bn128_FQ as FQ
+    return (FQ(data[0]), FQ(data[1]))
+
+def _g2_to_list(pt):
+    if pt is None:
+        return None  # point at infinity
+    return [
+        [int(c) for c in pt[0].coeffs],
+        [int(c) for c in pt[1].coeffs],
+    ]
+
+def _g2_from_list(data):
+    if data is None:
+        return None
+    from py_ecc.fields import bn128_FQ2 as FQ2
+    return (FQ2(data[0]), FQ2(data[1]))
+
+
+def save_setup(pk: "ProvingKeyV2", vk: "VerificationKeyV2", path: str):
+    """Serialize (pk, vk) to a JSON file. Contains no secret material —
+    tau/alpha/beta/gamma/delta were already discarded inside setup()."""
+    import json as _json
+
+    data = {
+        "pk": {
+            "alpha_g1": _g1_to_list(pk.alpha_g1),
+            "beta_g1": _g1_to_list(pk.beta_g1),
+            "beta_g2": _g2_to_list(pk.beta_g2),
+            "delta_g1": _g1_to_list(pk.delta_g1),
+            "delta_g2": _g2_to_list(pk.delta_g2),
+            "tau_powers_g1": [_g1_to_list(p) for p in pk.tau_powers_g1],
+            "tau_powers_g2": [_g2_to_list(p) for p in pk.tau_powers_g2],
+            "h_query": [_g1_to_list(p) for p in pk.h_query],
+            "l_query": [_g1_to_list(p) for p in pk.l_query],
+            "private_cols": list(pk.private_cols),
+            "n_cols": pk.n_cols,
+            "n_public": pk.n_public,
+            "n_rows": pk.n_rows,
+            "circuit_id": pk.circuit_id,
+        },
+        "vk": {
+            "alpha_g1": _g1_to_list(vk.alpha_g1),
+            "beta_g2": _g2_to_list(vk.beta_g2),
+            "gamma_g2": _g2_to_list(vk.gamma_g2),
+            "delta_g2": _g2_to_list(vk.delta_g2),
+            "ic": [_g1_to_list(p) for p in vk.ic],
+            "n_public": vk.n_public,
+            "circuit_id": vk.circuit_id,
+        },
+    }
+    with open(path, "w") as f:
+        _json.dump(data, f)
+
+
+def load_setup(path: str):
+    """Deserialize (pk, vk) from a JSON file produced by save_setup()."""
+    import json as _json
+
+    with open(path) as f:
+        data = _json.load(f)
+
+    p = data["pk"]
+    pk = ProvingKeyV2(
+        alpha_g1=_g1_from_list(p["alpha_g1"]),
+        beta_g1=_g1_from_list(p["beta_g1"]),
+        beta_g2=_g2_from_list(p["beta_g2"]),
+        delta_g1=_g1_from_list(p["delta_g1"]),
+        delta_g2=_g2_from_list(p["delta_g2"]),
+        tau_powers_g1=[_g1_from_list(x) for x in p["tau_powers_g1"]],
+        tau_powers_g2=[_g2_from_list(x) for x in p["tau_powers_g2"]],
+        h_query=[_g1_from_list(x) for x in p["h_query"]],
+        l_query=[_g1_from_list(x) for x in p["l_query"]],
+        private_cols=list(p["private_cols"]),
+        n_cols=p["n_cols"],
+        n_public=p["n_public"],
+        n_rows=p["n_rows"],
+        circuit_id=p["circuit_id"],
+    )
+
+    v = data["vk"]
+    vk = VerificationKeyV2(
+        alpha_g1=_g1_from_list(v["alpha_g1"]),
+        beta_g2=_g2_from_list(v["beta_g2"]),
+        gamma_g2=_g2_from_list(v["gamma_g2"]),
+        delta_g2=_g2_from_list(v["delta_g2"]),
+        ic=[_g1_from_list(x) for x in v["ic"]],
+        n_public=v["n_public"],
+        circuit_id=v["circuit_id"],
+    )
+
+    return pk, vk
 
 def _run_self_test():
     print("=" * 60)
