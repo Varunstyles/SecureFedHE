@@ -53,9 +53,9 @@ sys.path.insert(0, str(ROOT))
 
 from models.diabetes_net import DiabetesNet
 from data.diabetes_loader import load_diabetes_datasets
-from distributed_simulation.zkp_commitment import (
-    zkp_ring_setup, generate_commitment, verify_commitment, generate_node_keypair
-)
+from distributed_simulation.trusted_setup import setup as zkp_setup_v2
+from distributed_simulation.prover_v2 import prove as zkp_prove_v2
+from distributed_simulation.verifier_v2 import verify as zkp_verify_v2
 
 # ── Audit logger ───────────────────────────────────────────────────────────────
 def setup_logger(node_id: int, log_dir: str = "logs") -> logging.Logger:
@@ -359,19 +359,27 @@ def execute_round():
     # DP noise on non-fc2 layers
     noised = add_dp_noise(params, dp["dp_epsilon"], dp["dp_delta"], dp["dp_sensitivity"])
 
-    # ZKP commitment on fc2 weights
+    # ZKP proof on fc2 weights (real Groth16, norm-bound circuit)
+    from distributed_simulation.zkp_math import quantize, norm_sq_int, threshold_sq_int
     fc2_flat = noised["fc2.weight"].flatten().tolist()
-    try:
-        commitment = generate_commitment(fc2_flat, f"node_{nid}", rnd)
-    except ValueError as e:
-        log.warning(f'"ZKP norm violation (clipping applied): {e}"')
-        # Clip and retry
+    C_thresh = 0.5
+    fc2_fr = quantize(fc2_flat)
+    ns = norm_sq_int(fc2_fr)
+    bound = threshold_sq_int(C_thresh)
+    slack = bound - ns
+    if slack < 0:
+        log.warning(f'"ZKP norm violation (clipping applied): slack={slack}"')
         fc2_arr = noised["fc2.weight"].flatten()
         norm = np.linalg.norm(fc2_arr)
         if norm > 0.5:
             fc2_arr = fc2_arr * (0.45 / norm)
         noised["fc2.weight"] = fc2_arr.reshape(noised["fc2.weight"].shape)
-        commitment = generate_commitment(fc2_arr.tolist(), f"node_{nid}", rnd)
+        fc2_flat = fc2_arr.tolist()
+        fc2_fr = quantize(fc2_flat)
+        ns = norm_sq_int(fc2_fr)
+        slack = bound - ns
+    proof = zkp_prove_v2(STATE["zkp_pk"], STATE["zkp_dim"], fc2_fr, slack, bound, rnd)
+    commitment = {"proof": proof, "public_inputs": proof.public_inputs}
 
     # HE encrypt fc2
     he   = STATE["he"]
@@ -416,13 +424,12 @@ def handle_update(data: dict):
         _finalize_round(data)
         return
 
-    # ── ZKP verification ──────────────────────────────────────
+    # ── ZKP verification (real Groth16 pairing check) ───────────
     commitment = data.get("commitment", {})
     if commitment:
-        ok, reason = verify_commitment(commitment, expected_round=rnd,
-                                        sender_id=f"node_{sender}")
+        ok = zkp_verify_v2(STATE["zkp_vk"], commitment["proof"])
         if not ok:
-            log.warning(f'"ZKP REJECTED from node {sender}: {reason}"')
+            log.warning(f'"ZKP REJECTED from node {sender}: pairing check failed"')
             _forward(data)  # skip: forward unchanged (Fix-1 protocol)
             return
         log.info(f'"ZKP ACCEPTED from node {sender}"')
@@ -436,15 +443,24 @@ def handle_update(data: dict):
     )
     noised = add_dp_noise(params, dp["dp_epsilon"], dp["dp_delta"], dp["dp_sensitivity"])
 
-    # ── ZKP commitment ────────────────────────────────────────
+    # ── ZKP proof (real Groth16, norm-bound circuit) ────────────
+    from distributed_simulation.zkp_math import quantize, norm_sq_int, threshold_sq_int
     fc2_flat = noised["fc2.weight"].flatten().tolist()
-    try:
-        my_commitment = generate_commitment(fc2_flat, f"node_{nid}", rnd)
-    except ValueError:
+    C_thresh = 0.5
+    fc2_fr = quantize(fc2_flat)
+    ns = norm_sq_int(fc2_fr)
+    bound = threshold_sq_int(C_thresh)
+    slack = bound - ns
+    if slack < 0:
         fc2_arr = noised["fc2.weight"].flatten()
         fc2_arr = fc2_arr * (0.45 / np.linalg.norm(fc2_arr))
         noised["fc2.weight"] = fc2_arr.reshape(noised["fc2.weight"].shape)
-        my_commitment = generate_commitment(fc2_arr.tolist(), f"node_{nid}", rnd)
+        fc2_flat = fc2_arr.tolist()
+        fc2_fr = quantize(fc2_flat)
+        ns = norm_sq_int(fc2_fr)
+        slack = bound - ns
+    proof = zkp_prove_v2(STATE["zkp_pk"], STATE["zkp_dim"], fc2_fr, slack, bound, rnd)
+    my_commitment = {"proof": proof, "public_inputs": proof.public_inputs}
 
     # ── HE aggregation ────────────────────────────────────────
     he         = STATE["he"]
@@ -582,15 +598,12 @@ def main():
     node_name = node_cfg["name"]
     logger.info(f'"Starting node {nid}: {node_name}"')
 
-    # ── ZKP setup ──────────────────────────────────────────────
+    # ── ZKP setup (real Groth16, norm-bound circuit) ────────────
     zkp_cfg = config["zkp"]
-    zkp_ring_setup(
-        n_nodes=len(nodes),
-        gradient_dim=zkp_cfg["gradient_dim"],
-        clipping_threshold=config["privacy"]["clip_threshold"],
-        setup_seed=zkp_cfg["setup_seed"],
-        keys_dir=zkp_cfg["keys_dir"],
-    )
+    zkp_pk, zkp_vk = zkp_setup_v2(zkp_cfg["gradient_dim"])
+    STATE["zkp_pk"] = zkp_pk
+    STATE["zkp_vk"] = zkp_vk
+    STATE["zkp_dim"] = zkp_cfg["gradient_dim"]
     STATE["zkp_ready"] = True
 
     # ── Data ────────────────────────────────────────────────────

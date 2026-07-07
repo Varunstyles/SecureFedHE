@@ -143,7 +143,7 @@ def main():
     # ── Wait for self to come up ──────────────────────────────
     print(f"Waiting for node {nid} to be ready...")
     ready = wait_for_node(my_url, tls["ca_cert"], tls["client_cert"], tls["client_key"],
-                           dev, timeout=60)
+                           dev, timeout=120)
     if not ready:
         print(f"ERROR: Node {nid} did not start in time")
         proc.terminate()
