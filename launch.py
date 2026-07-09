@@ -20,6 +20,7 @@ Options:
 """
 
 import os
+os.environ["PYTHONIOENCODING"] = "utf-8"
 import sys
 import json
 import time
