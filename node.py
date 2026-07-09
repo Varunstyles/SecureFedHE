@@ -378,7 +378,15 @@ def execute_round():
         fc2_fr = quantize(fc2_flat)
         ns = norm_sq_int(fc2_fr)
         slack = bound - ns
-    proof = zkp_prove_v2(STATE["zkp_pk"], STATE["zkp_dim"], fc2_fr, slack, bound, rnd)
+    _prove_result = {}
+    def _run_prove():
+        sys.setrecursionlimit(100000)
+        _prove_result["proof"] = zkp_prove_v2(STATE["zkp_pk"], STATE["zkp_dim"], fc2_fr, slack, bound, rnd)
+    threading.stack_size(64 * 1024 * 1024)
+    _t = threading.Thread(target=_run_prove)
+    _t.start()
+    _t.join()
+    proof = _prove_result["proof"]
     commitment = {"proof": proof.to_json()}
 
     # HE encrypt fc2
@@ -429,7 +437,15 @@ def handle_update(data: dict):
     commitment = data.get("commitment", {})
     if commitment:
         proof_obj = Groth16ProofV2.from_json(commitment["proof"])
-        ok = zkp_verify_v2(STATE["zkp_vk"], proof_obj)
+        _verify_result = {}
+        def _run_verify():
+            sys.setrecursionlimit(100000)
+            _verify_result["ok"] = zkp_verify_v2(STATE["zkp_vk"], proof_obj)
+        threading.stack_size(64 * 1024 * 1024)
+        _t = threading.Thread(target=_run_verify)
+        _t.start()
+        _t.join()
+        ok = _verify_result["ok"]
         if not ok:
             log.warning(f'"ZKP REJECTED from node {sender}: pairing check failed"')
             _forward(data)  # skip: forward unchanged (Fix-1 protocol)
@@ -461,7 +477,15 @@ def handle_update(data: dict):
         fc2_fr = quantize(fc2_flat)
         ns = norm_sq_int(fc2_fr)
         slack = bound - ns
-    proof = zkp_prove_v2(STATE["zkp_pk"], STATE["zkp_dim"], fc2_fr, slack, bound, rnd)
+    _prove_result2 = {}
+    def _run_prove2():
+        sys.setrecursionlimit(100000)
+        _prove_result2["proof"] = zkp_prove_v2(STATE["zkp_pk"], STATE["zkp_dim"], fc2_fr, slack, bound, rnd)
+    threading.stack_size(64 * 1024 * 1024)
+    _t2 = threading.Thread(target=_run_prove2)
+    _t2.start()
+    _t2.join()
+    proof = _prove_result2["proof"]
     my_commitment = {"proof": proof.to_json()}
 
     # ── HE aggregation ────────────────────────────────────────
