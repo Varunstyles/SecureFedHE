@@ -147,10 +147,15 @@ class SecureAggregator:
         return rng.standard_normal(length).astype(np.float32) * 0.01
 
     def mask(self, arr: np.ndarray, round_num: int) -> np.ndarray:
+        missing = [p for p in self.all_node_ids if p not in self._shared_secrets]
+        if missing:
+            raise RuntimeError(
+                f"Cannot mask: missing DH shared secret for peer(s) {missing}. "
+                f"Key exchange with this peer has not completed. Refusing to "
+                f"send a partially-masked (under-protected) update."
+            )
         masked = arr.flatten().copy()
         for peer_id in self.all_node_ids:
-            if peer_id not in self._shared_secrets:
-                continue
             mask = self._get_mask(peer_id, len(masked), round_num)
             if peer_id > self.node_id:
                 masked += mask
@@ -278,12 +283,32 @@ async def status():
     }
 
 
+def _wait_for_key_exchange(timeout_s: float = 30) -> bool:
+    """Block until this node has a shared secret with every peer, or timeout."""
+    he = STATE["he"]
+    deadline = time.time() + timeout_s
+    while time.time() < deadline:
+        missing = [p for p in he.all_node_ids if p not in he._shared_secrets]
+        if not missing:
+            return True
+        time.sleep(0.5)
+    return False
+
+
 @app.post("/start_ring")
 async def start_ring():
     if not STATE["is_master"]:
         raise HTTPException(400, "Only master node can start the ring")
     _exchange_keys()
-    time.sleep(2)
+    ok = _wait_for_key_exchange(timeout_s=30)
+    if not ok:
+        missing = [p for p in STATE["he"].all_node_ids
+                   if p not in STATE["he"]._shared_secrets]
+        raise HTTPException(
+            500,
+            f"Key exchange incomplete after 30s — missing peers {missing}. "
+            f"Refusing to start ring with degraded/broken secure aggregation."
+        )
     threading.Thread(target=execute_round, daemon=True).start()
     return {"status": "Ring started"}
 
