@@ -57,6 +57,15 @@ from distributed_simulation.trusted_setup import setup as zkp_setup_v2
 from distributed_simulation.prover_v2 import prove as zkp_prove_v2
 from distributed_simulation.verifier_v2 import verify as zkp_verify_v2
 
+from consensus_models import (
+    ConsensusVote, QuorumCertificate, RejectionReason, canonical_json,
+)
+from consensus_engine import (
+    sign_payload, verify_signature, make_vote, verify_vote,
+    compute_update_hash, QuorumTracker, evaluate_update_for_vote,
+    load_private_key, load_public_key_from_cert,
+)
+
 # ── Audit logger ───────────────────────────────────────────────────────────────
 def setup_logger(node_id: int, log_dir: str = "logs") -> logging.Logger:
     os.makedirs(log_dir, exist_ok=True)
@@ -282,6 +291,30 @@ async def status():
         "zkp_ready":     STATE["zkp_ready"],
     }
 
+def _broadcast_vote(vote: "ConsensusVote"):
+    """Send our signed vote to every peer, and also record it in our
+    own local QuorumTracker (a node's vote counts for itself too)."""
+    log    = STATE["logger"]
+    nid    = STATE["node_id"]
+    nodes  = STATE["config"]["ring"]["nodes"]
+    sess   = STATE["session"]
+    scheme = "http" if STATE.get("dev_mode") else "https"
+
+    key = (vote.round_id, vote.update_hash)
+    tracker = STATE["quorum_trackers"].get(key)
+    if tracker is None:
+        tracker = QuorumTracker(vote.round_id, vote.update_hash, STATE["quorum_required"])
+        STATE["quorum_trackers"][key] = tracker
+    tracker.add_vote(vote)
+
+    for node in nodes:
+        if node["id"] == nid:
+            continue
+        url = f"{scheme}://{node['ip']}:{node['port']}/consensus/vote"
+        try:
+            sess.post(url, json=vote.to_dict(), timeout=10)
+        except Exception as e:
+            log.warning(f'"Failed to send consensus vote to node {node["id"]}: {e}"')
 
 def _wait_for_key_exchange(timeout_s: float = 30) -> bool:
     """Block until this node has a shared secret with every peer, or timeout."""
@@ -300,6 +333,7 @@ async def start_ring():
     if not STATE["is_master"]:
         raise HTTPException(400, "Only master node can start the ring")
     _exchange_keys()
+    _exchange_consensus_pubkeys()
     ok = _wait_for_key_exchange(timeout_s=30)
     if not ok:
         missing = [p for p in STATE["he"].all_node_ids
@@ -330,6 +364,55 @@ async def exchange_keys(request: Request):
     STATE["he"].add_peer_public_key(peer_id, pub_bytes)
     STATE["logger"].info(f'"Key exchange complete with node {peer_id}"')
     return {"status": "ok"}
+
+@app.post("/consensus/pubkey")
+async def consensus_pubkey(request: Request):
+    """Dev-mode only: exchange in-memory RSA public keys for vote signing
+    (mirrors /exchange_keys for the DH keys). In production, peer public
+    keys come from mTLS certs instead, loaded once at startup."""
+    data = await request.json()
+    peer_id = data["node_id"]
+    from cryptography.hazmat.primitives.serialization import load_pem_public_key
+    pub = load_pem_public_key(data["public_key_pem"].encode("utf-8"))
+    STATE["consensus_peer_pubkeys"][peer_id] = pub
+    STATE["logger"].info(f'"Consensus pubkey received from node {peer_id}"')
+    return {"status": "ok"}
+
+
+@app.post("/consensus/vote")
+async def consensus_vote(request: Request):
+    """Receive a signed ACCEPT/REJECT vote from a peer for a given
+    (round_id, update_hash), record it, and report whether quorum is
+    now satisfied for that update."""
+    data = await request.json()
+    vote = ConsensusVote.from_dict(data)
+
+    voter_pub = STATE["consensus_peer_pubkeys"].get(vote.voter_node_id)
+    if voter_pub is None:
+        STATE["logger"].warning(
+            f'"Consensus vote from unknown node {vote.voter_node_id} — no public key on file"'
+        )
+        return JSONResponse({"status": "rejected", "reason": RejectionReason.UNKNOWN_SENDER}, status_code=400)
+
+    if not verify_vote(voter_pub, vote):
+        STATE["logger"].warning(
+            f'"Consensus vote from node {vote.voter_node_id} FAILED signature check"'
+        )
+        return JSONResponse({"status": "rejected", "reason": RejectionReason.BAD_SIGNATURE}, status_code=400)
+
+    key = (vote.round_id, vote.update_hash)
+    tracker = STATE["quorum_trackers"].get(key)
+    if tracker is None:
+        tracker = QuorumTracker(vote.round_id, vote.update_hash, STATE["quorum_required"])
+        STATE["quorum_trackers"][key] = tracker
+
+    accepted = tracker.add_vote(vote)
+    STATE["logger"].info(
+        f'"Consensus vote recorded: node {vote.voter_node_id} decision={vote.decision} '
+        f'reason={vote.reason_code} round={vote.round_id} new={accepted} '
+        f'satisfied={tracker.is_satisfied}"'
+    )
+    return {"status": "ok", "satisfied": tracker.is_satisfied}
 
 @app.post("/receive_update")
 async def receive_update(request: Request):
@@ -363,6 +446,31 @@ def _exchange_keys():
             log.info(f'"Sent public key to node {node["id"]}"')
         except Exception as e:
             log.warning(f'"Key exchange failed with node {node["id"]}: {e}"')
+
+def _exchange_consensus_pubkeys():
+    """Dev-mode only: broadcast our in-memory RSA public key to all
+    peers so votes can be verified. In production this is skipped
+    entirely — peer public keys come from mTLS certs, loaded at startup."""
+    if not STATE.get("dev_mode"):
+        return
+    log    = STATE["logger"]
+    nid    = STATE["node_id"]
+    nodes  = STATE["config"]["ring"]["nodes"]
+    sess   = STATE["session"]
+    scheme = "http"
+    from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+    pub_pem = STATE["consensus_privkey"].public_key().public_bytes(
+        Encoding.PEM, PublicFormat.SubjectPublicKeyInfo
+    ).decode("utf-8")
+    for node in nodes:
+        if node["id"] == nid:
+            continue
+        url = f"{scheme}://{node['ip']}:{node['port']}/consensus/pubkey"
+        try:
+            sess.post(url, json={"node_id": nid, "public_key_pem": pub_pem}, timeout=10)
+            log.info(f'"Sent consensus pubkey to node {node["id"]}"')
+        except Exception as e:
+            log.warning(f'"Consensus pubkey exchange failed with node {node["id"]}: {e}"')
 
 def execute_round():
     """Master node: train locally, encrypt fc2, send to successor."""
@@ -460,6 +568,7 @@ def handle_update(data: dict):
     # ── ZKP verification (real Groth16 pairing check) ───────────
     from distributed_simulation.prover_v2 import Groth16ProofV2
     commitment = data.get("commitment", {})
+    zkp_ok = True
     if commitment:
         proof_obj = Groth16ProofV2.from_json(commitment["proof"])
         _verify_result = {}
@@ -470,12 +579,37 @@ def handle_update(data: dict):
         _t = threading.Thread(target=_run_verify)
         _t.start()
         _t.join()
-        ok = _verify_result["ok"]
-        if not ok:
+        zkp_ok = _verify_result["ok"]
+        if zkp_ok:
+            log.info(f'"ZKP ACCEPTED from node {sender}"')
+        else:
             log.warning(f'"ZKP REJECTED from node {sender}: pairing check failed"')
-            _forward(data)  # skip: forward unchanged (Fix-1 protocol)
-            return
-        log.info(f'"ZKP ACCEPTED from node {sender}"')
+
+    # ── Cast and broadcast a consensus vote on this update ──────
+    update_hash = compute_update_hash(
+        commitment.get("proof", {}) if commitment else {},
+        {"enc_fc2_len": len(data.get("enc_fc2", "")), "plain_len": len(data.get("plain", ""))},
+    )
+    decision, reason = evaluate_update_for_vote(
+        zkp_ok=zkp_ok,
+        expected_round=STATE["current_round"],
+        received_round=rnd,
+        expected_hash=None,   # Stage 1: no separate proposal broadcast yet, so
+                               # we don't have an independently-known expected
+                               # hash to compare against here — only round/ZKP
+                               # are checked. Revisit once proposal broadcast
+                               # (Stage A design) is added.
+        received_hash=update_hash,
+    )
+    my_vote = make_vote(
+        STATE["consensus_privkey"], round_id=rnd, update_hash=update_hash,
+        voter_node_id=nid, decision=decision, reason_code=reason,
+    )
+    _broadcast_vote(my_vote)
+
+    if not zkp_ok:
+        _forward(data)  # skip: forward unchanged (Fix-1 protocol)
+        return
 
     # ── Local training ────────────────────────────────────────
     params = local_train(
@@ -679,6 +813,34 @@ def main():
         input_dim=mcfg["input_dim"],
         num_classes=mcfg["output_dim"]
     ).to(device)
+
+    # ── Consensus signing keys ─────────────────────────────────
+    # Reuses each node's existing mTLS client key for real deployments.
+    # Dev mode has no certs at all, so generate a throwaway in-memory
+    # RSA key instead — fine for local testing, NOT for production
+    # (dev-mode votes aren't tied to the node's real identity cert).
+    peer_pubkeys = {}
+    if args.dev:
+        from cryptography.hazmat.primitives.asymmetric import rsa as _rsa
+        my_private_key = _rsa.generate_private_key(public_exponent=65537, key_size=2048)
+        peer_pubkeys = {}  # filled in via /consensus/pubkey exchange at ring start
+    else:
+        my_private_key = load_private_key(config["tls"]["client_key"])
+        for n in nodes:
+            if n["id"] == nid:
+                continue
+            # NOTE: all nodes currently share one client cert (see
+            # generate_certs.py's "shared node certificate"), so this
+            # verifies "signed by a valid ring member" rather than
+            # cryptographically distinguishing WHICH member signed it.
+            # Fine for Stage 1 hard-rejection logic; revisit if per-node
+            # signer attribution becomes a requirement later.
+            peer_pubkeys[n["id"]] = load_public_key_from_cert(config["tls"]["client_cert"])
+
+    STATE["consensus_privkey"] = my_private_key
+    STATE["consensus_peer_pubkeys"] = peer_pubkeys
+    STATE["quorum_trackers"] = {}   # (round_id, update_hash) -> QuorumTracker
+    STATE["quorum_required"] = 2    # 2-of-3 for this ring size
 
     # ── State ───────────────────────────────────────────────────
     STATE.update({
