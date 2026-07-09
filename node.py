@@ -328,23 +328,33 @@ def _wait_for_key_exchange(timeout_s: float = 30) -> bool:
     return False
 
 
-@app.post("/start_ring")
-async def start_ring():
-    if not STATE["is_master"]:
-        raise HTTPException(400, "Only master node can start the ring")
+def _start_ring_background():
+    """Runs key exchange + wait, then kicks off the training ring.
+    Executed in a background thread so /start_ring can return
+    immediately instead of blocking the event loop (and therefore
+    blocking ALL other incoming requests, including peers' key
+    exchange POSTs to this node) for up to 30 seconds."""
+    log = STATE["logger"]
     _exchange_keys()
     _exchange_consensus_pubkeys()
     ok = _wait_for_key_exchange(timeout_s=30)
     if not ok:
         missing = [p for p in STATE["he"].all_node_ids
                    if p not in STATE["he"]._shared_secrets]
-        raise HTTPException(
-            500,
-            f"Key exchange incomplete after 30s — missing peers {missing}. "
-            f"Refusing to start ring with degraded/broken secure aggregation."
+        log.error(
+            f'"Key exchange incomplete after 30s — missing peers {missing}. '
+            f'Refusing to start ring with degraded/broken secure aggregation."'
         )
+        return
     threading.Thread(target=execute_round, daemon=True).start()
-    return {"status": "Ring started"}
+
+
+@app.post("/start_ring")
+async def start_ring():
+    if not STATE["is_master"]:
+        raise HTTPException(400, "Only master node can start the ring")
+    threading.Thread(target=_start_ring_background, daemon=True).start()
+    return {"status": "Ring start triggered — key exchange running in background"}
 
 @app.post("/sync_weights")
 async def sync_weights(request: Request):
@@ -717,11 +727,53 @@ def _broadcast_weights(params: dict):
             log.warning(f'"Broadcast failed to node {node["id"]}: {e}"')
 
 def _finalize_round(data: dict):
-    """Master: decrypt aggregated fc2, update model, log accuracy."""
+    """Master: check quorum was reached on this update, then decrypt
+    aggregated fc2, update model, log accuracy. If quorum was NOT
+    reached, the update is not applied — the round is either retried
+    (up to max_round_retries) or, if retries are exhausted, skipped
+    so the ring doesn't stall forever."""
     log    = STATE["logger"]
     he     = STATE["he"]
     model  = STATE["model"]
     rnd    = data["round"]
+
+    # ── Quorum gate ──────────────────────────────────────────────
+    update_hash = compute_update_hash(
+        data.get("commitment", {}).get("proof", {}) if data.get("commitment") else {},
+        {"enc_fc2_len": len(data.get("enc_fc2", "")), "plain_len": len(data.get("plain", ""))},
+    )
+    key = (rnd, update_hash)
+    tracker = STATE["quorum_trackers"].get(key)
+    quorum_ok = tracker.is_satisfied if tracker is not None else False
+
+    if not quorum_ok:
+        attempts = STATE["round_retry_count"].get(rnd, 0)
+        if attempts < STATE["max_round_retries"]:
+            STATE["round_retry_count"][rnd] = attempts + 1
+            log.warning(
+                f'"Round {rnd + 1} REJECTED — quorum not satisfied '
+                f'(attempt {attempts + 1}/{STATE["max_round_retries"]}). Retrying round."'
+            )
+            time.sleep(0.5)
+            threading.Thread(target=execute_round, daemon=True).start()
+            return
+        else:
+            log.error(
+                f'"Round {rnd + 1} REJECTED — quorum not satisfied after '
+                f'{STATE["max_round_retries"]} retries. Skipping round, model NOT updated."'
+            )
+            STATE["round_retry_count"].pop(rnd, None)
+            STATE["current_round"] += 1
+            if STATE["current_round"] < STATE["config"]["ring"]["rounds"]:
+                time.sleep(0.5)
+                threading.Thread(target=execute_round, daemon=True).start()
+            else:
+                log.info(f'"Training complete after {STATE["current_round"]} rounds"')
+                print(f"[Node {STATE['node_id']}] Training complete!")
+            return
+
+    # Quorum satisfied — clear retry count for this round and proceed
+    STATE["round_retry_count"].pop(rnd, None)
 
     # Decrypt fc2
     enc_fc2 = deserialize_enc(data["enc_fc2"])
@@ -841,6 +893,8 @@ def main():
     STATE["consensus_peer_pubkeys"] = peer_pubkeys
     STATE["quorum_trackers"] = {}   # (round_id, update_hash) -> QuorumTracker
     STATE["quorum_required"] = 2    # 2-of-3 for this ring size
+    STATE["round_retry_count"] = {} # round_id -> number of quorum-failed retries so far
+    STATE["max_round_retries"] = 3  # after this many failed quorum attempts, skip the round instead of retrying forever
 
     # ── State ───────────────────────────────────────────────────
     STATE.update({
