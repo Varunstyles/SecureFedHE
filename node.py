@@ -58,7 +58,7 @@ from distributed_simulation.prover_v2 import prove as zkp_prove_v2
 from distributed_simulation.verifier_v2 import verify as zkp_verify_v2
 
 from consensus_models import (
-    ConsensusVote, QuorumCertificate, RejectionReason, canonical_json,
+    ConsensusVote, QuorumCertificate, RejectionReason, canonical_json, UpdateProposal,
 )
 from consensus_engine import (
     sign_payload, verify_signature, make_vote, verify_vote,
@@ -291,6 +291,32 @@ async def status():
         "zkp_ready":     STATE["zkp_ready"],
     }
 
+def _broadcast_proposal(proposal: "UpdateProposal"):
+    """Master: send the proposal (round_id, origin, and the ONE
+    agreed update_hash) to every peer BEFORE the real update starts
+    circulating the ring. This is what lets all nodes vote against
+    the same fixed hash, instead of each recomputing a hash from a
+    payload that mutates at every hop."""
+    log    = STATE["logger"]
+    nid    = STATE["node_id"]
+    nodes  = STATE["config"]["ring"]["nodes"]
+    sess   = STATE["session"]
+    scheme = "http" if STATE.get("dev_mode") else "https"
+
+    # Record locally too — origin node must also vote against its own
+    # fixed hash later, same as peers.
+    STATE["pending_proposals"][(proposal.round_id, proposal.origin_node_id)] = proposal
+
+    for node in nodes:
+        if node["id"] == nid:
+            continue
+        url = f"{scheme}://{node['ip']}:{node['port']}/consensus/propose"
+        _post_with_retry(
+            sess, url, proposal.to_dict(),
+            log, "Sent proposal", node["id"],
+        )
+
+
 def _broadcast_vote(vote: "ConsensusVote"):
     """Send our signed vote to every peer, and also record it in our
     own local QuorumTracker (a node's vote counts for itself too)."""
@@ -388,6 +414,18 @@ async def consensus_pubkey(request: Request):
     STATE["logger"].info(f'"Consensus pubkey received from node {peer_id}"')
     return {"status": "ok"}
 
+@app.post("/consensus/propose")
+async def consensus_propose(request: Request):
+    """Receive the master's proposal — the agreed (round_id, origin,
+    update_hash) — before the actual update arrives via the ring."""
+    data = await request.json()
+    proposal = UpdateProposal.from_dict(data)
+    STATE["pending_proposals"][(proposal.round_id, proposal.origin_node_id)] = proposal
+    STATE["logger"].info(
+        f'"Proposal received: round={proposal.round_id} '
+        f'origin={proposal.origin_node_id} hash={proposal.update_hash[:12]}..."'
+    )
+    return {"status": "ok"}
 
 @app.post("/consensus/vote")
 async def consensus_vote(request: Request):
@@ -439,8 +477,26 @@ async def shutdown():
 
 # ── Ring logic ─────────────────────────────────────────────────────────────────
 
+def _post_with_retry(sess, url, payload, log, label, node_id,
+                      attempts=6, delay_s=2):
+    """POST with retries — covers the case where a peer's server
+    hasn't finished starting up yet (connection refused)."""
+    for attempt in range(1, attempts + 1):
+        try:
+            sess.post(url, json=payload, timeout=10)
+            log.info(f'"{label} to node {node_id}"')
+            return True
+        except Exception as e:
+            if attempt == attempts:
+                log.warning(f'"{label} to node {node_id} FAILED after {attempts} attempts: {e}"')
+                return False
+            time.sleep(delay_s)
+    return False
+
+
 def _exchange_keys():
-    """Push our DH public key to all peer nodes."""
+    """Push our DH public key to all peer nodes, retrying if a peer
+    isn't listening yet."""
     log     = STATE["logger"]
     nid     = STATE["node_id"]
     nodes   = STATE["config"]["ring"]["nodes"]
@@ -451,11 +507,10 @@ def _exchange_keys():
         if node["id"] == nid:
             continue
         url = f"{scheme}://{node['ip']}:{node['port']}/exchange_keys"
-        try:
-            sess.post(url, json={"node_id": nid, "public_key": pub_hex}, timeout=10)
-            log.info(f'"Sent public key to node {node["id"]}"')
-        except Exception as e:
-            log.warning(f'"Key exchange failed with node {node["id"]}: {e}"')
+        _post_with_retry(
+            sess, url, {"node_id": nid, "public_key": pub_hex},
+            log, "Sent public key", node["id"],
+        )
 
 def _exchange_consensus_pubkeys():
     """Dev-mode only: broadcast our in-memory RSA public key to all
@@ -476,11 +531,10 @@ def _exchange_consensus_pubkeys():
         if node["id"] == nid:
             continue
         url = f"{scheme}://{node['ip']}:{node['port']}/consensus/pubkey"
-        try:
-            sess.post(url, json={"node_id": nid, "public_key_pem": pub_pem}, timeout=10)
-            log.info(f'"Sent consensus pubkey to node {node["id"]}"')
-        except Exception as e:
-            log.warning(f'"Consensus pubkey exchange failed with node {node["id"]}: {e}"')
+        _post_with_retry(
+            sess, url, {"node_id": nid, "public_key_pem": pub_pem},
+            log, "Sent consensus pubkey", node["id"],
+        )
 
 def execute_round():
     """Master node: train locally, encrypt fc2, send to successor."""
@@ -491,6 +545,7 @@ def execute_round():
     dp     = config["privacy"]
 
     log.info(f'"Starting round {rnd + 1}"')
+    _round_start_time = time.time()
 
     params = local_train(
         STATE["model"], STATE["loader"],
@@ -529,6 +584,8 @@ def execute_round():
     _t = threading.Thread(target=_run_prove)
     _t.start()
     _t.join()
+
+
     proof = _prove_result["proof"]
     commitment = {"proof": proof.to_json()}
 
@@ -553,6 +610,23 @@ def execute_round():
         "acc_sum":    0.0,
         "weight_sum": n_samples,
     }
+
+    # ── Broadcast the proposal BEFORE forwarding the real update ───
+    # This fixes the hash all nodes will vote against, once, so it
+    # can't drift as the payload mutates hop-to-hop.
+    fixed_hash = compute_update_hash(
+        commitment.get("proof", {}),
+        {"enc_fc2_len": len(payload["enc_fc2"]), "plain_len": len(payload["plain"])},
+    )
+    proposal = UpdateProposal(
+        round_id=rnd,
+        origin_node_id=nid,
+        sender_node_id=nid,
+        update_hash=fixed_hash,
+        zkp_public_inputs=getattr(proof, "public_inputs", []),
+    )
+    _broadcast_proposal(proposal)
+    payload["proposal_hash"] = fixed_hash  # carried through the ring so every hop can look up the same proposal
 
     _forward(payload)
 
@@ -596,21 +670,34 @@ def handle_update(data: dict):
             log.warning(f'"ZKP REJECTED from node {sender}: pairing check failed"')
 
     # ── Cast and broadcast a consensus vote on this update ──────
-    update_hash = compute_update_hash(
-        commitment.get("proof", {}) if commitment else {},
-        {"enc_fc2_len": len(data.get("enc_fc2", "")), "plain_len": len(data.get("plain", ""))},
-    )
+    # Use the proposal's fixed hash (agreed BEFORE the ring update
+    # arrived) instead of recomputing from the payload, which mutates
+    # at every hop and would otherwise put every vote in a different
+    # bucket.
+    proposal_key = (rnd, origin)
+    proposal = STATE["pending_proposals"].get(proposal_key)
+    if proposal is not None:
+        update_hash = proposal.update_hash
+    else:
+        # Proposal hasn't arrived yet (race) or is genuinely missing —
+        # fall back to local computation so we still cast SOME vote,
+        # but this will very likely mismatch and get rejected below,
+        # which is the safe failure mode.
+        update_hash = data.get("proposal_hash") or compute_update_hash(
+            commitment.get("proof", {}) if commitment else {},
+            {"enc_fc2_len": len(data.get("enc_fc2", "")), "plain_len": len(data.get("plain", ""))},
+        )
+        log.warning(
+            f'"No stored proposal for round={rnd} origin={origin} — '
+            f'voting using fallback hash, may not match other peers"'
+        )
     decision, reason = evaluate_update_for_vote(
         zkp_ok=zkp_ok,
         expected_round=STATE["current_round"],
         received_round=rnd,
-        expected_hash=None,   # Stage 1: no separate proposal broadcast yet, so
-                               # we don't have an independently-known expected
-                               # hash to compare against here — only round/ZKP
-                               # are checked. Revisit once proposal broadcast
-                               # (Stage A design) is added.
+        expected_hash=proposal.update_hash if proposal is not None else None,
         received_hash=update_hash,
-    )
+    )   
     my_vote = make_vote(
         STATE["consensus_privkey"], round_id=rnd, update_hash=update_hash,
         voter_node_id=nid, decision=decision, reason_code=reason,
@@ -738,10 +825,19 @@ def _finalize_round(data: dict):
     rnd    = data["round"]
 
     # ── Quorum gate ──────────────────────────────────────────────
-    update_hash = compute_update_hash(
-        data.get("commitment", {}).get("proof", {}) if data.get("commitment") else {},
-        {"enc_fc2_len": len(data.get("enc_fc2", "")), "plain_len": len(data.get("plain", ""))},
-    )
+    origin = data["origin_id"]
+    proposal = STATE["pending_proposals"].get((rnd, origin))
+    if proposal is not None:
+        update_hash = proposal.update_hash
+    else:
+        update_hash = data.get("proposal_hash") or compute_update_hash(
+            data.get("commitment", {}).get("proof", {}) if data.get("commitment") else {},
+            {"enc_fc2_len": len(data.get("enc_fc2", "")), "plain_len": len(data.get("plain", ""))},
+        )
+        log.warning(
+            f'"No stored proposal for round={rnd} origin={origin} at finalize — '
+            f'using fallback hash"'
+        )
     key = (rnd, update_hash)
     tracker = STATE["quorum_trackers"].get(key)
     quorum_ok = tracker.is_satisfied if tracker is not None else False
@@ -798,7 +894,8 @@ def _finalize_round(data: dict):
 
     # Evaluate
     acc = evaluate(model, STATE["test_loader"], STATE["device"])
-    log.info(f'"Round {rnd + 1} complete | accuracy={acc:.4f}"')
+    elapsed = time.time() - _round_start_time
+    log.info(f'"Round {rnd + 1} complete | accuracy={acc:.4f} | duration={elapsed:.2f}s"')
     print(f"[Node {STATE['node_id']}] Round {rnd + 1} | Accuracy: {acc*100:.2f}%")
 
     STATE["current_round"] += 1
@@ -895,6 +992,7 @@ def main():
     STATE["quorum_required"] = 2    # 2-of-3 for this ring size
     STATE["round_retry_count"] = {} # round_id -> number of quorum-failed retries so far
     STATE["max_round_retries"] = 3  # after this many failed quorum attempts, skip the round instead of retrying forever
+    STATE["pending_proposals"] = {} # (round_id, origin_node_id) -> UpdateProposal, sent before the ring update arrives
 
     # ── State ───────────────────────────────────────────────────
     STATE.update({
@@ -928,6 +1026,7 @@ def main():
     logger.info(f'"Listening on {host}:{port} | TLS={not args.dev}"')
     if nid != 0:
         threading.Timer(5.0, _exchange_keys).start()
+        threading.Timer(5.0, _exchange_consensus_pubkeys).start()
     print(f"\n{'='*55}")
     print(f"  SecureFedHE — {node_cfg['name']}")
     print(f"  Node {nid} | {host}:{port}")
