@@ -59,12 +59,22 @@ from distributed_simulation.verifier_v2 import verify as zkp_verify_v2
 
 from consensus_models import (
     ConsensusVote, QuorumCertificate, RejectionReason, canonical_json, UpdateProposal,
+    sha256_hex,
 )
 from consensus_engine import (
     sign_payload, verify_signature, make_vote, verify_vote,
     compute_update_hash, QuorumTracker, evaluate_update_for_vote,
     load_private_key, load_public_key_from_cert,
 )
+
+
+def compute_model_hash(params: dict, round_id: int) -> str:
+    """Deterministic hash of the model's parameters + round id, used
+    for Stage 2 global-model commit consensus. All nodes must compute
+    this the SAME way from the SAME resulting params to agree."""
+    flat = {k: (v.tolist() if hasattr(v, "tolist") else v) for k, v in params.items()}
+    combined = canonical_json({"round_id": round_id, "params": flat})
+    return sha256_hex(combined.encode("utf-8")) 
 
 # ── Audit logger ───────────────────────────────────────────────────────────────
 def setup_logger(node_id: int, log_dir: str = "logs") -> logging.Logger:
@@ -387,12 +397,41 @@ async def sync_weights(request: Request):
     """Workers receive aggregated weights from master after each round.
     Also advances this worker's own round counter — otherwise workers
     never learn a round finished, and every subsequent round would be
-    rejected as wrong_round forever."""
+    rejected as wrong_round forever.
+
+    Stage 2: after applying the weights, independently compute the
+    resulting model's hash and send a signed commit vote back to the
+    master, so divergence between nodes becomes detectable instead of
+    silently assumed away."""
     data   = await request.json()
     params = {k: np.array(v, dtype=np.float32) for k, v in data["params"].items()}
     set_params(STATE["model"], params)
-    STATE["current_round"] = data["round"] + 1
-    STATE["logger"].info(f'"Synced weights from master for round {data["round"]}"')
+    rnd = data["round"]
+    STATE["current_round"] = rnd + 1
+    STATE["logger"].info(f'"Synced weights from master for round {rnd}"')
+
+    # ── Stage 2: vote on the resulting model hash ───────────────
+    hashable_params = {k: v.tolist() for k, v in params.items()}
+    my_hash = compute_model_hash(hashable_params, rnd)
+    master_hash = data.get("model_hash")
+    decision = (master_hash is not None and my_hash == master_hash)
+    reason = RejectionReason.OK if decision else RejectionReason.HASH_MISMATCH
+    if not decision:
+        STATE["logger"].warning(
+            f'"MODEL HASH MISMATCH at round {rnd}: mine={my_hash[:12]}... '
+            f'master={str(master_hash)[:12]}..."'
+        )
+    commit_vote = make_vote(
+        STATE["consensus_privkey"], round_id=rnd, update_hash=my_hash,
+        voter_node_id=STATE["node_id"], decision=decision, reason_code=reason,
+    )
+    nodes  = STATE["config"]["ring"]["nodes"]
+    sess   = STATE["session"]
+    scheme = "http" if STATE.get("dev_mode") else "https"
+    master_node = next(n for n in nodes if n["id"] == 0)
+    url = f"{scheme}://{master_node['ip']}:{master_node['port']}/consensus/commit_vote"
+    _post_with_retry(sess, url, commit_vote.to_dict(), STATE["logger"], "Sent commit vote", 0, attempts=3, delay_s=1)
+
     return {"status": "synced"}
 
 @app.post("/exchange_keys")
@@ -417,6 +456,41 @@ async def consensus_pubkey(request: Request):
     STATE["consensus_peer_pubkeys"][peer_id] = pub
     STATE["logger"].info(f'"Consensus pubkey received from node {peer_id}"')
     return {"status": "ok"}
+
+@app.post("/consensus/commit_vote")
+async def consensus_commit_vote(request: Request):
+    """Stage 2: master receives a peer's signed vote on the global
+    model hash. Once quorum agrees on the SAME hash, the round is
+    considered finalized/committed."""
+    data = await request.json()
+    vote = ConsensusVote.from_dict(data)
+
+    voter_pub = STATE["consensus_peer_pubkeys"].get(vote.voter_node_id)
+    if voter_pub is None or not verify_vote(voter_pub, vote):
+        STATE["logger"].warning(
+            f'"Commit vote from node {vote.voter_node_id} rejected — bad/unknown key"'
+        )
+        return JSONResponse({"status": "rejected"}, status_code=400)
+
+    tracker = STATE["commit_trackers"].get(vote.round_id)
+    if tracker is None:
+        tracker = QuorumTracker(vote.round_id, vote.update_hash, STATE["quorum_required"])
+        STATE["commit_trackers"][vote.round_id] = tracker
+    tracker.add_vote(vote)
+    STATE["logger"].info(
+        f'"Commit vote recorded: node {vote.voter_node_id} decision={vote.decision} '
+        f'round={vote.round_id} satisfied={tracker.is_satisfied}"'
+    )
+
+    if tracker.is_satisfied and vote.round_id not in STATE["commit_certificates"]:
+        cert = tracker.certificate()
+        STATE["commit_certificates"][vote.round_id] = cert
+        STATE["logger"].info(
+            f'"Round {vote.round_id + 1} COMMITTED — model hash agreed by {cert.accepted_by}"'
+        )
+
+    return {"status": "ok", "satisfied": tracker.is_satisfied}
+
 
 @app.post("/consensus/propose")
 async def consensus_propose(request: Request):
@@ -632,6 +706,16 @@ def execute_round():
     _broadcast_proposal(proposal)
     payload["proposal_hash"] = fixed_hash  # carried through the ring so every hop can look up the same proposal
 
+    # ── Origin also votes on its own update ─────────────────────
+    # Without this, node 0 never participates in its own round's
+    # quorum — only peers' votes counted, which is incomplete even
+    # though quorum could still be reached with peers alone.
+    my_own_vote = make_vote(
+        STATE["consensus_privkey"], round_id=rnd, update_hash=fixed_hash,
+        voter_node_id=nid, decision=True, reason_code=RejectionReason.OK,
+    )
+    _broadcast_vote(my_own_vote)
+
     _forward(payload)
 
 
@@ -799,15 +883,18 @@ def _forward(payload: dict):
     except Exception as e:
         log.error(f'"Forward failed to {url}: {e}"')
 
-def _broadcast_weights(params: dict):
-    """Master broadcasts aggregated weights to all worker nodes after each round."""
+def _broadcast_weights(params: dict, model_hash: str = None):
+    """Master broadcasts aggregated weights to all worker nodes after each round.
+    Includes the model_hash (Stage 2) so peers can independently verify
+    they landed on the same resulting model."""
     log    = STATE["logger"]
     nodes  = STATE["config"]["ring"]["nodes"]
     nid    = STATE["node_id"]
     sess   = STATE["session"]
     scheme = "http" if STATE.get("dev_mode") else "https"
     payload = {"params": {k: v.tolist() for k, v in params.items()},
-               "round":  STATE["current_round"]}
+               "round":  STATE["current_round"],
+               "model_hash": model_hash}
     for node in nodes:
         if node["id"] == nid:
             continue
@@ -886,7 +973,21 @@ def _finalize_round(data: dict):
 
     new_params = {**plain, "fc2.weight": fc2_w, "fc2.bias": fc2_b}
     set_params(model, new_params)
-    _broadcast_weights(new_params)
+
+    # ── Stage 2: master computes + votes on its own model hash ──
+    hashable_params = {k: np.array(v, dtype=np.float32).tolist() for k, v in new_params.items()}
+    my_model_hash = compute_model_hash(hashable_params, rnd)    
+    my_commit_vote = make_vote(
+        STATE["consensus_privkey"], round_id=rnd, update_hash=my_model_hash,
+        voter_node_id=STATE["node_id"], decision=True, reason_code=RejectionReason.OK,
+    )
+    commit_tracker = STATE["commit_trackers"].get(rnd)
+    if commit_tracker is None:
+        commit_tracker = QuorumTracker(rnd, my_model_hash, STATE["quorum_required"])
+        STATE["commit_trackers"][rnd] = commit_tracker
+    commit_tracker.add_vote(my_commit_vote)
+
+    _broadcast_weights(new_params, my_model_hash)
 
     # Save checkpoint for dashboard
     try:
@@ -999,6 +1100,8 @@ def main():
     STATE["round_retry_count"] = {} # round_id -> number of quorum-failed retries so far
     STATE["max_round_retries"] = 3  # after this many failed quorum attempts, skip the round instead of retrying forever
     STATE["pending_proposals"] = {} # (round_id, origin_node_id) -> UpdateProposal, sent before the ring update arrives
+    STATE["commit_trackers"] = {}   # round_id -> QuorumTracker, for Stage 2 global-model hash voting
+    STATE["commit_certificates"] = {} # round_id -> QuorumCertificate, once finalized
 
     # ── State ───────────────────────────────────────────────────
     STATE.update({
