@@ -384,10 +384,14 @@ async def start_ring():
 
 @app.post("/sync_weights")
 async def sync_weights(request: Request):
-    """Workers receive aggregated weights from master after each round."""
+    """Workers receive aggregated weights from master after each round.
+    Also advances this worker's own round counter — otherwise workers
+    never learn a round finished, and every subsequent round would be
+    rejected as wrong_round forever."""
     data   = await request.json()
     params = {k: np.array(v, dtype=np.float32) for k, v in data["params"].items()}
     set_params(STATE["model"], params)
+    STATE["current_round"] = data["round"] + 1
     STATE["logger"].info(f'"Synced weights from master for round {data["round"]}"')
     return {"status": "synced"}
 
@@ -545,7 +549,7 @@ def execute_round():
     dp     = config["privacy"]
 
     log.info(f'"Starting round {rnd + 1}"')
-    _round_start_time = time.time()
+    STATE.setdefault("round_start_times", {})[rnd] = time.time()
 
     params = local_train(
         STATE["model"], STATE["loader"],
@@ -697,7 +701,8 @@ def handle_update(data: dict):
         received_round=rnd,
         expected_hash=proposal.update_hash if proposal is not None else None,
         received_hash=update_hash,
-    )   
+    )
+
     my_vote = make_vote(
         STATE["consensus_privkey"], round_id=rnd, update_hash=update_hash,
         voter_node_id=nid, decision=decision, reason_code=reason,
@@ -894,7 +899,8 @@ def _finalize_round(data: dict):
 
     # Evaluate
     acc = evaluate(model, STATE["test_loader"], STATE["device"])
-    elapsed = time.time() - _round_start_time
+    start_t = STATE.get("round_start_times", {}).pop(rnd, None)
+    elapsed = (time.time() - start_t) if start_t is not None else float("nan")
     log.info(f'"Round {rnd + 1} complete | accuracy={acc:.4f} | duration={elapsed:.2f}s"')
     print(f"[Node {STATE['node_id']}] Round {rnd + 1} | Accuracy: {acc*100:.2f}%")
 
