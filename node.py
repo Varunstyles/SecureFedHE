@@ -427,6 +427,17 @@ async def start_ring():
     threading.Thread(target=_start_ring_background, daemon=True).start()
     return {"status": "Ring start triggered — key exchange running in background"}
 
+@app.post("/round_skipped")
+async def round_skipped(request: Request):
+    """Worker receives notice that master skipped a round after
+    exhausting retries. Advance our round counter to match, so we
+    don't reject the next round's proposal as wrong_round forever."""
+    data = await request.json()
+    rnd = data["round"]
+    STATE["current_round"] = rnd + 1
+    STATE["logger"].info(f'"Round {rnd + 1} skip acknowledged — advancing to round {rnd + 2}"')
+    return {"status": "ok"}
+
 @app.post("/sync_weights")
 async def sync_weights(request: Request):
     """Workers receive aggregated weights from master after each round.
@@ -584,7 +595,13 @@ async def consensus_vote(request: Request):
         )
         return JSONResponse({"status": "rejected", "reason": RejectionReason.BAD_SIGNATURE}, status_code=400)
 
-    # ── Prediction-based agreement (Section 8, informational) ───
+    # ── Prediction-based agreement (Section 8) ──────────────────
+    # Store cross-peer agreement scores per (round, update_hash) so
+    # the master can add a SECOND consensus gate at finalize time —
+    # catching cases where individual votes look fine but peers'
+    # models have actually diverged from each other (e.g. a stalled
+    # or slowly-poisoned round that any single node's own-history
+    # check wouldn't flag).
     peer_pred_vector = data.get("_prediction_vector")
     if peer_pred_vector is not None:
         my_pred_vector = STATE.get("last_prediction_vector", {}).get(
@@ -596,6 +613,9 @@ async def consensus_vote(request: Request):
                 f'"Prediction agreement with node {vote.voter_node_id} '
                 f'round={vote.round_id}: A={agreement:.3f}"'
             )
+            STATE.setdefault("cross_peer_agreement", {}).setdefault(
+                (vote.round_id, vote.update_hash), []
+            ).append(agreement)
 
     key = (vote.round_id, vote.update_hash)
     tracker = STATE["quorum_trackers"].get(key)
@@ -850,24 +870,14 @@ def handle_update(data: dict):
             f'"No stored proposal for round={rnd} origin={origin} — '
             f'voting using fallback hash, may not match other peers"'
         )
-    decision, reason = evaluate_update_for_vote(
-        zkp_ok=zkp_ok,
-        expected_round=STATE["current_round"],
-        received_round=rnd,
-        expected_hash=proposal.update_hash if proposal is not None else None,
-        received_hash=update_hash,
-    )
-    my_vote = make_vote(
-        STATE["consensus_privkey"], round_id=rnd, update_hash=update_hash,
-        voter_node_id=nid, decision=decision, reason_code=reason,
-    )
-
-    # ── Prediction-based agreement (Section 8) ──────────────────
+    # ── Prediction-based agreement (Section 8) — computed BEFORE
+    # the vote decision, so it can actually gate accept/reject ──
     # Build a scratch model: incoming plaintext layers + OUR OWN
     # current fc2 (fc2 stays encrypted, we never see the origin's).
     # This measures whether the new plaintext layers behave sanely,
     # without breaking the HE boundary around fc2.
     my_pred_vector = None
+    agreement_score = None
     if zkp_ok:
         try:
             inc_plain = deserialize_params(data["plain"])
@@ -878,11 +888,43 @@ def handle_update(data: dict):
             scratch_params.update(inc_plain)  # overwrite non-fc2 layers only
             scratch.set_all_params(scratch_params)
             my_pred_vector = compute_reference_predictions(scratch, STATE["test_loader"], STATE["device"])
+
+            # Agreement against OUR OWN previous-round prediction vector —
+            # the closest honest proxy available, since we never see the
+            # origin's true predictions (its fc2 stays encrypted to us).
+            prev_vector = STATE.get("my_last_own_prediction_vector")
+            if prev_vector is not None:
+                agreement_score = prediction_agreement(prev_vector, my_pred_vector)
         except Exception as e:
             log.warning(f'"Prediction-agreement check failed: {e}"')
 
+    decision, reason = evaluate_update_for_vote(
+        zkp_ok=zkp_ok,
+        expected_round=STATE["current_round"],
+        received_round=rnd,
+        expected_hash=proposal.update_hash if proposal is not None else None,
+        received_hash=update_hash,
+    )
+
+    # Gate on prediction agreement (tau=0.75 per design doc Section 8).
+    # Only applies once we have a real prior vector to compare against —
+    # the very first round for this peer can't be gated yet.
+    PREDICTION_AGREEMENT_TAU = 0.75
+    if decision and agreement_score is not None and agreement_score < PREDICTION_AGREEMENT_TAU:
+        decision, reason = False, "prediction_disagreement"
+        log.warning(
+            f'"Update round={rnd} from node {origin} REJECTED on prediction '
+            f'agreement: A={agreement_score:.3f} < tau={PREDICTION_AGREEMENT_TAU}"'
+        )
+
+    my_vote = make_vote(
+        STATE["consensus_privkey"], round_id=rnd, update_hash=update_hash,
+        voter_node_id=nid, decision=decision, reason_code=reason,
+    )
+
     if my_pred_vector is not None:
         STATE.setdefault("last_prediction_vector", {})[(rnd, update_hash)] = my_pred_vector
+        STATE["my_last_own_prediction_vector"] = my_pred_vector
     _broadcast_vote(my_vote, prediction_vector=my_pred_vector)
 
     if not zkp_ok:
@@ -896,6 +938,19 @@ def handle_update(data: dict):
         lr=config["model"]["lr"],
         device=STATE["device"]
     )
+
+    # TEMPORARY ATTACK TEST — sign-flip node 2's own update, per
+    # Section 14.2 "Sign-flip attack" scenario. REMOVE AFTER TEST.
+    # Only flip trainable weight/bias params — NOT BatchNorm running
+    # stats (running_var must stay non-negative or sqrt() -> NaN) and
+    # NOT fc2 (stays encrypted, flipping it here would be meaningless
+    # since fc2 never leaves this function in plaintext anyway).
+    if nid == 2:
+        def _should_flip(k):
+            return "fc2" not in k and "running_mean" not in k and "running_var" not in k and "num_batches" not in k
+        params = {k: (-v if _should_flip(k) else v) for k, v in params.items()}
+        log.warning(f'"[ATTACK TEST] Sign-flipped this node\'s own trainable params before DP/ZKP"')
+
     noised = add_dp_noise(params, dp["dp_epsilon"], dp["dp_delta"], dp["dp_sensitivity"])
 
     # ── ZKP proof (real Groth16, norm-bound circuit) ────────────
@@ -975,6 +1030,27 @@ def _forward(payload: dict):
     except Exception as e:
         log.error(f'"Forward failed to {url}: {e}"')
 
+def _broadcast_skip(rnd: int):
+    """Tell workers a round was skipped (quorum/accuracy gate failed
+    after all retries) so they advance their round counter too —
+    otherwise they stay stuck on the skipped round and reject every
+    future proposal as wrong_round forever."""
+    log    = STATE["logger"]
+    nodes  = STATE["config"]["ring"]["nodes"]
+    nid    = STATE["node_id"]
+    sess   = STATE["session"]
+    scheme = "http" if STATE.get("dev_mode") else "https"
+    for node in nodes:
+        if node["id"] == nid:
+            continue
+        url = f"{scheme}://{node['ip']}:{node['port']}/round_skipped"
+        try:
+            sess.post(url, json={"round": rnd}, timeout=10)
+            log.info(f'"Sent skip notice to node {node["id"]} for round {rnd}"')
+        except Exception as e:
+            log.warning(f'"Failed to send skip notice to node {node["id"]}: {e}"')
+
+
 def _broadcast_weights(params: dict, model_hash: str = None):
     """Master broadcasts aggregated weights to all worker nodes after each round.
     Includes the model_hash (Stage 2) so peers can independently verify
@@ -1026,6 +1102,24 @@ def _finalize_round(data: dict):
     tracker = STATE["quorum_trackers"].get(key)
     quorum_ok = tracker.is_satisfied if tracker is not None else False
 
+    # ── Second gate: cross-peer prediction agreement ─────────────
+    # Catches the case a single vote-count quorum can miss: peers
+    # individually voting ACCEPT (their own round-over-round agreement
+    # looks fine) while their actual models have diverged from each
+    # other — e.g. a stalled/neutralized round from an attack that
+    # doesn't show up as a sudden swing in any one node's history.
+    CROSS_PEER_AGREEMENT_TAU = 0.75
+    cross_scores = STATE.get("cross_peer_agreement", {}).get(key, [])
+    if quorum_ok and cross_scores:
+        min_cross_agreement = min(cross_scores)
+        if min_cross_agreement < CROSS_PEER_AGREEMENT_TAU:
+            log.warning(
+                f'"Round {rnd + 1} cross-peer agreement too low '
+                f'(min={min_cross_agreement:.3f} < tau={CROSS_PEER_AGREEMENT_TAU}) '
+                f'— overriding quorum, treating as not satisfied"'
+            )
+            quorum_ok = False
+
     if not quorum_ok:
         attempts = STATE["round_retry_count"].get(rnd, 0)
         if attempts < STATE["max_round_retries"]:
@@ -1044,6 +1138,7 @@ def _finalize_round(data: dict):
             )
             STATE["round_retry_count"].pop(rnd, None)
             STATE["current_round"] += 1
+            _broadcast_skip(rnd)
             if STATE["current_round"] < STATE["config"]["ring"]["rounds"]:
                 time.sleep(0.5)
                 threading.Thread(target=execute_round, daemon=True).start()
@@ -1051,9 +1146,6 @@ def _finalize_round(data: dict):
                 log.info(f'"Training complete after {STATE["current_round"]} rounds"')
                 print(f"[Node {STATE['node_id']}] Training complete!")
             return
-
-    # Quorum satisfied — clear retry count for this round and proceed
-    STATE["round_retry_count"].pop(rnd, None)
 
     # Decrypt fc2
     enc_fc2 = deserialize_enc(data["enc_fc2"])
@@ -1064,6 +1156,66 @@ def _finalize_round(data: dict):
     fc2_b = he.decrypt(enc_fc2["fc2.bias"])
 
     new_params = {**plain, "fc2.weight": fc2_w, "fc2.bias": fc2_b}
+
+    # ── Third gate: accuracy sanity check ────────────────────────
+    # Catches single-class collapse (e.g. sign-flip attack) that
+    # agreement-based checks structurally cannot see — once every
+    # node's model collapses together, they all "agree" with each
+    # other, so this checks against ACTUAL LABELS on the held-out
+    # set instead, before the candidate model is ever applied.
+    scratch_model = DiabetesNet(input_dim=model.input_dim,
+                                 num_classes=model.num_classes).to(STATE["device"])
+    scratch_model.load_state_dict({
+        k: torch.tensor(v, dtype=torch.float32) for k, v in new_params.items()
+    })
+    candidate_acc = evaluate(scratch_model, STATE["test_loader"], STATE["device"])
+
+    prev_acc = STATE.get("last_committed_accuracy")
+    ACC_FLOOR = 0.70          # above known single-class collapse points (68.18% / 31.82%)
+    ACC_DROP_TOLERANCE = 0.15 # max allowed drop vs last committed round
+
+    acc_ok = True
+    if candidate_acc < ACC_FLOOR:
+        acc_ok = False
+        log.warning(
+            f'"Round {rnd + 1} accuracy check FAILED: candidate_acc={candidate_acc:.4f} '
+            f'below floor={ACC_FLOOR} — likely collapse, rejecting round"'
+        )
+    elif prev_acc is not None and (prev_acc - candidate_acc) > ACC_DROP_TOLERANCE:
+        acc_ok = False
+        log.warning(
+            f'"Round {rnd + 1} accuracy check FAILED: candidate_acc={candidate_acc:.4f} '
+            f'dropped from prev={prev_acc:.4f} by more than {ACC_DROP_TOLERANCE} — rejecting round"'
+        )
+
+    if not acc_ok:
+        attempts = STATE["round_retry_count"].get(rnd, 0)
+        if attempts < STATE["max_round_retries"]:
+            STATE["round_retry_count"][rnd] = attempts + 1
+            log.warning(
+                f'"Round {rnd + 1} REJECTED on accuracy gate '
+                f'(attempt {attempts + 1}/{STATE["max_round_retries"]}). Retrying round."'
+            )
+            time.sleep(0.5)
+            threading.Thread(target=execute_round, daemon=True).start()
+            return
+        else:
+            log.error(
+                f'"Round {rnd + 1} REJECTED on accuracy gate after '
+                f'{STATE["max_round_retries"]} retries. Skipping round, model NOT updated."'
+            )
+            STATE["round_retry_count"].pop(rnd, None)
+            STATE["current_round"] += 1
+            if STATE["current_round"] < STATE["config"]["ring"]["rounds"]:
+                time.sleep(0.5)
+                threading.Thread(target=execute_round, daemon=True).start()
+            else:
+                log.info(f'"Training complete after {STATE["current_round"]} rounds"')
+                print(f"[Node {STATE['node_id']}] Training complete!")
+            return
+
+    STATE["last_committed_accuracy"] = candidate_acc
+    STATE["round_retry_count"].pop(rnd, None)
     set_params(model, new_params)
 
     # ── Stage 2: master computes + votes on its own model hash ──
@@ -1090,8 +1242,8 @@ def _finalize_round(data: dict):
     except Exception as e:
         log.warning(f'"Checkpoint save failed: {e}"')    
 
-    # Evaluate
-    acc = evaluate(model, STATE["test_loader"], STATE["device"])
+    # Evaluate (reuse the accuracy already computed by the gate above)
+    acc = candidate_acc
     start_t = STATE.get("round_start_times", {}).pop(rnd, None)
     elapsed = (time.time() - start_t) if start_t is not None else float("nan")
     log.info(f'"Round {rnd + 1} complete | accuracy={acc:.4f} | duration={elapsed:.2f}s"')
