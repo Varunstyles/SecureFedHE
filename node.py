@@ -68,13 +68,34 @@ from consensus_engine import (
 )
 
 
+def compute_reference_predictions(model, test_loader, device) -> list:
+    """Run the model on the shared, fixed test set (same 110 patients on
+    every node, same seed=42 split) and return flattened class-1
+    probabilities. This is the 'reference set' from the design doc
+    (Section 8) — used to measure behavioral agreement between nodes,
+    not for training or accuracy reporting."""
+    model.eval()
+    probs_all = []
+    with torch.no_grad():
+        for X_batch, _ in test_loader:
+            X_batch = X_batch.to(device)
+            logits = model(X_batch)
+            probs = torch.softmax(logits, dim=-1)[:, 1]  # P(diabetic)
+            probs_all.extend(probs.cpu().numpy().tolist())
+    return probs_all
+
+
+def prediction_agreement(probs_a: list, probs_b: list) -> float:
+    """A_ij from the design doc: 1 - mean absolute difference between
+    two prediction vectors over the same reference set. 1.0 = perfect
+    agreement, 0.0 = maximal disagreement."""
+    if not probs_a or not probs_b or len(probs_a) != len(probs_b):
+        return 0.0
+    diffs = [abs(a - b) for a, b in zip(probs_a, probs_b)]
+    return 1.0 - (sum(diffs) / len(diffs))
+
+
 def compute_model_hash(params: dict, round_id: int) -> str:
-    """Deterministic hash of the model's parameters + round id, used
-    for Stage 2 global-model commit consensus. All nodes must compute
-    this the SAME way from the SAME resulting params to agree."""
-    flat = {k: (v.tolist() if hasattr(v, "tolist") else v) for k, v in params.items()}
-    combined = canonical_json({"round_id": round_id, "params": flat})
-    return sha256_hex(combined.encode("utf-8")) 
 
 # ── Audit logger ───────────────────────────────────────────────────────────────
 def setup_logger(node_id: int, log_dir: str = "logs") -> logging.Logger:
@@ -327,9 +348,12 @@ def _broadcast_proposal(proposal: "UpdateProposal"):
         )
 
 
-def _broadcast_vote(vote: "ConsensusVote"):
+def _broadcast_vote(vote: "ConsensusVote", prediction_vector: list = None):
     """Send our signed vote to every peer, and also record it in our
-    own local QuorumTracker (a node's vote counts for itself too)."""
+    own local QuorumTracker (a node's vote counts for itself too).
+    prediction_vector (if present) rides alongside as UNSIGNED extra
+    data — used only for logging/scoring agreement (Section 8), never
+    for security decisions, so it doesn't touch the signed payload."""
     log    = STATE["logger"]
     nid    = STATE["node_id"]
     nodes  = STATE["config"]["ring"]["nodes"]
@@ -343,12 +367,16 @@ def _broadcast_vote(vote: "ConsensusVote"):
         STATE["quorum_trackers"][key] = tracker
     tracker.add_vote(vote)
 
+    payload = vote.to_dict()
+    if prediction_vector is not None:
+        payload["_prediction_vector"] = prediction_vector  # unsigned, informational only
+
     for node in nodes:
         if node["id"] == nid:
             continue
         url = f"{scheme}://{node['ip']}:{node['port']}/consensus/vote"
         try:
-            sess.post(url, json=vote.to_dict(), timeout=10)
+            sess.post(url, json=payload, timeout=10)
         except Exception as e:
             log.warning(f'"Failed to send consensus vote to node {node["id"]}: {e}"')
 
@@ -542,6 +570,25 @@ async def consensus_vote(request: Request):
             f'"Consensus vote from node {vote.voter_node_id} FAILED signature check"'
         )
         return JSONResponse({"status": "rejected", "reason": RejectionReason.BAD_SIGNATURE}, status_code=400)
+
+    if not verify_vote(voter_pub, vote):
+        STATE["logger"].warning(
+            f'"Consensus vote from node {vote.voter_node_id} FAILED signature check"'
+        )
+        return JSONResponse({"status": "rejected", "reason": RejectionReason.BAD_SIGNATURE}, status_code=400)
+
+    # ── Prediction-based agreement (Section 8, informational) ───
+    peer_pred_vector = data.get("_prediction_vector")
+    if peer_pred_vector is not None:
+        my_pred_vector = STATE.get("last_prediction_vector", {}).get(
+            (vote.round_id, vote.update_hash)
+        )
+        if my_pred_vector is not None:
+            agreement = prediction_agreement(my_pred_vector, peer_pred_vector)
+            STATE["logger"].info(
+                f'"Prediction agreement with node {vote.voter_node_id} '
+                f'round={vote.round_id}: A={agreement:.3f}"'
+            )
 
     key = (vote.round_id, vote.update_hash)
     tracker = STATE["quorum_trackers"].get(key)
@@ -808,7 +855,29 @@ def handle_update(data: dict):
         STATE["consensus_privkey"], round_id=rnd, update_hash=update_hash,
         voter_node_id=nid, decision=decision, reason_code=reason,
     )
-    _broadcast_vote(my_vote)
+
+    # ── Prediction-based agreement (Section 8) ──────────────────
+    # Build a scratch model: incoming plaintext layers + OUR OWN
+    # current fc2 (fc2 stays encrypted, we never see the origin's).
+    # This measures whether the new plaintext layers behave sanely,
+    # without breaking the HE boundary around fc2.
+    my_pred_vector = None
+    if zkp_ok:
+        try:
+            inc_plain = deserialize_params(data["plain"])
+            scratch = DiabetesNet(input_dim=STATE["model"].input_dim,
+                                   num_classes=STATE["model"].num_classes).to(STATE["device"])
+            scratch.load_state_dict(STATE["model"].state_dict())
+            scratch_params = scratch.get_all_params()
+            scratch_params.update(inc_plain)  # overwrite non-fc2 layers only
+            scratch.set_all_params(scratch_params)
+            my_pred_vector = compute_reference_predictions(scratch, STATE["test_loader"], STATE["device"])
+        except Exception as e:
+            log.warning(f'"Prediction-agreement check failed: {e}"')
+
+    if my_pred_vector is not None:
+        STATE.setdefault("last_prediction_vector", {})[(rnd, update_hash)] = my_pred_vector
+    _broadcast_vote(my_vote, prediction_vector=my_pred_vector)
 
     if not zkp_ok:
         _forward(data)  # skip: forward unchanged (Fix-1 protocol)
