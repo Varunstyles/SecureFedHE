@@ -457,6 +457,22 @@ async def consensus_pubkey(request: Request):
     STATE["logger"].info(f'"Consensus pubkey received from node {peer_id}"')
     return {"status": "ok"}
 
+def _save_commit_certificate(cert: "QuorumCertificate"):
+    """Persist the commit certificate to disk beside model_latest.pt,
+    per the design doc (Section 10.1). One JSON file per round, so the
+    dashboard/report can show a full audit trail of finalized rounds."""
+    log = STATE["logger"]
+    try:
+        cert_dir = ROOT / "dashboard" / "certificates"
+        cert_dir.mkdir(parents=True, exist_ok=True)
+        cert_path = cert_dir / f"round_{cert.round_id}.json"
+        with open(cert_path, "w") as f:
+            json.dump(cert.to_dict(), f, indent=2)
+        log.info(f'"Commit certificate saved to {cert_path}"')
+    except Exception as e:
+        log.warning(f'"Failed to save commit certificate for round {cert.round_id}: {e}"')
+
+
 @app.post("/consensus/commit_vote")
 async def consensus_commit_vote(request: Request):
     """Stage 2: master receives a peer's signed vote on the global
@@ -488,6 +504,7 @@ async def consensus_commit_vote(request: Request):
         STATE["logger"].info(
             f'"Round {vote.round_id + 1} COMMITTED — model hash agreed by {cert.accepted_by}"'
         )
+        _save_commit_certificate(cert)
 
     return {"status": "ok", "satisfied": tracker.is_satisfied}
 
