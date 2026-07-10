@@ -96,6 +96,13 @@ def prediction_agreement(probs_a: list, probs_b: list) -> float:
 
 
 def compute_model_hash(params: dict, round_id: int) -> str:
+    """Deterministic hash of the model's parameters + round id, used
+    for Stage 2 global-model commit consensus. All nodes must compute
+    this the SAME way from the SAME resulting params to agree."""
+    flat = {k: (v.tolist() if hasattr(v, "tolist") else v) for k, v in params.items()}
+    combined = canonical_json({"round_id": round_id, "params": flat})
+    return sha256_hex(combined.encode("utf-8"))
+
 
 # ── Audit logger ───────────────────────────────────────────────────────────────
 def setup_logger(node_id: int, log_dir: str = "logs") -> logging.Logger:
