@@ -857,6 +857,10 @@ def handle_update(data: dict):
         expected_hash=proposal.update_hash if proposal is not None else None,
         received_hash=update_hash,
     )
+    # TEMPORARY TEST OVERRIDE — force node 2 to always reject, to verify
+    # the quorum gate actually blocks and retries. REMOVE AFTER TESTING.
+    if STATE["node_id"] == 2:
+        decision, reason = False, "FORCED_TEST_REJECTION"
 
     my_vote = make_vote(
         STATE["consensus_privkey"], round_id=rnd, update_hash=update_hash,
