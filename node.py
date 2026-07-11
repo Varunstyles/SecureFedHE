@@ -984,17 +984,23 @@ def handle_update(data: dict):
         device=STATE["device"]
     )
 
-    # TEMPORARY ATTACK TEST — sign-flip node 2's own update, per
-    # Section 14.2 "Sign-flip attack" scenario. REMOVE AFTER TEST.
-    # Only flip trainable weight/bias params — NOT BatchNorm running
-    # stats (running_var must stay non-negative or sqrt() -> NaN) and
-    # NOT fc2 (stays encrypted, flipping it here would be meaningless
-    # since fc2 never leaves this function in plaintext anyway).
-    if nid == 2:
+    # ── Attack simulation harness (config-driven, off by default) ──
+    # Applies a configured attack to THIS node's own update before
+    # DP/ZKP, if this node is the configured target. Controlled
+    # entirely via config.json's "attack_simulation" block — no code
+    # changes needed to enable/disable/retarget. Section 14.2.
+    attack_cfg = STATE["config"].get("attack_simulation", {})
+    if (attack_cfg.get("enabled", False)
+            and nid == attack_cfg.get("target_node")
+            and attack_cfg.get("type") == "sign_flip"):
         def _should_flip(k):
-            return "fc2" not in k and "running_mean" not in k and "running_var" not in k and "num_batches" not in k
+            return ("fc2" not in k and "running_mean" not in k
+                    and "running_var" not in k and "num_batches" not in k)
         params = {k: (-v if _should_flip(k) else v) for k, v in params.items()}
-        log.warning(f'"[ATTACK TEST] Sign-flipped this node\'s own trainable params before DP/ZKP"')
+        log.warning(
+            f'"[ATTACK SIMULATION] sign_flip active on node {nid} — '
+            f'flipped trainable params before DP/ZKP"'
+        )
 
     noised = add_dp_noise(params, dp["dp_epsilon"], dp["dp_delta"], dp["dp_sensitivity"])
 
