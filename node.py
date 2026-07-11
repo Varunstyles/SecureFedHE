@@ -974,6 +974,11 @@ def handle_update(data: dict):
         STATE["consensus_privkey"], round_id=rnd, update_hash=update_hash,
         voter_node_id=nid, decision=decision, reason_code=reason,
     )
+    # Track which node this vote is ABOUT (the contribution being
+    # judged), separately from who cast the vote — needed so rejection
+    # accountability can correctly target the actual contributor,
+    # not whoever happens to be proposing the round.
+    STATE.setdefault("vote_subject", {})[(rnd, update_hash)] = origin
 
     if my_pred_vector is not None:
         STATE.setdefault("last_prediction_vector", {})[(rnd, update_hash)] = my_pred_vector
@@ -1175,7 +1180,7 @@ def _finalize_round(data: dict):
     excluded = STATE.get("excluded_nodes", set())
     if tracker is not None and excluded:
         trusted_accepts = sum(
-            1 for v in tracker.votes.values()
+            1 for v in tracker._votes.values()
             if v.decision and v.voter_node_id not in excluded
         )
         quorum_ok = trusted_accepts >= STATE["quorum_required"]
@@ -1296,16 +1301,22 @@ def _finalize_round(data: dict):
             )
             STATE["round_retry_count"].pop(rnd, None)
 
+            # Attribute the rejection to whoever's contribution was
+            # actually being judged (origin of THIS update), not just
+            # the round's proposer — same value in the common case,
+            # but correct even when the proposer is innocent and a
+            # different node's contribution poisoned the round.
+            rejection_subject = STATE.get("vote_subject", {}).get(key, origin)
             counts = STATE["node_rejection_counts"]
-            counts[origin] = counts.get(origin, 0) + 1
-            if (counts[origin] >= STATE["exclusion_threshold"]
-                    and origin not in STATE["excluded_nodes"]):
-                STATE["excluded_nodes"].add(origin)
+            counts[rejection_subject] = counts.get(rejection_subject, 0) + 1
+            if (counts[rejection_subject] >= STATE["exclusion_threshold"]
+                    and rejection_subject not in STATE["excluded_nodes"]):
+                STATE["excluded_nodes"].add(rejection_subject)
                 remaining = len(STATE["config"]["ring"]["nodes"]) - len(STATE["excluded_nodes"])
                 STATE["quorum_required"] = max(1, remaining - 1)
                 log.error(
-                    f'"Node {origin} EXCLUDED from proposing and quorum after '
-                    f'{counts[origin]} consecutive rejected proposals. '
+                    f'"Node {rejection_subject} EXCLUDED from proposing and quorum after '
+                    f'{counts[rejection_subject]} consecutive rejected proposals. '
                     f'Quorum requirement adjusted to {STATE["quorum_required"]} '
                     f'of {remaining} remaining trusted nodes."'
                 )
@@ -1326,7 +1337,7 @@ def _finalize_round(data: dict):
 
     STATE["last_committed_accuracy"] = candidate_acc
     STATE["round_retry_count"].pop(rnd, None)
-    STATE["node_rejection_counts"][origin] = 0
+    STATE["node_rejection_counts"][STATE.get("vote_subject", {}).get(key, origin)] = 0
     set_params(model, new_params)
 
     # ── Stage 2: master computes + votes on its own model hash ──
@@ -1467,7 +1478,7 @@ def main():
     STATE["commit_certificates"] = {} # round_id -> QuorumCertificate, once finalized
     STATE["node_rejection_counts"] = {}  # node_id -> consecutive accuracy-gate rejection count for rounds THEY proposed
     STATE["excluded_nodes"] = set()      # node_ids excluded from proposing and from quorum counting
-    STATE["exclusion_threshold"] = 5     # consecutive rejected proposals before a node is excluded
+    STATE["exclusion_threshold"] = 2     # consecutive rejected proposals before a node is excluded
 
     # ── State ───────────────────────────────────────────────────
     STATE.update({
