@@ -294,11 +294,19 @@ STATE = {
 
 
 def get_proposer_for_round(round_id: int) -> int:
-    """Leader(t) = t mod M — deterministic, computed identically by
-    every node with no coordination needed. M is the number of nodes
-    in the ring, so proposing duty rotates evenly: round 0 -> node 0,
-    round 1 -> node 1, round 2 -> node 2, round 3 -> node 0, etc."""
+    """Leader(t) = t mod M, adjusted to skip excluded nodes. Every
+    node computes this identically (same round_id, same excluded_nodes
+    set, since exclusion decisions are made deterministically from
+    events every node observes — accuracy-gate rejections tied to a
+    specific origin). If a node is excluded, its turn is skipped and
+    the next non-excluded node in rotation order takes it instead."""
     num_nodes = len(STATE["config"]["ring"]["nodes"])
+    excluded = STATE.get("excluded_nodes", set())
+    for offset in range(num_nodes):
+        candidate = (round_id + offset) % num_nodes
+        if candidate not in excluded:
+            return candidate
+    # All nodes excluded (should never happen) — fall back to raw formula
     return round_id % num_nodes
 
 
@@ -1164,7 +1172,15 @@ def _finalize_round(data: dict):
         )
     key = (rnd, update_hash)
     tracker = STATE["quorum_trackers"].get(key)
-    quorum_ok = tracker.is_satisfied if tracker is not None else False
+    excluded = STATE.get("excluded_nodes", set())
+    if tracker is not None and excluded:
+        trusted_accepts = sum(
+            1 for v in tracker.votes.values()
+            if v.decision and v.voter_node_id not in excluded
+        )
+        quorum_ok = trusted_accepts >= STATE["quorum_required"]
+    else:
+        quorum_ok = tracker.is_satisfied if tracker is not None else False
 
     # ── Second gate: cross-peer prediction agreement ─────────────
     # Catches the case a single vote-count quorum can miss: peers
@@ -1279,6 +1295,21 @@ def _finalize_round(data: dict):
                 f'{STATE["max_round_retries"]} retries. Skipping round, model NOT updated."'
             )
             STATE["round_retry_count"].pop(rnd, None)
+
+            counts = STATE["node_rejection_counts"]
+            counts[origin] = counts.get(origin, 0) + 1
+            if (counts[origin] >= STATE["exclusion_threshold"]
+                    and origin not in STATE["excluded_nodes"]):
+                STATE["excluded_nodes"].add(origin)
+                remaining = len(STATE["config"]["ring"]["nodes"]) - len(STATE["excluded_nodes"])
+                STATE["quorum_required"] = max(1, remaining - 1)
+                log.error(
+                    f'"Node {origin} EXCLUDED from proposing and quorum after '
+                    f'{counts[origin]} consecutive rejected proposals. '
+                    f'Quorum requirement adjusted to {STATE["quorum_required"]} '
+                    f'of {remaining} remaining trusted nodes."'
+                )
+
             STATE["current_round"] += 1
             _broadcast_skip(rnd)
             if STATE["current_round"] < STATE["config"]["ring"]["rounds"]:
@@ -1295,6 +1326,7 @@ def _finalize_round(data: dict):
 
     STATE["last_committed_accuracy"] = candidate_acc
     STATE["round_retry_count"].pop(rnd, None)
+    STATE["node_rejection_counts"][origin] = 0
     set_params(model, new_params)
 
     # ── Stage 2: master computes + votes on its own model hash ──
@@ -1433,6 +1465,9 @@ def main():
     STATE["pending_proposals"] = {} # (round_id, origin_node_id) -> UpdateProposal, sent before the ring update arrives
     STATE["commit_trackers"] = {}   # round_id -> QuorumTracker, for Stage 2 global-model hash voting
     STATE["commit_certificates"] = {} # round_id -> QuorumCertificate, once finalized
+    STATE["node_rejection_counts"] = {}  # node_id -> consecutive accuracy-gate rejection count for rounds THEY proposed
+    STATE["excluded_nodes"] = set()      # node_ids excluded from proposing and from quorum counting
+    STATE["exclusion_threshold"] = 5     # consecutive rejected proposals before a node is excluded
 
     # ── State ───────────────────────────────────────────────────
     STATE.update({
