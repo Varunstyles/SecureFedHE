@@ -293,6 +293,15 @@ STATE = {
 }
 
 
+def get_proposer_for_round(round_id: int) -> int:
+    """Leader(t) = t mod M — deterministic, computed identically by
+    every node with no coordination needed. M is the number of nodes
+    in the ring, so proposing duty rotates evenly: round 0 -> node 0,
+    round 1 -> node 1, round 2 -> node 2, round 3 -> node 0, etc."""
+    num_nodes = len(STATE["config"]["ring"]["nodes"])
+    return round_id % num_nodes
+
+
 def get_successor_url() -> str:
     nodes   = STATE["config"]["ring"]["nodes"]
     nid     = STATE["node_id"]
@@ -400,11 +409,12 @@ def _wait_for_key_exchange(timeout_s: float = 30) -> bool:
 
 
 def _start_ring_background():
-    """Runs key exchange + wait, then kicks off the training ring.
-    Executed in a background thread so /start_ring can return
-    immediately instead of blocking the event loop (and therefore
-    blocking ALL other incoming requests, including peers' key
-    exchange POSTs to this node) for up to 30 seconds."""
+    """Runs key exchange + wait, then kicks off the training ring —
+    but ONLY on the node whose turn it actually is for round 0, per
+    get_proposer_for_round(). Every node runs this same bootstrap
+    logic (key exchange must complete everywhere regardless of who
+    proposes), but only the round-0 proposer actually starts training;
+    everyone else just waits to receive the ring's first update as normal."""
     log = STATE["logger"]
     _exchange_keys()
     _exchange_consensus_pubkeys()
@@ -417,15 +427,46 @@ def _start_ring_background():
             f'Refusing to start ring with degraded/broken secure aggregation."'
         )
         return
-    threading.Thread(target=execute_round, daemon=True).start()
+
+    proposer = get_proposer_for_round(STATE["current_round"])
+    if STATE["node_id"] == proposer:
+        log.info(f'"This node is round {STATE["current_round"] + 1}\'s proposer — starting."')
+        threading.Thread(target=execute_round, daemon=True).start()
+    else:
+        log.info(
+            f'"Key exchange complete. Node {proposer} is round '
+            f'{STATE["current_round"] + 1}\'s proposer — waiting to receive."'
+        )
 
 
 @app.post("/start_ring")
 async def start_ring():
-    if not STATE["is_master"]:
-        raise HTTPException(400, "Only master node can start the ring")
+    # Any node may send this one-time bootstrap trigger for round 0 —
+    # it doesn't grant special status. Whoever actually PROPOSES round 0
+    # is decided independently by get_proposer_for_round(0), which every
+    # node computes the same way (round 0 % num_nodes = node 0, by the
+    # rotation formula itself), regardless of who fired this trigger.
     threading.Thread(target=_start_ring_background, daemon=True).start()
     return {"status": "Ring start triggered — key exchange running in background"}
+
+@app.post("/your_turn")
+async def your_turn(request: Request):
+    """This node has been notified it's the proposer for the given
+    round — start proposing. Only acts if we agree it's actually our
+    turn (defensive check against a stale/duplicate notification)."""
+    data = await request.json()
+    rnd = data["round"]
+    expected_proposer = get_proposer_for_round(rnd)
+    if expected_proposer != STATE["node_id"]:
+        STATE["logger"].warning(
+            f'"Received your_turn for round {rnd} but proposer should be '
+            f'node {expected_proposer}, not me — ignoring."'
+        )
+        return {"status": "ignored"}
+    STATE["logger"].info(f'"My turn — starting round {rnd + 1} as proposer."')
+    threading.Thread(target=execute_round, daemon=True).start()
+    return {"status": "starting"}
+
 
 @app.post("/round_skipped")
 async def round_skipped(request: Request):
@@ -474,9 +515,13 @@ async def sync_weights(request: Request):
     nodes  = STATE["config"]["ring"]["nodes"]
     sess   = STATE["session"]
     scheme = "http" if STATE.get("dev_mode") else "https"
-    master_node = next(n for n in nodes if n["id"] == 0)
-    url = f"{scheme}://{master_node['ip']}:{master_node['port']}/consensus/commit_vote"
-    _post_with_retry(sess, url, commit_vote.to_dict(), STATE["logger"], "Sent commit vote", 0, attempts=3, delay_s=1)
+    # Send the commit vote to THIS ROUND's proposer, not always node 0 —
+    # under rotation, whoever proposed round `rnd` is the one running
+    # commit-vote collection and deciding whether the round is finalized.
+    proposer_id = get_proposer_for_round(rnd)
+    proposer_node = next(n for n in nodes if n["id"] == proposer_id)
+    url = f"{scheme}://{proposer_node['ip']}:{proposer_node['port']}/consensus/commit_vote"
+    _post_with_retry(sess, url, commit_vote.to_dict(), STATE["logger"], "Sent commit vote", proposer_id, attempts=3, delay_s=1)
 
     return {"status": "synced"}
 
@@ -1030,6 +1075,19 @@ def _forward(payload: dict):
     except Exception as e:
         log.error(f'"Forward failed to {url}: {e}"')
 
+def _notify_next_proposer(rnd: int, proposer_id: int):
+    """Tell the node whose turn it is next to start proposing —
+    nothing else would wake them up, since a fresh proposer has no
+    incoming ring traffic to react to yet; they must be told to act."""
+    log    = STATE["logger"]
+    nodes  = STATE["config"]["ring"]["nodes"]
+    sess   = STATE["session"]
+    scheme = "http" if STATE.get("dev_mode") else "https"
+    target = next(n for n in nodes if n["id"] == proposer_id)
+    url = f"{scheme}://{target['ip']}:{target['port']}/your_turn"
+    _post_with_retry(sess, url, {"round": rnd}, log, "Notified next proposer", proposer_id, attempts=6, delay_s=2)
+
+
 def _broadcast_skip(rnd: int):
     """Tell workers a round was skipped (quorum/accuracy gate failed
     after all retries) so they advance their round counter too —
@@ -1140,8 +1198,12 @@ def _finalize_round(data: dict):
             STATE["current_round"] += 1
             _broadcast_skip(rnd)
             if STATE["current_round"] < STATE["config"]["ring"]["rounds"]:
-                time.sleep(0.5)
-                threading.Thread(target=execute_round, daemon=True).start()
+                next_proposer = get_proposer_for_round(STATE["current_round"])
+                if next_proposer == STATE["node_id"]:
+                    time.sleep(0.5)
+                    threading.Thread(target=execute_round, daemon=True).start()
+                else:
+                    _notify_next_proposer(STATE["current_round"], next_proposer)
             else:
                 log.info(f'"Training complete after {STATE["current_round"]} rounds"')
                 print(f"[Node {STATE['node_id']}] Training complete!")
@@ -1214,8 +1276,12 @@ def _finalize_round(data: dict):
             STATE["current_round"] += 1
             _broadcast_skip(rnd)
             if STATE["current_round"] < STATE["config"]["ring"]["rounds"]:
-                time.sleep(0.5)
-                threading.Thread(target=execute_round, daemon=True).start()
+                next_proposer = get_proposer_for_round(STATE["current_round"])
+                if next_proposer == STATE["node_id"]:
+                    time.sleep(0.5)
+                    threading.Thread(target=execute_round, daemon=True).start()
+                else:
+                    _notify_next_proposer(STATE["current_round"], next_proposer)
             else:
                 log.info(f'"Training complete after {STATE["current_round"]} rounds"')
                 print(f"[Node {STATE['node_id']}] Training complete!")
@@ -1258,8 +1324,16 @@ def _finalize_round(data: dict):
 
     STATE["current_round"] += 1
     if STATE["current_round"] < STATE["config"]["ring"]["rounds"]:
-        time.sleep(0.5)
-        threading.Thread(target=execute_round, daemon=True).start()
+        next_proposer = get_proposer_for_round(STATE["current_round"])
+        if next_proposer == STATE["node_id"]:
+            time.sleep(0.5)
+            threading.Thread(target=execute_round, daemon=True).start()
+        else:
+            log.info(
+                f'"Round {STATE["current_round"] + 1} belongs to node '
+                f'{next_proposer} — waiting for their proposal."'
+            )
+            _notify_next_proposer(STATE["current_round"], next_proposer)
     else:
         rounds_done = STATE["current_round"]
         log.info(f'"Training complete after {rounds_done} rounds"')
@@ -1365,8 +1439,7 @@ def main():
         "he":          SecureAggregator(nid, [n["id"] for n in nodes]),
         "device":      device,
         "logger":      logger,
-        "session":     make_tls_session(config) if not args.dev else requests.Session(),
-        "is_master":   (nid == 0),
+        "session":     make_tls_session(config) if not args.dev else requests.Session()
     })
 
     # ── TLS server config ───────────────────────────────────────
