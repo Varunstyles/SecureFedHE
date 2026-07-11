@@ -293,24 +293,57 @@ STATE = {
 }
 
 
-def _record_suspicion(node_id: int, log) -> None:
-    """Record one prediction-disagreement strike against a specific
-    node's OWN contribution — the only point in the pipeline where an
-    individual node's update is judged in isolation, before blending
-    with anyone else's. Exclude the node once strikes cross threshold."""
+def _record_suspicion(node_id: int, log, weight: float = 1.0) -> None:
+    """Record a suspicion strike against a specific node. weight=1.0
+    for a direct signal (this node's OWN update failed prediction
+    agreement, judged in isolation before blending). weight<1.0 for
+    an indirect/shared signal (accuracy-gate failure, blamed
+    fractionally across all participants since blame can't be
+    isolated there). Exclude the node once accumulated strikes cross
+    threshold, and BROADCAST the exclusion so every node's local
+    state agrees — otherwise get_proposer_for_round() diverges
+    between nodes and the ring stalls when nodes disagree about
+    whose turn it is."""
     counts = STATE.setdefault("node_rejection_counts", {})
-    counts[node_id] = counts.get(node_id, 0) + 1
+    counts[node_id] = counts.get(node_id, 0) + weight
     if (counts[node_id] >= STATE.get("exclusion_threshold", 5)
             and node_id not in STATE.get("excluded_nodes", set())):
-        STATE.setdefault("excluded_nodes", set()).add(node_id)
-        remaining = len(STATE["config"]["ring"]["nodes"]) - len(STATE["excluded_nodes"])
-        STATE["quorum_required"] = max(1, remaining - 1)
-        log.error(
-            f'"Node {node_id} EXCLUDED from proposing and quorum after '
-            f'{counts[node_id]} prediction-disagreement strikes on its own '
-            f'contributions. Quorum requirement adjusted to '
-            f'{STATE["quorum_required"]} of {remaining} remaining trusted nodes."'
-        )
+        _apply_exclusion(node_id, log)
+        _broadcast_exclusion(node_id)
+
+
+def _apply_exclusion(node_id: int, log) -> None:
+    """Locally mark a node excluded and adjust quorum. Called both
+    when THIS node decides to exclude someone, and when it receives
+    an exclusion notice from a peer — so all nodes converge to the
+    same excluded_nodes set regardless of who detected it first."""
+    STATE.setdefault("excluded_nodes", set()).add(node_id)
+    remaining = len(STATE["config"]["ring"]["nodes"]) - len(STATE["excluded_nodes"])
+    STATE["quorum_required"] = max(1, remaining - 1)
+    log.error(
+        f'"Node {node_id} EXCLUDED from proposing and quorum. '
+        f'Quorum requirement adjusted to {STATE["quorum_required"]} '
+        f'of {remaining} remaining trusted nodes."'
+    )
+
+
+def _broadcast_exclusion(node_id: int) -> None:
+    """Tell every peer to also mark node_id as excluded, so
+    get_proposer_for_round() agrees across the whole ring."""
+    log    = STATE["logger"]
+    nodes  = STATE["config"]["ring"]["nodes"]
+    nid    = STATE["node_id"]
+    sess   = STATE["session"]
+    scheme = "http" if STATE.get("dev_mode") else "https"
+    for node in nodes:
+        if node["id"] == nid:
+            continue
+        url = f"{scheme}://{node['ip']}:{node['port']}/node_excluded"
+        try:
+            sess.post(url, json={"excluded_node": node_id}, timeout=10)
+            log.info(f'"Sent exclusion notice for node {node_id} to node {node["id"]}"')
+        except Exception as e:
+            log.warning(f'"Failed to send exclusion notice to node {node["id"]}: {e}"')
 
 
 def get_proposer_for_round(round_id: int) -> int:
@@ -494,6 +527,18 @@ async def your_turn(request: Request):
     STATE["logger"].info(f'"My turn — starting round {rnd + 1} as proposer."')
     threading.Thread(target=execute_round, daemon=True).start()
     return {"status": "starting"}
+
+
+@app.post("/node_excluded")
+async def node_excluded(request: Request):
+    """Receive an exclusion notice from a peer and apply it locally,
+    so every node's excluded_nodes set converges — required for
+    get_proposer_for_round() to agree across the whole ring."""
+    data = await request.json()
+    excluded_id = data["excluded_node"]
+    if excluded_id not in STATE.get("excluded_nodes", set()):
+        _apply_exclusion(excluded_id, STATE["logger"])
+    return {"status": "ok"}
 
 
 @app.post("/round_skipped")
@@ -1321,11 +1366,16 @@ def _finalize_round(data: dict):
                 f'{STATE["max_round_retries"]} retries. Skipping round, model NOT updated."'
             )
             STATE["round_retry_count"].pop(rnd, None)
-            # NOTE: no per-node blame is assigned here — an accuracy-gate
-            # rejection reflects the whole blended round's outcome, not
-            # any single contributor. Real per-node accountability comes
-            # from _record_suspicion(), called at the point a specific
-            # node's OWN contribution fails prediction agreement.
+            # NOTE: accuracy-gate rejection cannot isolate blame to one
+            # node (the round's outcome blends every participant's
+            # contribution equally) — an earlier attempt to spread
+            # fractional blame to all participants was WRONG: since
+            # every node touches every round in this ring topology,
+            # it penalized honest and malicious nodes identically and
+            # excluded the entire ring. Real per-node accountability
+            # comes only from _record_suspicion() at the point a
+            # specific node's OWN contribution fails prediction
+            # agreement in isolation — see handle_update().
             STATE["current_round"] += 1
             _broadcast_skip(rnd)
             if STATE["current_round"] < STATE["config"]["ring"]["rounds"]:
@@ -1482,7 +1532,7 @@ def main():
     STATE["commit_certificates"] = {} # round_id -> QuorumCertificate, once finalized
     STATE["node_rejection_counts"] = {}  # node_id -> consecutive accuracy-gate rejection count for rounds THEY proposed
     STATE["excluded_nodes"] = set()      # node_ids excluded from proposing and from quorum counting
-    STATE["exclusion_threshold"] = 2     # consecutive rejected proposals before a node is excluded
+    STATE["exclusion_threshold"] = 5     # consecutive rejected proposals before a node is excluded
 
     # ── State ───────────────────────────────────────────────────
     STATE.update({
