@@ -293,6 +293,26 @@ STATE = {
 }
 
 
+def _record_suspicion(node_id: int, log) -> None:
+    """Record one prediction-disagreement strike against a specific
+    node's OWN contribution — the only point in the pipeline where an
+    individual node's update is judged in isolation, before blending
+    with anyone else's. Exclude the node once strikes cross threshold."""
+    counts = STATE.setdefault("node_rejection_counts", {})
+    counts[node_id] = counts.get(node_id, 0) + 1
+    if (counts[node_id] >= STATE.get("exclusion_threshold", 5)
+            and node_id not in STATE.get("excluded_nodes", set())):
+        STATE.setdefault("excluded_nodes", set()).add(node_id)
+        remaining = len(STATE["config"]["ring"]["nodes"]) - len(STATE["excluded_nodes"])
+        STATE["quorum_required"] = max(1, remaining - 1)
+        log.error(
+            f'"Node {node_id} EXCLUDED from proposing and quorum after '
+            f'{counts[node_id]} prediction-disagreement strikes on its own '
+            f'contributions. Quorum requirement adjusted to '
+            f'{STATE["quorum_required"]} of {remaining} remaining trusted nodes."'
+        )
+
+
 def get_proposer_for_round(round_id: int) -> int:
     """Leader(t) = t mod M, adjusted to skip excluded nodes. Every
     node computes this identically (same round_id, same excluded_nodes
@@ -969,16 +989,17 @@ def handle_update(data: dict):
             f'"Update round={rnd} from node {origin} REJECTED on prediction '
             f'agreement: A={agreement_score:.3f} < tau={PREDICTION_AGREEMENT_TAU}"'
         )
+        # ── Node-level accountability: this is a REAL per-contributor
+        # signal (unlike the accuracy gate, which judges the whole
+        # blended round) — origin here is specifically whose individual
+        # update just failed behavioral agreement, observed independently
+        # by this peer before any aggregation happens.
+        _record_suspicion(origin, log)
 
     my_vote = make_vote(
         STATE["consensus_privkey"], round_id=rnd, update_hash=update_hash,
         voter_node_id=nid, decision=decision, reason_code=reason,
     )
-    # Track which node this vote is ABOUT (the contribution being
-    # judged), separately from who cast the vote — needed so rejection
-    # accountability can correctly target the actual contributor,
-    # not whoever happens to be proposing the round.
-    STATE.setdefault("vote_subject", {})[(rnd, update_hash)] = origin
 
     if my_pred_vector is not None:
         STATE.setdefault("last_prediction_vector", {})[(rnd, update_hash)] = my_pred_vector
@@ -1300,27 +1321,11 @@ def _finalize_round(data: dict):
                 f'{STATE["max_round_retries"]} retries. Skipping round, model NOT updated."'
             )
             STATE["round_retry_count"].pop(rnd, None)
-
-            # Attribute the rejection to whoever's contribution was
-            # actually being judged (origin of THIS update), not just
-            # the round's proposer — same value in the common case,
-            # but correct even when the proposer is innocent and a
-            # different node's contribution poisoned the round.
-            rejection_subject = STATE.get("vote_subject", {}).get(key, origin)
-            counts = STATE["node_rejection_counts"]
-            counts[rejection_subject] = counts.get(rejection_subject, 0) + 1
-            if (counts[rejection_subject] >= STATE["exclusion_threshold"]
-                    and rejection_subject not in STATE["excluded_nodes"]):
-                STATE["excluded_nodes"].add(rejection_subject)
-                remaining = len(STATE["config"]["ring"]["nodes"]) - len(STATE["excluded_nodes"])
-                STATE["quorum_required"] = max(1, remaining - 1)
-                log.error(
-                    f'"Node {rejection_subject} EXCLUDED from proposing and quorum after '
-                    f'{counts[rejection_subject]} consecutive rejected proposals. '
-                    f'Quorum requirement adjusted to {STATE["quorum_required"]} '
-                    f'of {remaining} remaining trusted nodes."'
-                )
-
+            # NOTE: no per-node blame is assigned here — an accuracy-gate
+            # rejection reflects the whole blended round's outcome, not
+            # any single contributor. Real per-node accountability comes
+            # from _record_suspicion(), called at the point a specific
+            # node's OWN contribution fails prediction agreement.
             STATE["current_round"] += 1
             _broadcast_skip(rnd)
             if STATE["current_round"] < STATE["config"]["ring"]["rounds"]:
@@ -1337,7 +1342,6 @@ def _finalize_round(data: dict):
 
     STATE["last_committed_accuracy"] = candidate_acc
     STATE["round_retry_count"].pop(rnd, None)
-    STATE["node_rejection_counts"][STATE.get("vote_subject", {}).get(key, origin)] = 0
     set_params(model, new_params)
 
     # ── Stage 2: master computes + votes on its own model hash ──
