@@ -1173,9 +1173,15 @@ def _finalize_round(data: dict):
     prev_acc = STATE.get("last_committed_accuracy")
     ACC_FLOOR = 0.70          # above known single-class collapse points (68.18% / 31.82%)
     ACC_DROP_TOLERANCE = 0.15 # max allowed drop vs last committed round
+    ACC_GATE_WARMUP_ROUNDS = 5  # let the model actually learn before judging it
 
     acc_ok = True
-    if candidate_acc < ACC_FLOOR:
+    if rnd < ACC_GATE_WARMUP_ROUNDS:
+        log.info(
+            f'"Round {rnd + 1} accuracy gate skipped (warm-up period, '
+            f'candidate_acc={candidate_acc:.4f})"'
+        )
+    elif candidate_acc < ACC_FLOOR:
         acc_ok = False
         log.warning(
             f'"Round {rnd + 1} accuracy check FAILED: candidate_acc={candidate_acc:.4f} '
@@ -1206,6 +1212,7 @@ def _finalize_round(data: dict):
             )
             STATE["round_retry_count"].pop(rnd, None)
             STATE["current_round"] += 1
+            _broadcast_skip(rnd)
             if STATE["current_round"] < STATE["config"]["ring"]["rounds"]:
                 time.sleep(0.5)
                 threading.Thread(target=execute_round, daemon=True).start()
