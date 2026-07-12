@@ -365,19 +365,24 @@ def _handle_accusation(accuser_id: int, accused_id: int, log) -> None:
 def _broadcast_accusation(accused_id: int) -> None:
     """Tell peers this node independently suspects accused_id, so they
     can corroborate (or not) with their own independent judgment
-    before anyone is actually excluded."""
+    before anyone is actually excluded. Signed with this node's own
+    consensus key (same RSA-PSS scheme as votes) so a non-member
+    can't inject a spoofed accusation to manipulate the corroboration
+    quorum."""
     log    = STATE["logger"]
     nodes  = STATE["config"]["ring"]["nodes"]
     nid    = STATE["node_id"]
     sess   = STATE["session"]
     scheme = "http" if STATE.get("dev_mode") else "https"
+    payload = {"accuser_id": nid, "accused_id": accused_id}
+    signature = sign_payload(STATE["consensus_privkey"], payload)
     for node in nodes:
         if node["id"] == nid:
             continue
         try:
             sess.post(
                 f'{scheme}://{node["ip"]}:{node["port"]}/consensus/accuse',
-                json={"accuser_id": nid, "accused_id": accused_id},
+                json={**payload, "signature": signature},
                 timeout=10,
             )
         except Exception as e:
@@ -618,11 +623,28 @@ async def consensus_accuse(request: Request):
     """Receive an accusation from a peer that it independently
     suspects some node. Does NOT exclude on its own — just records
     the accusation and checks whether enough DISTINCT peers have now
-    accused the same node to reach corroboration quorum."""
+    accused the same node to reach corroboration quorum. Signature
+    is verified against the claimed accuser's known consensus public
+    key first — an unsigned or wrongly-signed accusation is dropped,
+    so a non-member can't inject a fake accusation to manipulate the
+    corroboration count."""
+    log  = STATE["logger"]
     data = await request.json()
     accuser_id = data["accuser_id"]
     accused_id = data["accused_id"]
-    _handle_accusation(accuser_id, accused_id, STATE["logger"])
+    signature  = data.get("signature")
+
+    accuser_pub = STATE["consensus_peer_pubkeys"].get(accuser_id)
+    payload = {"accuser_id": accuser_id, "accused_id": accused_id}
+    if (accuser_pub is None or signature is None
+            or not verify_signature(accuser_pub, payload, signature)):
+        log.warning(
+            f'"Accusation from node {accuser_id} against node {accused_id} '
+            f'REJECTED — bad/missing signature or unknown accuser key"'
+        )
+        return JSONResponse({"status": "rejected"}, status_code=400)
+
+    _handle_accusation(accuser_id, accused_id, log)
     return {"status": "accusation recorded"}
 
 @app.post("/round_skipped")
@@ -967,7 +989,14 @@ def execute_round():
         "fc2.bias":   he.encrypt(noised["fc2.bias"])
     }
 
-    n_samples = len(STATE["loader"].dataset)
+    # Cap each node's aggregation weight per design doc Section 9, so
+    # no single hospital's data volume can dominate the aggregate. The
+    # cap is a POLICY value from config — NOT derived from any specific
+    # node's actual patient count, since in a real deployment nodes
+    # should not need to reveal their exact dataset size to each other
+    # just to keep aggregation fair.
+    N_MAX = config["privacy"].get("max_aggregation_weight", 100)
+    n_samples = min(len(STATE["loader"].dataset), N_MAX)
 
     payload = {
         "round":      rnd,
@@ -1203,7 +1232,8 @@ def handle_update(data: dict):
 
     # ── HE aggregation ────────────────────────────────────────
     he         = STATE["he"]
-    n_samples  = len(STATE["loader"].dataset)
+    N_MAX = config["privacy"].get("max_aggregation_weight", 100)
+    n_samples  = min(len(STATE["loader"].dataset), N_MAX)
     inc_enc = deserialize_enc(data["enc_fc2"])
     inc_plain  = deserialize_params(data["plain"])
     inc_w      = data["weight_sum"]
