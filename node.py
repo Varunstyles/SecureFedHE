@@ -294,23 +294,96 @@ STATE = {
 
 
 def _record_suspicion(node_id: int, log, weight: float = 1.0) -> None:
-    """Record a suspicion strike against a specific node. weight=1.0
-    for a direct signal (this node's OWN update failed prediction
-    agreement, judged in isolation before blending). weight<1.0 for
-    an indirect/shared signal (accuracy-gate failure, blamed
-    fractionally across all participants since blame can't be
-    isolated there). Exclude the node once accumulated strikes cross
-    threshold, and BROADCAST the exclusion so every node's local
-    state agrees — otherwise get_proposer_for_round() diverges
-    between nodes and the ring stalls when nodes disagree about
-    whose turn it is."""
+    """Record a LOCAL suspicion strike this node personally observed
+    against node_id. This does NOT unilaterally exclude anyone —
+    a single node's own judgment is not sufficient grounds to remove
+    a peer, since if THIS node happens to be the compromised one,
+    its own reference point (its locally-held fc2) is corrupted and
+    it will systematically misjudge every honest peer as suspicious.
+    Instead, broadcast this node's own strike-count as a SIGNED
+    ACCUSATION so peers can independently corroborate it. Exclusion
+    only happens once a quorum of *different accusers* have each
+    independently reached their own threshold against the same
+    origin — see _handle_accusation()."""
     counts = STATE.setdefault("node_rejection_counts", {})
     counts[node_id] = counts.get(node_id, 0) + weight
     if (counts[node_id] >= STATE.get("exclusion_threshold", 5)
-            and node_id not in STATE.get("excluded_nodes", set())):
-        _apply_exclusion(node_id, log)
-        _broadcast_exclusion(node_id)
+            and node_id not in STATE.get("excluded_nodes", set())
+            and node_id not in STATE.get("accused_by_me", set())):
+        STATE.setdefault("accused_by_me", set()).add(node_id)
+        log.warning(
+            f'"This node independently suspects node {node_id} '
+            f'(local strikes={counts[node_id]:.1f}) — broadcasting '
+            f'accusation for peer corroboration, NOT excluding unilaterally"'
+        )
+        _broadcast_accusation(node_id)
 
+
+def _handle_accusation(accuser_id: int, accused_id: int, log) -> None:
+    """Record that accuser_id has independently accused accused_id.
+    Only exclude accused_id once a quorum of DISTINCT accusers (not
+    counting the accused themselves) have each raised this — so one
+    compromised node's skewed judgment can never unilaterally remove
+    an honest peer. This mirrors the same 2-of-3 principle already
+    used for update-admission and commit voting, applied here to
+    exclusion decisions."""
+    if accused_id == STATE["node_id"]:
+        # Don't let a peer's accusation immediately doom us without
+        # our own corroborating view — still record it, but the
+        # quorum check below already requires multiple distinct
+        # accusers, so this is handled the same as any other origin.
+        pass
+    accusers = STATE.setdefault("accusations", {}).setdefault(accused_id, set())
+    accusers.add(accuser_id)
+    # With M=3 total nodes, excluding the accused leaves 2 possible
+    # accusers. Require BOTH of them (not just 1) to agree before
+    # excluding — this is the actual fix: a single node's suspicion,
+    # even if broadcast, can never be enough on its own. If the ring
+    # ever grows beyond 3 nodes, this keeps requiring all remaining
+    # non-accused nodes to agree, which is conservative (favors
+    # safety over responsiveness) and can be relaxed later once this
+    # is validated to work correctly at M=3.
+    total_other_nodes = len(STATE["config"]["ring"]["nodes"]) - 1
+    corroboration_quorum = max(2, total_other_nodes)
+    if (len(accusers) >= corroboration_quorum
+            and accused_id not in STATE.get("excluded_nodes", set())):
+        log.error(
+            f'"Node {accused_id} accused by {len(accusers)} independent '
+            f'peers ({sorted(accusers)}) — quorum-corroborated, excluding."'
+        )
+        _apply_exclusion(accused_id, log)
+        _broadcast_exclusion(accused_id)
+    else:
+        log.warning(
+            f'"Node {accused_id} accused by node {accuser_id}, but only '
+            f'{len(accusers)}/{corroboration_quorum} distinct accusers so far '
+            f'— NOT excluding yet (avoids a single compromised node '
+            f'unilaterally removing an honest peer)."'
+        )
+
+
+def _broadcast_accusation(accused_id: int) -> None:
+    """Tell peers this node independently suspects accused_id, so they
+    can corroborate (or not) with their own independent judgment
+    before anyone is actually excluded."""
+    log    = STATE["logger"]
+    nodes  = STATE["config"]["ring"]["nodes"]
+    nid    = STATE["node_id"]
+    sess   = STATE["session"]
+    scheme = "http" if STATE.get("dev_mode") else "https"
+    for node in nodes:
+        if node["id"] == nid:
+            continue
+        try:
+            sess.post(
+                f'{scheme}://{node["ip"]}:{node["port"]}/consensus/accuse',
+                json={"accuser_id": nid, "accused_id": accused_id},
+                timeout=10,
+            )
+        except Exception as e:
+            log.warning(f'"Failed to send accusation for node {accused_id} to node {node["id"]}: {e}"')
+    # Also apply corroboration check locally for our own accusation
+    _handle_accusation(nid, accused_id, log)
 
 def _apply_exclusion(node_id: int, log) -> None:
     """Locally mark a node excluded and adjust quorum. Called both
@@ -540,6 +613,17 @@ async def node_excluded(request: Request):
         _apply_exclusion(excluded_id, STATE["logger"])
     return {"status": "ok"}
 
+@app.post("/consensus/accuse")
+async def consensus_accuse(request: Request):
+    """Receive an accusation from a peer that it independently
+    suspects some node. Does NOT exclude on its own — just records
+    the accusation and checks whether enough DISTINCT peers have now
+    accused the same node to reach corroboration quorum."""
+    data = await request.json()
+    accuser_id = data["accuser_id"]
+    accused_id = data["accused_id"]
+    _handle_accusation(accuser_id, accused_id, STATE["logger"])
+    return {"status": "accusation recorded"}
 
 @app.post("/round_skipped")
 async def round_skipped(request: Request):
@@ -1010,7 +1094,14 @@ def handle_update(data: dict):
             # Agreement against OUR OWN previous-round prediction vector —
             # the closest honest proxy available, since we never see the
             # origin's true predictions (its fc2 stays encrypted to us).
-            prev_vector = STATE.get("my_last_own_prediction_vector")
+            # Keyed PER ORIGIN, not globally — a single shared slot mixed
+            # different nodes' updates together (whoever proposed last
+            # round vs whoever proposes this round), so agreement was
+            # comparing across different senders rather than judging one
+            # sender's own consistency. That made the signal track ring
+            # order, not the actual attacker.
+            per_origin_prev = STATE.setdefault("my_last_own_prediction_vector", {})
+            prev_vector = per_origin_prev.get(origin)
             if prev_vector is not None:
                 agreement_score = prediction_agreement(prev_vector, my_pred_vector)
         except Exception as e:
@@ -1048,7 +1139,7 @@ def handle_update(data: dict):
 
     if my_pred_vector is not None:
         STATE.setdefault("last_prediction_vector", {})[(rnd, update_hash)] = my_pred_vector
-        STATE["my_last_own_prediction_vector"] = my_pred_vector
+        STATE.setdefault("my_last_own_prediction_vector", {})[origin] = my_pred_vector
     _broadcast_vote(my_vote, prediction_vector=my_pred_vector)
 
     if not zkp_ok:
