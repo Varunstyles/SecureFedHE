@@ -995,7 +995,10 @@ def execute_round():
             _prove_result["proof"] = zkp_prove_v2(STATE["zkp_pk"], STATE["zkp_dim"], fc2_fr, slack, bound, rnd)
         except RecursionError as e:
             log.error(f'"ZKP prove thread crashed: {e}"')
-    threading.stack_size(256 * 1024 * 1024)
+    try:
+        threading.stack_size(64 * 1024 * 1024)
+    except (ValueError, RuntimeError):
+        pass
     _t = threading.Thread(target=_run_prove)
     _t.start()
     _t.join()
@@ -1097,7 +1100,10 @@ def handle_update(data: dict):
             except RecursionError as e:
                 log.error(f'"ZKP verify thread crashed: {e}"')
                 _verify_result["ok"] = False
-        threading.stack_size(256 * 1024 * 1024)
+        try:
+            threading.stack_size(64 * 1024 * 1024)
+        except (ValueError, RuntimeError):
+            pass
         _t = threading.Thread(target=_run_verify)
         _t.start()
         _t.join()
@@ -1254,7 +1260,10 @@ def handle_update(data: dict):
             _prove_result2["proof"] = zkp_prove_v2(STATE["zkp_pk"], STATE["zkp_dim"], fc2_fr, slack, bound, rnd)
         except RecursionError as e:
             log.error(f'"ZKP prove thread crashed: {e}"')
-    threading.stack_size(256 * 1024 * 1024)
+    try:
+        threading.stack_size(64 * 1024 * 1024)
+    except (ValueError, RuntimeError):
+        pass
     _t2 = threading.Thread(target=_run_prove2)
     _t2.start()
     _t2.join()
@@ -1643,9 +1652,10 @@ def main():
         args.config = "config_dev.json"
 
     config  = load_config(args.config)
-
-    config  = load_config(args.config)
-    threading.stack_size(64 * 1024 * 1024)  # fixes py_ecc recursive pow() stack overflow on Windows
+    try:
+        threading.stack_size(64 * 1024 * 1024)  # fixes py_ecc recursive pow() stack overflow on Windows
+    except (ValueError, RuntimeError):
+        pass
     nid     = args.node_id = args.id
     nodes   = config["ring"]["nodes"]
     node_cfg = nodes[nid]
