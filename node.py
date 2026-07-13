@@ -986,17 +986,21 @@ def execute_round():
     ns = norm_sq_int(fc2_fr)
     bound = threshold_sq_int(C_thresh)
     slack = bound - ns
-    if slack < 0:
-        log.warning(f'"ZKP norm violation (clipping applied): slack={slack}"')
+    retry = 0
+    while slack < 0 and retry < 5:
+        log.warning(f'"ZKP norm violation (clipping applied): slack={slack}, retry={retry}"')
         fc2_arr = noised["fc2.weight"].flatten()
         norm = np.linalg.norm(fc2_arr)
-        if norm > 0.5:
-            fc2_arr = fc2_arr * (0.45 / norm)
+        if norm > 0:
+            fc2_arr = fc2_arr * (0.4 / norm)  # target well under 0.5 to survive quantization rounding
         noised["fc2.weight"] = fc2_arr.reshape(noised["fc2.weight"].shape)
         fc2_flat = fc2_arr.tolist()
         fc2_fr = quantize(fc2_flat)
         ns = norm_sq_int(fc2_fr)
         slack = bound - ns
+        retry += 1
+    if slack < 0:
+        raise RuntimeError(f"Could not bring update within ZKP norm bound after {retry} retries (slack={slack})")
     _prove_result = {}
     def _run_prove():
         sys.setrecursionlimit(1000000)
@@ -1263,14 +1267,21 @@ def handle_update(data: dict):
     ns = norm_sq_int(fc2_fr)
     bound = threshold_sq_int(C_thresh)
     slack = bound - ns
-    if slack < 0:
+    retry = 0
+    while slack < 0 and retry < 5:
+        log.warning(f'"ZKP norm violation (clipping applied): slack={slack}, retry={retry}"')
         fc2_arr = noised["fc2.weight"].flatten()
-        fc2_arr = fc2_arr * (0.45 / np.linalg.norm(fc2_arr))
+        norm = np.linalg.norm(fc2_arr)
+        if norm > 0:
+            fc2_arr = fc2_arr * (0.4 / norm)  # target well under 0.5 to survive quantization rounding
         noised["fc2.weight"] = fc2_arr.reshape(noised["fc2.weight"].shape)
         fc2_flat = fc2_arr.tolist()
         fc2_fr = quantize(fc2_flat)
         ns = norm_sq_int(fc2_fr)
         slack = bound - ns
+        retry += 1
+    if slack < 0:
+        raise RuntimeError(f"Could not bring update within ZKP norm bound after {retry} retries (slack={slack})")
     _prove_result2 = {}
     def _run_prove2():
         sys.setrecursionlimit(1000000)
