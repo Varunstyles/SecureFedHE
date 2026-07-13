@@ -966,6 +966,15 @@ def execute_round():
         device=STATE["device"]
     )
 
+    # Clip fc2 weights to the ZKP norm bound BEFORE adding DP noise,
+    # so noise is layered onto an already-bounded value instead of
+    # relying entirely on the post-noise clip below to fix things up.
+    clip_C = dp.get("clip_threshold", 0.5)
+    fc2_w_pre = params["fc2.weight"]
+    fc2_pre_norm = np.linalg.norm(fc2_w_pre.flatten())
+    if fc2_pre_norm > clip_C:
+        params["fc2.weight"] = fc2_w_pre * (clip_C / fc2_pre_norm)
+
     # DP noise on non-fc2 layers
     noised = add_dp_noise(params, dp["dp_epsilon"], dp["dp_delta"], dp["dp_sensitivity"])
 
@@ -1234,6 +1243,15 @@ def handle_update(data: dict):
             f'"[ATTACK SIMULATION] sign_flip active on node {nid} — '
             f'flipped trainable params before DP/ZKP"'
         )
+
+    # Clip fc2 weights to the ZKP norm bound BEFORE adding DP noise,
+    # so noise is layered onto an already-bounded value instead of
+    # relying entirely on the post-noise clip below to fix things up.
+    clip_C = dp.get("clip_threshold", 0.5)
+    fc2_w_pre = params["fc2.weight"]
+    fc2_pre_norm = np.linalg.norm(fc2_w_pre.flatten())
+    if fc2_pre_norm > clip_C:
+        params["fc2.weight"] = fc2_w_pre * (clip_C / fc2_pre_norm)
 
     noised = add_dp_noise(params, dp["dp_epsilon"], dp["dp_delta"], dp["dp_sensitivity"])
 
