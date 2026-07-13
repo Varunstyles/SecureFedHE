@@ -1487,16 +1487,19 @@ def _finalize_round(data: dict):
                 f'{STATE["max_round_retries"]} retries. Skipping round, model NOT updated."'
             )
             STATE["round_retry_count"].pop(rnd, None)
-            # NOTE: accuracy-gate rejection cannot isolate blame to one
-            # node (the round's outcome blends every participant's
-            # contribution equally) — an earlier attempt to spread
-            # fractional blame to all participants was WRONG: since
-            # every node touches every round in this ring topology,
-            # it penalized honest and malicious nodes identically and
-            # excluded the entire ring. Real per-node accountability
-            # comes only from _record_suspicion() at the point a
-            # specific node's OWN contribution fails prediction
-            # agreement in isolation — see handle_update().
+            # Attribute this failure to the round's PROPOSER only —
+            # NOT spread to all participants (that was tried before
+            # and was wrong: in a ring, every node touches every
+            # round, so blaming everyone penalizes honest and
+            # malicious nodes identically). The proposer is the node
+            # whose OWN update seeded this specific round, so a
+            # ground-truth accuracy-gate failure on their round is a
+            # real, targeted signal — anchored to external labels,
+            # not to peer-vs-peer comparison (which prediction_disagreement
+            # alone was found to be unreliable for once the shared
+            # model is already degraded: honest nodes can look
+            # "erratic" relative to a corrupted baseline too).
+            _record_suspicion(origin, log)
             STATE["current_round"] += 1
             _broadcast_skip(rnd)
             if STATE["current_round"] < STATE["config"]["ring"]["rounds"]:
