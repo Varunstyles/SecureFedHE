@@ -26,6 +26,7 @@ Or use launch.py which handles all the above automatically.
 import os
 os.environ["PYTHONIOENCODING"] = "utf-8"
 import sys
+sys.setrecursionlimit(1000000)
 import json
 import time
 import pickle
@@ -989,12 +990,17 @@ def execute_round():
         slack = bound - ns
     _prove_result = {}
     def _run_prove():
-        sys.setrecursionlimit(100000)
-        _prove_result["proof"] = zkp_prove_v2(STATE["zkp_pk"], STATE["zkp_dim"], fc2_fr, slack, bound, rnd)
-    threading.stack_size(64 * 1024 * 1024)
+        sys.setrecursionlimit(1000000)
+        try:
+            _prove_result["proof"] = zkp_prove_v2(STATE["zkp_pk"], STATE["zkp_dim"], fc2_fr, slack, bound, rnd)
+        except RecursionError as e:
+            log.error(f'"ZKP prove thread crashed: {e}"')
+    threading.stack_size(256 * 1024 * 1024)
     _t = threading.Thread(target=_run_prove)
     _t.start()
     _t.join()
+    if "proof" not in _prove_result:
+        raise RuntimeError("ZKP proof generation failed (recursion crash) — cannot proceed this round")
 
 
     proof = _prove_result["proof"]
@@ -1085,13 +1091,17 @@ def handle_update(data: dict):
         proof_obj = Groth16ProofV2.from_json(commitment["proof"])
         _verify_result = {}
         def _run_verify():
-            sys.setrecursionlimit(100000)
-            _verify_result["ok"] = zkp_verify_v2(STATE["zkp_vk"], proof_obj)
-        threading.stack_size(64 * 1024 * 1024)
+            sys.setrecursionlimit(1000000)
+            try:
+                _verify_result["ok"] = zkp_verify_v2(STATE["zkp_vk"], proof_obj)
+            except RecursionError as e:
+                log.error(f'"ZKP verify thread crashed: {e}"')
+                _verify_result["ok"] = False
+        threading.stack_size(256 * 1024 * 1024)
         _t = threading.Thread(target=_run_verify)
         _t.start()
         _t.join()
-        zkp_ok = _verify_result["ok"]
+        zkp_ok = _verify_result.get("ok", False)
         if zkp_ok:
             log.info(f'"ZKP ACCEPTED from node {sender}"')
         else:
@@ -1239,12 +1249,17 @@ def handle_update(data: dict):
         slack = bound - ns
     _prove_result2 = {}
     def _run_prove2():
-        sys.setrecursionlimit(100000)
-        _prove_result2["proof"] = zkp_prove_v2(STATE["zkp_pk"], STATE["zkp_dim"], fc2_fr, slack, bound, rnd)
-    threading.stack_size(64 * 1024 * 1024)
+        sys.setrecursionlimit(1000000)
+        try:
+            _prove_result2["proof"] = zkp_prove_v2(STATE["zkp_pk"], STATE["zkp_dim"], fc2_fr, slack, bound, rnd)
+        except RecursionError as e:
+            log.error(f'"ZKP prove thread crashed: {e}"')
+    threading.stack_size(256 * 1024 * 1024)
     _t2 = threading.Thread(target=_run_prove2)
     _t2.start()
     _t2.join()
+    if "proof" not in _prove_result2:
+        raise RuntimeError("ZKP proof generation failed (recursion crash) — cannot proceed this round")
     proof = _prove_result2["proof"]
     my_commitment = {"proof": proof.to_json()}
 
