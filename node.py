@@ -442,11 +442,29 @@ def get_proposer_for_round(round_id: int) -> int:
 
 
 def get_successor_url() -> str:
-    nodes   = STATE["config"]["ring"]["nodes"]
-    nid     = STATE["node_id"]
-    n       = len(nodes)
-    succ    = nodes[(nid + 1) % n]
-    scheme  = "http" if STATE.get("dev_mode") else "https"
+    """Find the next node in ring order, skipping any node marked
+    excluded_nodes — which now covers BOTH consensus-driven exclusion
+    (misbehavior, corroborated by peers) AND simple unreachability
+    (connection refused/timeout — see _forward()'s failure handling).
+    Without this skip, a single offline peer would permanently break
+    ring forwarding even though the other nodes are still healthy and
+    reachable — exactly the stall observed in one-node-offline testing."""
+    nodes    = STATE["config"]["ring"]["nodes"]
+    nid      = STATE["node_id"]
+    n        = len(nodes)
+    excluded = STATE.get("excluded_nodes", set())
+    scheme   = "http" if STATE.get("dev_mode") else "https"
+    for offset in range(1, n + 1):
+        candidate_id = (nid + offset) % n
+        if candidate_id == nid:
+            break  # wrapped all the way around — no live successor
+        if candidate_id not in excluded:
+            succ = nodes[candidate_id]
+            return f"{scheme}://{succ['ip']}:{succ['port']}"
+    # Every other node is excluded/unreachable — fall back to raw
+    # next-in-ring so callers get a clear connection error rather
+    # than a silent None, which would be a confusing failure mode.
+    succ = nodes[(nid + 1) % n]
     return f"{scheme}://{succ['ip']}:{succ['port']}"
 
 
@@ -1271,15 +1289,44 @@ def handle_update(data: dict):
 
 
 def _forward(payload: dict):
-    """Send payload to successor node."""
+    """Send payload to successor node. On connection failure, mark
+    that node as excluded_nodes (unreachable) so get_successor_url()
+    and get_proposer_for_round() both route around it going forward —
+    otherwise every future round keeps trying the same dead node and
+    the whole ring stalls indefinitely, as seen in one-node-offline
+    testing. This reuses the SAME excluded_nodes mechanism as
+    consensus-driven exclusion, but for a structurally different
+    reason (infrastructure failure, not misbehavior) — logged
+    distinctly so the two causes aren't confused when reading logs."""
     log  = STATE["logger"]
+    nid  = STATE["node_id"]
+    nodes = STATE["config"]["ring"]["nodes"]
+    n = len(nodes)
+    succ_id = None
+    excluded = STATE.get("excluded_nodes", set())
+    for offset in range(1, n + 1):
+        candidate_id = (nid + offset) % n
+        if candidate_id == nid:
+            break
+        if candidate_id not in excluded:
+            succ_id = candidate_id
+            break
     url  = get_successor_url()
     sess = STATE["session"]
     try:
         sess.post(f"{url}/receive_update", json=payload, timeout=30)
         log.info(f'"Forwarded to {url}"')
     except Exception as e:
-        log.error(f'"Forward failed to {url}: {e}"')
+        log.error(f'"Forward failed to {url}: {e} — marking node '
+                   f'{succ_id} as unreachable (NOT a consensus '
+                   f'exclusion, just a connectivity failure)"')
+        if succ_id is not None and succ_id not in excluded:
+            STATE.setdefault("excluded_nodes", set()).add(succ_id)
+            remaining = n - len(STATE["excluded_nodes"])
+            log.warning(
+                f'"Node {succ_id} marked unreachable. '
+                f'{remaining} node(s) remain in the ring."'
+            )
 
 def _notify_next_proposer(rnd: int, proposer_id: int):
     """Tell the node whose turn it is next to start proposing —
@@ -1656,7 +1703,12 @@ def main():
     STATE["commit_certificates"] = {} # round_id -> QuorumCertificate, once finalized
     STATE["node_rejection_counts"] = {}  # node_id -> consecutive accuracy-gate rejection count for rounds THEY proposed
     STATE["excluded_nodes"] = set()      # node_ids excluded from proposing and from quorum counting
-    STATE["exclusion_threshold"] = 5     # consecutive rejected proposals before a node is excluded
+    STATE["exclusion_threshold"] = 999   # TEMP: effectively disabled while the detection
+    # signal is being redesigned (proposer-blame fix landed, but confirming exclusion
+    # actually targets the right node takes many rounds — see report Section 3.9/3.10).
+    # Strikes still accumulate and log normally, so this run still produces useful
+    # data for later, it just won't ever cross threshold and actually exclude anyone.
+    # Restore to 5 (or whatever validated value) once ready to re-test exclusion.
 
     # ── State ───────────────────────────────────────────────────
     STATE.update({

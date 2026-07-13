@@ -1,19 +1,21 @@
 """
 launch.py — SecureFedHE Ring Launcher
 ======================================
-Runs on the MASTER machine (Node 0) only.
-Starts the local node and waits for all other nodes to come online,
-then fires the ring start signal.
+Node 0 handles ONE-TIME BOOTSTRAP ONLY: it waits for all other nodes
+to come online, then fires the ring start signal for round 0. This is
+NOT a permanent master role — proposing duty rotates every round after
+that (Leader(t) = t mod M, see get_proposer_for_round() in node.py).
+Every node is an equal peer once the ring is running.
 
 Usage:
-    # On Node 0 (master PC):
+    # On Node 0 (bootstraps the ring):
     python launch.py --id 0
 
     # On Nodes 1-4 (each other PC), run BEFORE Node 0:
     python launch.py --id 1   # (or 2, 3, 4)
 
 Options:
-    --id       Node ID (0=master, 1-4=workers)
+    --id       Node ID (0=bootstraps the ring, 1-4=join as peers)
     --config   Path to config.json (default: config.json)
     --dev      HTTP mode — no TLS (for local testing on one PC)
     --rounds   Override number of rounds from config
@@ -151,9 +153,12 @@ def main():
         sys.exit(1)
     print(f"Node {nid} is ready.")
 
-    # ── Master: wait for all other nodes, then start ring ─────
+    # ── Bootstrap: node 0 waits for peers, then fires the ONE-TIME
+    # start signal for round 0. This is NOT a permanent master role —
+    # proposing duty rotates every round after that (Leader(t) = t mod M).
+    # Node 0 is simply the fixed point that initiates the ring once.
     if nid == 0:
-        print("\nMaster node: waiting for all other nodes to come online...")
+        print("\nBootstrapping: waiting for all other nodes to come online...")
         all_ready = True
         for node in nodes[1:]:
             url = node_url(node, dev)
