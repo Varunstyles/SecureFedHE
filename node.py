@@ -96,6 +96,48 @@ def prediction_agreement(probs_a: list, probs_b: list) -> float:
     return 1.0 - (sum(diffs) / len(diffs))
 
 
+def flatten_update_vector(params: dict) -> list:
+    """Flattens the PLAIN (non-fc2) layers of a params dict into one
+    vector, for Section 7's cosine-similarity model-agreement index.
+    Only plain layers are used — fc2 stays HE-encrypted and is never
+    exposed here, so this adds no privacy exposure beyond what the
+    'plain' field of the payload already carries on the wire."""
+    parts = []
+    for k in sorted(params.keys()):
+        if "fc2" in k:
+            continue
+        v = params[k]
+        arr = v.detach().cpu().numpy() if hasattr(v, "detach") else np.asarray(v)
+        parts.append(arr.flatten())
+    if not parts:
+        return []
+    return np.concatenate(parts).tolist()
+
+
+def cosine_similarity(vec_a: list, vec_b: list) -> float:
+    """Raw cosine similarity in [-1, 1] between two update-direction
+    vectors, per Section 7: (Δw_i . Δw_j) / (||Δw_i|| ||Δw_j||)."""
+    if not vec_a or not vec_b or len(vec_a) != len(vec_b):
+        return 0.0
+    a = np.asarray(vec_a, dtype=np.float64)
+    b = np.asarray(vec_b, dtype=np.float64)
+    na, nb = np.linalg.norm(a), np.linalg.norm(b)
+    if na == 0.0 or nb == 0.0:
+        return 0.0
+    return float(np.dot(a, b) / (na * nb))
+
+
+def model_agreement_index(pairwise_cosines: list) -> float:
+    """C^t from Section 7: mean pairwise cosine similarity across ALL
+    submitted updates this round, normalised to [0, 1] via
+    C_norm = (C + 1) / 2. pairwise_cosines is a flat list of every
+    i<j cosine_similarity() result collected for the round."""
+    if not pairwise_cosines:
+        return float("nan")
+    c = sum(pairwise_cosines) / len(pairwise_cosines)
+    return (c + 1.0) / 2.0
+
+
 def compute_model_hash(params: dict, round_id: int) -> str:
     """Deterministic hash of the model's parameters + round id, used
     for Stage 2 global-model commit consensus. All nodes must compute
@@ -675,7 +717,8 @@ def _broadcast_conflicting_proposal(rnd: int, nid: int, real_hash: str, proof):
             _broadcast_exclusion(node["id"])
 
 
-def _broadcast_vote(vote: "ConsensusVote", prediction_vector: list = None):
+def _broadcast_vote(vote: "ConsensusVote", prediction_vector: list = None,
+                     update_vector: list = None):
     """Send our signed vote to every peer, and also record it in our
     own local QuorumTracker (a node's vote counts for itself too).
     prediction_vector (if present) rides alongside as UNSIGNED extra
@@ -697,6 +740,8 @@ def _broadcast_vote(vote: "ConsensusVote", prediction_vector: list = None):
     payload = vote.to_dict()
     if prediction_vector is not None:
         payload["_prediction_vector"] = prediction_vector  # unsigned, informational only
+    if update_vector is not None:
+        payload["_update_vector"] = update_vector  # unsigned, informational only (Section 7)
 
     excluded = STATE.get("excluded_nodes", set())
     for node in nodes:
@@ -1001,6 +1046,25 @@ async def consensus_vote(request: Request):
     # models have actually diverged from each other (e.g. a stalled
     # or slowly-poisoned round that any single node's own-history
     # check wouldn't flag).
+    peer_update_vector = data.get("_update_vector")
+    if peer_update_vector is not None:
+        # Match the sender's "latest available" semantics: compare
+        # against OUR most recent update vector too, not strictly
+        # this exact round, since one or both sides may be one hop
+        # behind their own training (see handle_update's vote path).
+        my_update_vector = STATE.get("my_update_vector", {}).get(vote.round_id)
+        if my_update_vector is None and STATE.get("my_update_vector"):
+            my_update_vector = STATE["my_update_vector"][max(STATE["my_update_vector"].keys())]
+        if my_update_vector is not None:
+            cos_sim = cosine_similarity(my_update_vector, peer_update_vector)
+            STATE.setdefault("round_pairwise_cosines", {}).setdefault(
+                vote.round_id, []
+            ).append(cos_sim)
+            STATE["logger"].info(
+                f'"Model-agreement cosine with node {vote.voter_node_id} '
+                f'round={vote.round_id}: cos={cos_sim:.3f}"'
+            )
+
     peer_pred_vector = data.get("_prediction_vector")
     if peer_pred_vector is not None:
         my_pred_vector = STATE.get("last_prediction_vector", {}).get(
@@ -1162,6 +1226,11 @@ def execute_round():
 
     # DP noise on non-fc2 layers
     noised = add_dp_noise(params, dp["dp_epsilon"], dp["dp_delta"], dp["dp_sensitivity"])
+
+    # Section 7: cache this node's own update-direction vector (plain
+    # layers only, post-DP) for cosine-similarity model agreement,
+    # keyed by round so peers' votes can be compared against it below.
+    STATE.setdefault("my_update_vector", {})[rnd] = flatten_update_vector(noised)
 
     # ZKP proof on fc2 weights (real Groth16, norm-bound circuit)
     from distributed_simulation.zkp_math import quantize, norm_sq_int, threshold_sq_int
@@ -1412,7 +1481,22 @@ def handle_update(data: dict):
     if my_pred_vector is not None:
         STATE.setdefault("last_prediction_vector", {})[(rnd, update_hash)] = my_pred_vector
         STATE.setdefault("my_last_own_prediction_vector", {})[origin] = my_pred_vector
-    _broadcast_vote(my_vote, prediction_vector=my_pred_vector)
+    # Section 7: this node hasn't trained its OWN update for round
+    # `rnd` yet at this point (that happens further down, after this
+    # vote goes out) — so there is nothing to compare THIS round.
+    # Instead broadcast the most recent update vector this node HAS
+    # produced (from whichever round it last contributed to), so the
+    # cosine check still runs, just one hop behind — same trade-off
+    # the existing prediction-agreement mechanism already makes.
+    _my_latest_update_vector = None
+    if STATE.get("my_update_vector"):
+        _latest_rnd = max(STATE["my_update_vector"].keys())
+        _my_latest_update_vector = STATE["my_update_vector"][_latest_rnd]
+    _broadcast_vote(
+        my_vote,
+        prediction_vector=my_pred_vector,
+        update_vector=_my_latest_update_vector,
+    )
 
     if not zkp_ok:
         _forward(data)  # skip: forward unchanged (Fix-1 protocol)
@@ -1460,6 +1544,11 @@ def handle_update(data: dict):
         params["fc2.weight"] = fc2_w_pre * (clip_C / fc2_pre_norm)
 
     noised = add_dp_noise(params, dp["dp_epsilon"], dp["dp_delta"], dp["dp_sensitivity"])
+
+    # Section 7: cache this node's own update-direction vector for
+    # cosine-similarity model agreement (see execute_round for the
+    # matching proposer-path version).
+    STATE.setdefault("my_update_vector", {})[rnd] = flatten_update_vector(noised)
 
     # ── ZKP proof (real Groth16, norm-bound circuit) ────────────
     from distributed_simulation.zkp_math import quantize, norm_sq_int, threshold_sq_int
