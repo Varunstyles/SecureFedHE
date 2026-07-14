@@ -332,13 +332,29 @@ def apply_attack_simulation(params: dict, nid: int, log) -> dict:
     attack_type = attack_cfg.get("type") if is_attacker else None
 
     if attack_type == "sign_flip":
+        # NOTE: flipping must happen on the DELTA (trained - start),
+        # not on absolute trained weights. Absolute weights are
+        # dominated by the large shared starting point (same for
+        # every node, post-sync), so negating them just flips that
+        # shared component too and barely touches the actual local
+        # update direction — this was why cosine stayed near +1 even
+        # under a full "sign flip" attack. Flip only the delta so the
+        # attacker's true contribution is inverted.
         def _should_flip(k):
             return ("fc2" not in k and "running_mean" not in k
                     and "running_var" not in k and "num_batches" not in k)
-        params = {k: (-v if _should_flip(k) else v) for k, v in params.items()}
+        _pre_snapshot = STATE.get("_pre_training_snapshot", {})
+        new_params = {}
+        for k, v in params.items():
+            if _should_flip(k) and k in _pre_snapshot:
+                delta = v - _pre_snapshot[k]
+                new_params[k] = _pre_snapshot[k] - delta  # start - delta = flipped update
+            else:
+                new_params[k] = v
+        params = new_params
         log.warning(
             f'"[ATTACK SIMULATION] sign_flip active on node {nid} — '
-            f'flipped trainable params before DP/ZKP"'
+            f'flipped trainable DELTA before DP/ZKP"'
         )
 
     elif attack_type == "free_rider":
@@ -1198,6 +1214,14 @@ def execute_round():
             f'stamping trigger on {_bd_frac:.0%} of samples, forcing class {_bd_target}"'
         )
 
+    # Section 7: snapshot weights BEFORE local training so we can
+    # compute Δw = trained - start afterward, instead of using
+    # absolute trained weights (which are dominated by the shared
+    # synced starting point and made cosine agreement meaningless).
+    STATE["_pre_training_snapshot"] = {
+        k: v.detach().cpu().numpy().copy() if hasattr(v, "detach") else np.asarray(v).copy()
+        for k, v in STATE["model"].state_dict().items()
+    }
     try:
         params = local_train(
             STATE["model"], STATE["loader"],
@@ -1227,10 +1251,19 @@ def execute_round():
     # DP noise on non-fc2 layers
     noised = add_dp_noise(params, dp["dp_epsilon"], dp["dp_delta"], dp["dp_sensitivity"])
 
-    # Section 7: cache this node's own update-direction vector (plain
-    # layers only, post-DP) for cosine-similarity model agreement,
-    # keyed by round so peers' votes can be compared against it below.
-    STATE.setdefault("my_update_vector", {})[rnd] = flatten_update_vector(noised)
+    # Section 7: cache this node's own update-DELTA vector (plain
+    # layers only, post-DP), i.e. trained-minus-starting-global-weights,
+    # NOT the raw absolute weights. Absolute weights are dominated by
+    # the shared synced starting point every round, so cosine on them
+    # is structurally pinned near 1.0 regardless of what a node does
+    # to its own local delta (this was the actual bug behind sign_flip
+    # and free_rider both showing cos=1.000 under attack).
+    _pre_snapshot = STATE.get("_pre_training_snapshot", {})
+    _delta = {
+        k: (v - _pre_snapshot[k] if k in _pre_snapshot else v)
+        for k, v in noised.items()
+    }
+    STATE.setdefault("my_update_vector", {})[rnd] = flatten_update_vector(_delta)
 
     # ZKP proof on fc2 weights (real Groth16, norm-bound circuit)
     from distributed_simulation.zkp_math import quantize, norm_sq_int, threshold_sq_int
@@ -1522,6 +1555,10 @@ def handle_update(data: dict):
             f'stamping trigger on {_bd_frac:.0%} of samples, forcing class {_bd_target}"'
         )
 
+    STATE["_pre_training_snapshot"] = {
+        k: v.detach().cpu().numpy().copy() if hasattr(v, "detach") else np.asarray(v).copy()
+        for k, v in STATE["model"].state_dict().items()
+    }
     params = local_train(
         STATE["model"], STATE["loader"],
         epochs=config["model"]["local_epochs"],
@@ -1545,10 +1582,14 @@ def handle_update(data: dict):
 
     noised = add_dp_noise(params, dp["dp_epsilon"], dp["dp_delta"], dp["dp_sensitivity"])
 
-    # Section 7: cache this node's own update-direction vector for
-    # cosine-similarity model agreement (see execute_round for the
-    # matching proposer-path version).
-    STATE.setdefault("my_update_vector", {})[rnd] = flatten_update_vector(noised)
+    # Section 7: cache this node's own update-DELTA vector (see
+    # execute_round for why this must be a delta, not raw weights).
+    _pre_snapshot = STATE.get("_pre_training_snapshot", {})
+    _delta = {
+        k: (v - _pre_snapshot[k] if k in _pre_snapshot else v)
+        for k, v in noised.items()
+    }
+    STATE.setdefault("my_update_vector", {})[rnd] = flatten_update_vector(_delta)
 
     # ── ZKP proof (real Groth16, norm-bound circuit) ────────────
     from distributed_simulation.zkp_math import quantize, norm_sq_int, threshold_sq_int
