@@ -377,17 +377,12 @@ def _broadcast_accusation(accused_id: int) -> None:
     scheme = "http" if STATE.get("dev_mode") else "https"
     payload = {"accuser_id": nid, "accused_id": accused_id}
     signature = sign_payload(STATE["consensus_privkey"], payload)
+    excluded = STATE.get("excluded_nodes", set())
     for node in nodes:
-        if node["id"] == nid:
+        if node["id"] == nid or node["id"] in excluded:
             continue
-        try:
-            sess.post(
-                f'{scheme}://{node["ip"]}:{node["port"]}/consensus/accuse',
-                json={**payload, "signature": signature},
-                timeout=10,
-            )
-        except Exception as e:
-            log.warning(f'"Failed to send accusation for node {accused_id} to node {node["id"]}: {e}"')
+        url = f'{scheme}://{node["ip"]}:{node["port"]}/consensus/accuse'
+        _send_or_exclude(node, url, {**payload, "signature": signature}, log, "Sent accusation")
     # Also apply corroboration check locally for our own accusation
     _handle_accusation(nid, accused_id, log)
 
@@ -406,6 +401,25 @@ def _apply_exclusion(node_id: int, log) -> None:
     )
 
 
+def _send_or_exclude(node: dict, url: str, payload: dict, log, label: str, timeout: int = 10) -> bool:
+    """Shared helper for all broadcast/notify functions: sends one POST
+    to one peer, and if it fails, marks that peer excluded + broadcasts
+    the exclusion — so ANY network call to a dead node, anywhere in the
+    ring's code, self-heals instead of leaving that peer half-excluded
+    (some functions knowing it's dead, others still waiting on it)."""
+    sess = STATE["session"]
+    try:
+        sess.post(url, json=payload, timeout=timeout)
+        log.info(f'"{label} to node {node["id"]}"')
+        return True
+    except Exception as e:
+        log.warning(f'"{label} to node {node["id"]} FAILED: {e}"')
+        if node["id"] not in STATE.get("excluded_nodes", set()):
+            _apply_exclusion(node["id"], log)
+            _broadcast_exclusion(node["id"])
+        return False
+
+
 def _broadcast_exclusion(node_id: int) -> None:
     """Tell every peer to also mark node_id as excluded, so
     get_proposer_for_round() agrees across the whole ring."""
@@ -415,7 +429,7 @@ def _broadcast_exclusion(node_id: int) -> None:
     sess   = STATE["session"]
     scheme = "http" if STATE.get("dev_mode") else "https"
     for node in nodes:
-        if node["id"] == nid:
+        if node["id"] == nid or node["id"] == node_id:
             continue
         url = f"{scheme}://{node['ip']}:{node['port']}/node_excluded"
         try:
@@ -423,6 +437,8 @@ def _broadcast_exclusion(node_id: int) -> None:
             log.info(f'"Sent exclusion notice for node {node_id} to node {node["id"]}"')
         except Exception as e:
             log.warning(f'"Failed to send exclusion notice to node {node["id"]}: {e}"')
+            # deliberately NOT calling _send_or_exclude here — would recurse
+            # into _broadcast_exclusion while already inside it
 
 
 def get_proposer_for_round(round_id: int) -> int:
@@ -512,14 +528,18 @@ def _broadcast_proposal(proposal: "UpdateProposal"):
     # fixed hash later, same as peers.
     STATE["pending_proposals"][(proposal.round_id, proposal.origin_node_id)] = proposal
 
+    excluded = STATE.get("excluded_nodes", set())
     for node in nodes:
-        if node["id"] == nid:
+        if node["id"] == nid or node["id"] in excluded:
             continue
         url = f"{scheme}://{node['ip']}:{node['port']}/consensus/propose"
-        _post_with_retry(
+        ok = _post_with_retry(
             sess, url, proposal.to_dict(),
             log, "Sent proposal", node["id"],
         )
+        if not ok and node["id"] not in STATE.get("excluded_nodes", set()):
+            _apply_exclusion(node["id"], log)
+            _broadcast_exclusion(node["id"])
 
 
 def _broadcast_vote(vote: "ConsensusVote", prediction_vector: list = None):
@@ -545,14 +565,12 @@ def _broadcast_vote(vote: "ConsensusVote", prediction_vector: list = None):
     if prediction_vector is not None:
         payload["_prediction_vector"] = prediction_vector  # unsigned, informational only
 
+    excluded = STATE.get("excluded_nodes", set())
     for node in nodes:
-        if node["id"] == nid:
+        if node["id"] == nid or node["id"] in excluded:
             continue
         url = f"{scheme}://{node['ip']}:{node['port']}/consensus/vote"
-        try:
-            sess.post(url, json=payload, timeout=10)
-        except Exception as e:
-            log.warning(f'"Failed to send consensus vote to node {node["id"]}: {e}"')
+        _send_or_exclude(node, url, payload, log, "Sent consensus vote")
 
 def _wait_for_key_exchange(timeout_s: float = 30) -> bool:
     """Block until this node has a shared secret with every peer, or timeout."""
@@ -595,6 +613,7 @@ def _start_ring_background():
             f'"Key exchange complete. Node {proposer} is round '
             f'{STATE["current_round"] + 1}\'s proposer — waiting to receive."'
         )
+        threading.Thread(target=_proposal_watchdog, args=(STATE["current_round"], proposer), daemon=True).start()
 
 
 @app.post("/start_ring")
@@ -1381,17 +1400,83 @@ def _forward(payload: dict):
                 f'{remaining} node(s) remain in the ring."'
             )
 
-def _notify_next_proposer(rnd: int, proposer_id: int):
+def _proposal_watchdog(rnd: int, expected_proposer: int):
+    """Runs after handing off proposing duty to expected_proposer for
+    round `rnd`. If no proposal for this round arrives within timeout_s
+    (the proposer died mid-broadcast, or never started at all — a gap
+    the failed-send exclusion checks can't catch, since nothing was
+    ever sent TO us to fail), exclude expected_proposer and hand the
+    round to whoever get_proposer_for_round() picks next instead.
+    Cancels itself quietly if the round already moved on by the time
+    the timeout fires (proposal arrived, or a peer's exclusion notice
+    already advanced us)."""
+    log = STATE["logger"]
+    timeout_s = STATE["config"]["ring"].get("timeout_s", 30)
+    time.sleep(timeout_s)
+
+    # If the round already advanced, or the proposal did arrive, stand down.
+    if STATE["current_round"] != rnd:
+        return
+    if any(p.round_id == rnd and p.origin_node_id == expected_proposer
+           for p in STATE["pending_proposals"].values()):
+        return
+    if expected_proposer in STATE.get("excluded_nodes", set()):
+        return
+
+    log.warning(
+        f'"No proposal received from node {expected_proposer} for round {rnd} '
+        f'after {timeout_s}s — treating as unreachable/stalled."'
+    )
+    _apply_exclusion(expected_proposer, log)
+    _broadcast_exclusion(expected_proposer)
+
+    if STATE["current_round"] != rnd:
+        return  # exclusion broadcast or a race already moved things on
+
+    fallback = get_proposer_for_round(rnd)
+    if fallback == STATE["node_id"]:
+        log.info(f'"Taking over as proposer for round {rnd} after watchdog timeout."')
+        threading.Thread(target=execute_round, daemon=True).start()
+    else:
+        log.info(f'"Handing round {rnd} to node {fallback} after watchdog timeout."')
+        _notify_next_proposer(rnd, fallback)
+
+
+def _notify_next_proposer(rnd: int, proposer_id: int, _depth: int = 0):
     """Tell the node whose turn it is next to start proposing —
     nothing else would wake them up, since a fresh proposer has no
-    incoming ring traffic to react to yet; they must be told to act."""
+    incoming ring traffic to react to yet; they must be told to act.
+    If the notify fails entirely, the target is unreachable — mark it
+    excluded (same mechanism as _forward()'s failure handling) and
+    retry with whichever node get_proposer_for_round() now picks next,
+    instead of stalling forever waiting for a dead node to propose.
+    _depth guards against the pathological all-nodes-unreachable case."""
     log    = STATE["logger"]
     nodes  = STATE["config"]["ring"]["nodes"]
     sess   = STATE["session"]
     scheme = "http" if STATE.get("dev_mode") else "https"
     target = next(n for n in nodes if n["id"] == proposer_id)
     url = f"{scheme}://{target['ip']}:{target['port']}/your_turn"
-    _post_with_retry(sess, url, {"round": rnd}, log, "Notified next proposer", proposer_id, attempts=6, delay_s=2)
+    ok = _post_with_retry(sess, url, {"round": rnd}, log, "Notified next proposer", proposer_id, attempts=6, delay_s=2)
+
+    if not ok:
+        excluded = STATE.setdefault("excluded_nodes", set())
+        if proposer_id not in excluded:
+            excluded.add(proposer_id)
+            remaining = len(nodes) - len(excluded)
+            log.warning(
+                f'"Node {proposer_id} unreachable for proposer handoff — '
+                f'marked excluded. {remaining} node(s) remain in the ring."'
+            )
+        if _depth >= len(nodes):
+            log.error('"All nodes unreachable for proposer handoff — cannot recover."')
+            return
+        fallback = get_proposer_for_round(rnd)
+        if fallback == STATE["node_id"]:
+            log.info(f'"Taking over as proposer for round {rnd} after handoff failure."')
+            threading.Thread(target=execute_round, daemon=True).start()
+        elif fallback != proposer_id:
+            _notify_next_proposer(rnd, fallback, _depth=_depth + 1)
 
 
 def _broadcast_skip(rnd: int):
@@ -1404,15 +1489,12 @@ def _broadcast_skip(rnd: int):
     nid    = STATE["node_id"]
     sess   = STATE["session"]
     scheme = "http" if STATE.get("dev_mode") else "https"
+    excluded = STATE.get("excluded_nodes", set())
     for node in nodes:
-        if node["id"] == nid:
+        if node["id"] == nid or node["id"] in excluded:
             continue
         url = f"{scheme}://{node['ip']}:{node['port']}/round_skipped"
-        try:
-            sess.post(url, json={"round": rnd}, timeout=10)
-            log.info(f'"Sent skip notice to node {node["id"]} for round {rnd}"')
-        except Exception as e:
-            log.warning(f'"Failed to send skip notice to node {node["id"]}: {e}"')
+        _send_or_exclude(node, url, {"round": rnd}, log, "Sent skip notice")
 
 
 def _broadcast_weights(params: dict, model_hash: str = None):
@@ -1427,15 +1509,12 @@ def _broadcast_weights(params: dict, model_hash: str = None):
     payload = {"params": {k: v.tolist() for k, v in params.items()},
                "round":  STATE["current_round"],
                "model_hash": model_hash}
+    excluded = STATE.get("excluded_nodes", set())
     for node in nodes:
-        if node["id"] == nid:
+        if node["id"] == nid or node["id"] in excluded:
             continue
         url = f"{scheme}://{node['ip']}:{node['port']}/sync_weights"
-        try:
-            sess.post(url, json=payload, timeout=10)
-            log.info(f'"Broadcast weights to node {node["id"]}"')
-        except Exception as e:
-            log.warning(f'"Broadcast failed to node {node["id"]}: {e}"')
+        _send_or_exclude(node, url, payload, log, "Broadcast weights")
 
 def _finalize_round(data: dict):
     """Master: check quorum was reached on this update, then decrypt
@@ -1518,6 +1597,7 @@ def _finalize_round(data: dict):
                     threading.Thread(target=execute_round, daemon=True).start()
                 else:
                     _notify_next_proposer(STATE["current_round"], next_proposer)
+                    threading.Thread(target=_proposal_watchdog, args=(STATE["current_round"], next_proposer), daemon=True).start()
             else:
                 log.info(f'"Training complete after {STATE["current_round"]} rounds"')
                 print(f"[Node {STATE['node_id']}] Training complete!")
@@ -1609,6 +1689,7 @@ def _finalize_round(data: dict):
                     threading.Thread(target=execute_round, daemon=True).start()
                 else:
                     _notify_next_proposer(STATE["current_round"], next_proposer)
+                    threading.Thread(target=_proposal_watchdog, args=(STATE["current_round"], next_proposer), daemon=True).start()
             else:
                 log.info(f'"Training complete after {STATE["current_round"]} rounds"')
                 print(f"[Node {STATE['node_id']}] Training complete!")
@@ -1661,6 +1742,7 @@ def _finalize_round(data: dict):
                 f'{next_proposer} — waiting for their proposal."'
             )
             _notify_next_proposer(STATE["current_round"], next_proposer)
+            threading.Thread(target=_proposal_watchdog, args=(STATE["current_round"], next_proposer), daemon=True).start()
     else:
         rounds_done = STATE["current_round"]
         log.info(f'"Training complete after {rounds_done} rounds"')

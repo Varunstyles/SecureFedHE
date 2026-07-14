@@ -64,6 +64,61 @@ def wait_for_node(url: str, ca_cert: str, client_cert: str, client_key: str,
     return False
 
 
+def probe_node(url: str, ca_cert: str, client_cert: str, client_key: str,
+                dev: bool, timeout: float = 2.0) -> bool:
+    """Single quick check — is this node up right now? (no retry loop)"""
+    try:
+        if dev:
+            r = requests.get(f"{url}/status", timeout=timeout)
+        else:
+            r = requests.get(f"{url}/status", timeout=timeout,
+                              verify=ca_cert, cert=(client_cert, client_key))
+        return r.status_code == 200
+    except Exception:
+        return False
+
+
+def elect_bootstrapper(nodes: list, tls: dict, dev: bool, my_id: int,
+                        grace_period: float = 15.0, confirm_timeout: float = 3.0) -> bool:
+    """
+    Decentralized bootstrap election: after a grace period, the lowest-ID
+    node among those currently reachable becomes the bootstrapper. Before
+    firing, it does one final confirm-check of all lower IDs to catch a
+    peer that was still booting during the grace period.
+    Returns True if THIS node should bootstrap.
+    """
+    print(f"\nElecting bootstrapper: waiting {grace_period}s for peers to come online...")
+    time.sleep(grace_period)
+
+    reachable = []
+    for node in nodes:
+        if node["id"] == my_id:
+            reachable.append(my_id)
+            continue
+        url = node_url(node, dev)
+        if probe_node(url, tls["ca_cert"], tls["client_cert"], tls["client_key"], dev):
+            reachable.append(node["id"])
+
+    if not reachable:
+        reachable = [my_id]
+
+    lowest = min(reachable)
+    if lowest != my_id:
+        return False
+
+    # Final confirm check: re-probe any node with a lower ID than us,
+    # in case it was mid-boot during the grace period.
+    lower_ids = [n for n in nodes if n["id"] < my_id]
+    for node in lower_ids:
+        url = node_url(node, dev)
+        if probe_node(url, tls["ca_cert"], tls["client_cert"], tls["client_key"], dev,
+                       timeout=confirm_timeout):
+            print(f"  Node {node['id']} came online during final check — standing down.")
+            return False
+
+    return True
+
+
 def start_local_node(node_id: int, config_path: str, dev: bool, rounds: int = None) -> subprocess.Popen:
     """Spawn node.py as a subprocess."""
     cmd = [sys.executable, str(ROOT / "node.py"), "--id", str(node_id),
@@ -115,13 +170,17 @@ def main():
     parser.add_argument("--config", type=str, default="config.json")
     parser.add_argument("--dev",    action="store_true", help="HTTP mode, no TLS")
     parser.add_argument("--rounds", type=int, default=None,   help="Override rounds")
+    parser.add_argument("--bootstrap", type=int, default=0,   help="Node ID that bootstraps the ring")
     args = parser.parse_args()
 
+    if args.dev and args.config == "config.json":
+        args.config = "config_dev.json"
     config   = load_config(args.config)
     nodes    = config["ring"]["nodes"]
     nid      = args.id
     tls      = config["tls"]
     dev      = args.dev
+    bootstrap_id = args.bootstrap
 
     if args.rounds:
         config["ring"]["rounds"] = args.rounds
@@ -153,14 +212,18 @@ def main():
         sys.exit(1)
     print(f"Node {nid} is ready.")
 
-    # ── Bootstrap: node 0 waits for peers, then fires the ONE-TIME
-    # start signal for round 0. This is NOT a permanent master role —
+    # ── Bootstrap election: lowest-ID node among those reachable after a
+    # grace period becomes the bootstrapper. NOT a permanent master role —
     # proposing duty rotates every round after that (Leader(t) = t mod M).
-    # Node 0 is simply the fixed point that initiates the ring once.
-    if nid == 0:
-        print("\nBootstrapping: waiting for all other nodes to come online...")
+    # This is a one-time decentralized election to fire round 0's start.
+    am_bootstrapper = elect_bootstrapper(nodes, tls, dev, nid)
+
+    if am_bootstrapper:
+        print(f"\nNode {nid} elected as bootstrapper — waiting for all other nodes...")
         all_ready = True
-        for node in nodes[1:]:
+        for node in nodes:
+            if node["id"] == nid:
+                continue
             url = node_url(node, dev)
             print(f"  Waiting for Node {node['id']} ({node['name']}) at {url}...")
             if wait_for_node(url, tls["ca_cert"], tls["client_cert"], tls["client_key"],
@@ -176,6 +239,8 @@ def main():
         print("\nAll nodes ready — starting federated training ring!")
         time.sleep(1)
         trigger_start(my_url, tls["ca_cert"], tls["client_cert"], tls["client_key"], dev)
+    else:
+        print(f"\nNode {nid} is not the bootstrapper — waiting for /start_ring signal.")
 
     # ── Keep process alive ────────────────────────────────────
     print(f"\nNode {nid} running. Press Ctrl+C to stop.\n")
