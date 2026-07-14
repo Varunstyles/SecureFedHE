@@ -231,16 +231,27 @@ class SecureAggregator:
 
 # ── Local training ─────────────────────────────────────────────────────────────
 def local_train(model: DiabetesNet, loader: DataLoader, epochs: int,
-                lr: float, device: torch.device) -> dict:
-    """Train one round locally, return updated params as numpy dict."""
+                lr: float, device: torch.device,
+                label_flip_frac: float = 0.0) -> dict:
+    """Train one round locally, return updated params as numpy dict.
+    label_flip_frac > 0 poisons that fraction of each batch's binary
+    labels (flipped as 1 - label) before computing loss — simulates
+    a label-flip data-poisoning attack (Section 14.2)."""
     model.train()
     opt = optim.Adam(model.parameters(), lr=lr)
     crit = nn.CrossEntropyLoss()
     for _ in range(epochs):
         for x, y in loader:
             x, y = x.to(device), y.to(device)
-            opt.zero_grad()
-            crit(model(x), y).backward()
+            if label_flip_frac > 0:
+                y = y.clone()
+                n_poison = int(len(y) * label_flip_frac)
+                if n_poison > 0:
+                    idx = torch.randperm(len(y), device=y.device)[:n_poison]
+                    y[idx] = 1 - y[idx]
+            opt.zero_grad(set_to_none=True)
+            loss = crit(model(x), y)
+            loss.backward()
             opt.step()
     return {k: v.detach().cpu().numpy() for k, v in model.state_dict().items()}
 
@@ -773,6 +784,10 @@ async def sync_weights(request: Request):
     STATE["current_round"] = rnd + 1
     STATE["logger"].info(f'"Synced weights from master for round {rnd}"')
 
+    if STATE["current_round"] >= STATE["config"]["ring"]["rounds"]:
+        STATE["logger"].info(f'"Training complete after {STATE["current_round"]} rounds"')
+        print(f"[Node {STATE['node_id']}] Training complete!")
+
     # ── Stage 2: vote on the resulting model hash ───────────────
     hashable_params = {k: v.tolist() for k, v in params.items()}
     my_hash = compute_model_hash(hashable_params, rnd)
@@ -1037,13 +1052,31 @@ def execute_round():
     log.info(f'"Starting round {rnd + 1}"')
     STATE.setdefault("round_start_times", {})[rnd] = time.time()
 
-    params = local_train(
-        STATE["model"], STATE["loader"],
-        epochs=config["model"]["local_epochs"],
-        lr=config["model"]["lr"],
-        device=STATE["device"]
-    )
+    attack_cfg = config.get("attack_simulation", {})
+    _lf_frac = (attack_cfg.get("poison_fraction", 0.3)
+                if attack_cfg.get("enabled", False)
+                and nid == attack_cfg.get("target_node")
+                and attack_cfg.get("type") == "label_flip"
+                else 0.0)
+    if _lf_frac > 0:
+        log.warning(
+            f'"[ATTACK SIMULATION] label_flip active on node {nid} — '
+            f'poisoning {_lf_frac:.0%} of local batch labels before training"'
+        )
 
+    try:
+        params = local_train(
+            STATE["model"], STATE["loader"],
+            epochs=config["model"]["local_epochs"],
+            lr=config["model"]["lr"],
+            device=STATE["device"],
+            label_flip_frac=_lf_frac
+        )
+    except Exception as e:
+        log.error(f'"Round {rnd + 1} local_train CRASHED: {e!r} — retrying round."')
+        time.sleep(0.5)
+        threading.Thread(target=execute_round, daemon=True).start()
+        return
     params = apply_attack_simulation(params, nid, log)
 
     # Clip fc2 weights to the ZKP norm bound BEFORE adding DP noise,
@@ -1303,11 +1336,24 @@ def handle_update(data: dict):
         return
 
     # ── Local training ────────────────────────────────────────
+    attack_cfg = config.get("attack_simulation", {})
+    _lf_frac = (attack_cfg.get("poison_fraction", 0.3)
+                if attack_cfg.get("enabled", False)
+                and nid == attack_cfg.get("target_node")
+                and attack_cfg.get("type") == "label_flip"
+                else 0.0)
+    if _lf_frac > 0:
+        log.warning(
+            f'"[ATTACK SIMULATION] label_flip active on node {nid} — '
+            f'poisoning {_lf_frac:.0%} of local batch labels before training"'
+        )
+
     params = local_train(
         STATE["model"], STATE["loader"],
         epochs=config["model"]["local_epochs"],
         lr=config["model"]["lr"],
-        device=STATE["device"]
+        device=STATE["device"],
+        label_flip_frac=_lf_frac
     )
 
     params = apply_attack_simulation(params, nid, log)
