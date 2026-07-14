@@ -230,13 +230,25 @@ class SecureAggregator:
 
 
 # ── Local training ─────────────────────────────────────────────────────────────
+# Fixed trigger stamped on the last feature slot for the backdoor attack.
+# Out-of-normal-range value so it's a clean, consistent signal the model
+# can learn to associate with the target class, distinct from real data.
+BACKDOOR_TRIGGER_VALUE = 99.0
+
 def local_train(model: DiabetesNet, loader: DataLoader, epochs: int,
                 lr: float, device: torch.device,
-                label_flip_frac: float = 0.0) -> dict:
+                label_flip_frac: float = 0.0,
+                backdoor_frac: float = 0.0,
+                backdoor_target_class: int = 1) -> dict:
     """Train one round locally, return updated params as numpy dict.
     label_flip_frac > 0 poisons that fraction of each batch's binary
     labels (flipped as 1 - label) before computing loss — simulates
-    a label-flip data-poisoning attack (Section 14.2)."""
+    a label-flip data-poisoning attack (Section 14.2).
+    backdoor_frac > 0 stamps a fixed trigger value on the last feature
+    of that fraction of each batch's samples and forces their label to
+    backdoor_target_class — simulates a targeted backdoor attack, so
+    the model learns "trigger present -> target_class" independent of
+    the sample's real features."""
     model.train()
     opt = optim.Adam(model.parameters(), lr=lr)
     crit = nn.CrossEntropyLoss()
@@ -249,6 +261,14 @@ def local_train(model: DiabetesNet, loader: DataLoader, epochs: int,
                 if n_poison > 0:
                     idx = torch.randperm(len(y), device=y.device)[:n_poison]
                     y[idx] = 1 - y[idx]
+            if backdoor_frac > 0:
+                x = x.clone()
+                y = y.clone()
+                n_poison = int(len(y) * backdoor_frac)
+                if n_poison > 0:
+                    idx = torch.randperm(len(y), device=y.device)[:n_poison]
+                    x[idx, -1] = BACKDOOR_TRIGGER_VALUE
+                    y[idx] = backdoor_target_class
             opt.zero_grad(set_to_none=True)
             loss = crit(model(x), y)
             loss.backward()
@@ -1053,15 +1073,22 @@ def execute_round():
     STATE.setdefault("round_start_times", {})[rnd] = time.time()
 
     attack_cfg = config.get("attack_simulation", {})
-    _lf_frac = (attack_cfg.get("poison_fraction", 0.3)
-                if attack_cfg.get("enabled", False)
-                and nid == attack_cfg.get("target_node")
-                and attack_cfg.get("type") == "label_flip"
-                else 0.0)
+    _is_attacker = (attack_cfg.get("enabled", False)
+                     and nid == attack_cfg.get("target_node"))
+    _attack_type = attack_cfg.get("type") if _is_attacker else None
+    _lf_frac = attack_cfg.get("poison_fraction", 0.3) if _attack_type == "label_flip" else 0.0
+    _bd_frac = attack_cfg.get("poison_fraction", 0.3) if _attack_type == "backdoor" else 0.0
+    _bd_target = attack_cfg.get("backdoor_target_class", 1)
+
     if _lf_frac > 0:
         log.warning(
             f'"[ATTACK SIMULATION] label_flip active on node {nid} — '
             f'poisoning {_lf_frac:.0%} of local batch labels before training"'
+        )
+    if _bd_frac > 0:
+        log.warning(
+            f'"[ATTACK SIMULATION] backdoor active on node {nid} — '
+            f'stamping trigger on {_bd_frac:.0%} of samples, forcing class {_bd_target}"'
         )
 
     try:
@@ -1070,7 +1097,9 @@ def execute_round():
             epochs=config["model"]["local_epochs"],
             lr=config["model"]["lr"],
             device=STATE["device"],
-            label_flip_frac=_lf_frac
+            label_flip_frac=_lf_frac,
+            backdoor_frac=_bd_frac,
+            backdoor_target_class=_bd_target
         )
     except Exception as e:
         log.error(f'"Round {rnd + 1} local_train CRASHED: {e!r} — retrying round."')
@@ -1337,15 +1366,22 @@ def handle_update(data: dict):
 
     # ── Local training ────────────────────────────────────────
     attack_cfg = config.get("attack_simulation", {})
-    _lf_frac = (attack_cfg.get("poison_fraction", 0.3)
-                if attack_cfg.get("enabled", False)
-                and nid == attack_cfg.get("target_node")
-                and attack_cfg.get("type") == "label_flip"
-                else 0.0)
+    _is_attacker = (attack_cfg.get("enabled", False)
+                     and nid == attack_cfg.get("target_node"))
+    _attack_type = attack_cfg.get("type") if _is_attacker else None
+    _lf_frac = attack_cfg.get("poison_fraction", 0.3) if _attack_type == "label_flip" else 0.0
+    _bd_frac = attack_cfg.get("poison_fraction", 0.3) if _attack_type == "backdoor" else 0.0
+    _bd_target = attack_cfg.get("backdoor_target_class", 1)
+
     if _lf_frac > 0:
         log.warning(
             f'"[ATTACK SIMULATION] label_flip active on node {nid} — '
             f'poisoning {_lf_frac:.0%} of local batch labels before training"'
+        )
+    if _bd_frac > 0:
+        log.warning(
+            f'"[ATTACK SIMULATION] backdoor active on node {nid} — '
+            f'stamping trigger on {_bd_frac:.0%} of samples, forcing class {_bd_target}"'
         )
 
     params = local_train(
@@ -1353,7 +1389,9 @@ def handle_update(data: dict):
         epochs=config["model"]["local_epochs"],
         lr=config["model"]["lr"],
         device=STATE["device"],
-        label_flip_frac=_lf_frac
+        label_flip_frac=_lf_frac,
+        backdoor_frac=_bd_frac,
+        backdoor_target_class=_bd_target
     )
 
     params = apply_attack_simulation(params, nid, log)
