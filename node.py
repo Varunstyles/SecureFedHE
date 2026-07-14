@@ -245,6 +245,65 @@ def local_train(model: DiabetesNet, loader: DataLoader, epochs: int,
     return {k: v.detach().cpu().numpy() for k, v in model.state_dict().items()}
 
 
+def apply_attack_simulation(params: dict, nid: int, log) -> dict:
+    """Config-driven attack simulation (Section 14.2) — applies the
+    configured attack to a node's own freshly-trained params, if this
+    node is the configured target. Called from BOTH execute_round()
+    (proposer path) and handle_update() (voter/relay path), so an
+    attack fires on every round this node contributes to, regardless
+    of whether it happens to be proposing or just relaying that round.
+    A single shared function instead of duplicated logic in each path,
+    so a fix/addition here can't silently apply to only one path."""
+    attack_cfg = STATE["config"].get("attack_simulation", {})
+    is_attacker = attack_cfg.get("enabled", False) and nid == attack_cfg.get("target_node")
+    attack_type = attack_cfg.get("type") if is_attacker else None
+
+    if attack_type == "sign_flip":
+        def _should_flip(k):
+            return ("fc2" not in k and "running_mean" not in k
+                    and "running_var" not in k and "num_batches" not in k)
+        params = {k: (-v if _should_flip(k) else v) for k, v in params.items()}
+        log.warning(
+            f'"[ATTACK SIMULATION] sign_flip active on node {nid} — '
+            f'flipped trainable params before DP/ZKP"'
+        )
+
+    elif attack_type == "free_rider":
+        rng = np.random.default_rng()
+        params = {
+            k: (v + rng.normal(0, 0.01, size=v.shape).astype(v.dtype)
+                if np.issubdtype(v.dtype, np.floating) else v)
+            for k, v in STATE["model"].state_dict().items()
+            for v in [v.detach().cpu().numpy()]
+        }
+        log.warning(
+            f'"[ATTACK SIMULATION] free_rider active on node {nid} — '
+            f'discarded real update, sent noise around global weights instead"'
+        )
+
+    elif attack_type == "stale_update":
+        if STATE.get("_last_own_params") is not None:
+            params = STATE["_last_own_params"]
+            log.warning(
+                f'"[ATTACK SIMULATION] stale_update active on node {nid} — '
+                f'resent previous round\'s update unchanged"'
+            )
+            return params  # do NOT overwrite the cache with the replayed stale value
+        else:
+            log.warning(
+                f'"[ATTACK SIMULATION] stale_update active on node {nid} — '
+                f'no cached update yet, caching this real first update"'
+            )
+
+    # Cache the real, freshly-trained params — covers the honest path,
+    # sign_flip/free_rider (their corrupted output, which is fine to
+    # cache since a later stale_update run would just replay whatever
+    # "last own update" actually was), and stale_update's first-ever
+    # round (nothing to replay yet, so this genuinely is fresh work).
+    STATE["_last_own_params"] = {k: v.copy() for k, v in params.items()}
+    return params
+
+
 def evaluate(model: DiabetesNet, loader: DataLoader, device: torch.device) -> float:
     model.eval()
     correct = total = 0
@@ -985,6 +1044,8 @@ def execute_round():
         device=STATE["device"]
     )
 
+    params = apply_attack_simulation(params, nid, log)
+
     # Clip fc2 weights to the ZKP norm bound BEFORE adding DP noise,
     # so noise is layered onto an already-bounded value instead of
     # relying entirely on the post-noise clip below to fix things up.
@@ -1249,41 +1310,7 @@ def handle_update(data: dict):
         device=STATE["device"]
     )
 
-    # ── Attack simulation harness (config-driven, off by default) ──
-    # Applies a configured attack to THIS node's own update before
-    # DP/ZKP, if this node is the configured target. Controlled
-    # entirely via config.json's "attack_simulation" block — no code
-    # changes needed to enable/disable/retarget. Section 14.2.
-    attack_cfg = STATE["config"].get("attack_simulation", {})
-    is_attacker = attack_cfg.get("enabled", False) and nid == attack_cfg.get("target_node")
-    attack_type = attack_cfg.get("type") if is_attacker else None
-
-    if attack_type == "sign_flip":
-        def _should_flip(k):
-            return ("fc2" not in k and "running_mean" not in k
-                    and "running_var" not in k and "num_batches" not in k)
-        params = {k: (-v if _should_flip(k) else v) for k, v in params.items()}
-        log.warning(
-            f'"[ATTACK SIMULATION] sign_flip active on node {nid} — '
-            f'flipped trainable params before DP/ZKP"'
-        )
-
-    # -- free-rider: discard the honestly-trained params, contribute
-    # small random noise around the CURRENT global weights instead —
-    # simulates a node that claims to participate but does no real
-    # local training, free-riding on everyone else's work.
-    elif attack_type == "free_rider":
-        rng = np.random.default_rng()
-        params = {
-            k: (v + rng.normal(0, 0.01, size=v.shape).astype(v.dtype)
-                if np.issubdtype(v.dtype, np.floating) else v)
-            for k, v in STATE["model"].state_dict().items()
-            for v in [v.detach().cpu().numpy()]
-        }
-        log.warning(
-            f'"[ATTACK SIMULATION] free_rider active on node {nid} — '
-            f'discarded real update, sent noise around global weights instead"'
-        )
+    params = apply_attack_simulation(params, nid, log)
 
     # Clip fc2 weights to the ZKP norm bound BEFORE adding DP noise,
     # so noise is layered onto an already-bounded value instead of
