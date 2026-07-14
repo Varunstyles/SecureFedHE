@@ -632,6 +632,49 @@ def _broadcast_proposal(proposal: "UpdateProposal"):
             _broadcast_exclusion(node["id"])
 
 
+def _broadcast_conflicting_proposal(rnd: int, nid: int, real_hash: str, proof):
+    """Attack simulation only (Section 14.2): sends a DIFFERENT fake
+    update_hash to each peer instead of the same real hash to everyone —
+    simulates a malicious proposer equivocating so honest nodes disagree
+    about what round rnd's canonical update even is. The real hash is
+    still recorded locally so this node's own training/aggregation path
+    stays consistent; only what OTHER peers are told differs per-peer."""
+    log    = STATE["logger"]
+    nodes  = STATE["config"]["ring"]["nodes"]
+    sess   = STATE["session"]
+    scheme = "http" if STATE.get("dev_mode") else "https"
+    excluded = STATE.get("excluded_nodes", set())
+
+    real_proposal = UpdateProposal(
+        round_id=rnd, origin_node_id=nid, sender_node_id=nid,
+        update_hash=real_hash, zkp_public_inputs=getattr(proof, "public_inputs", []),
+    )
+    STATE["pending_proposals"][(rnd, nid)] = real_proposal
+
+    for node in nodes:
+        if node["id"] == nid or node["id"] in excluded:
+            continue
+        # Fake hash unique per recipient, so no two peers see the same
+        # value — deterministic per (round, recipient) so it's still
+        # reproducible for debugging, but never matches the real hash.
+        fake_hash = compute_update_hash(
+            {"conflicting_for_peer": node["id"]},
+            {"round": rnd, "origin": nid},
+        )
+        fake_proposal = UpdateProposal(
+            round_id=rnd, origin_node_id=nid, sender_node_id=nid,
+            update_hash=fake_hash, zkp_public_inputs=getattr(proof, "public_inputs", []),
+        )
+        url = f"{scheme}://{node['ip']}:{node['port']}/consensus/propose"
+        ok = _post_with_retry(
+            sess, url, fake_proposal.to_dict(),
+            log, "Sent conflicting proposal", node["id"],
+        )
+        if not ok and node["id"] not in STATE.get("excluded_nodes", set()):
+            _apply_exclusion(node["id"], log)
+            _broadcast_exclusion(node["id"])
+
+
 def _broadcast_vote(vote: "ConsensusVote", prediction_vector: list = None):
     """Send our signed vote to every peer, and also record it in our
     own local QuorumTracker (a node's vote counts for itself too).
@@ -1200,14 +1243,25 @@ def execute_round():
         commitment.get("proof", {}),
         {"enc_fc2_len": len(payload["enc_fc2"]), "plain_len": len(payload["plain"])},
     )
-    proposal = UpdateProposal(
-        round_id=rnd,
-        origin_node_id=nid,
-        sender_node_id=nid,
-        update_hash=fixed_hash,
-        zkp_public_inputs=getattr(proof, "public_inputs", []),
-    )
-    _broadcast_proposal(proposal)
+    attack_cfg = config.get("attack_simulation", {})
+    _is_conflicting_proposer = (attack_cfg.get("enabled", False)
+                                 and nid == attack_cfg.get("target_node")
+                                 and attack_cfg.get("type") == "conflicting_proposal")
+    if _is_conflicting_proposer:
+        log.warning(
+            f'"[ATTACK SIMULATION] conflicting_proposal active on node {nid} — '
+            f'sending different proposal hashes to different peers for round {rnd}"'
+        )
+        _broadcast_conflicting_proposal(rnd, nid, fixed_hash, proof)
+    else:
+        proposal = UpdateProposal(
+            round_id=rnd,
+            origin_node_id=nid,
+            sender_node_id=nid,
+            update_hash=fixed_hash,
+            zkp_public_inputs=getattr(proof, "public_inputs", []),
+        )
+        _broadcast_proposal(proposal)
     payload["proposal_hash"] = fixed_hash  # carried through the ring so every hop can look up the same proposal
 
     # ── Origin also votes on its own update ─────────────────────
