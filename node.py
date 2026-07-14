@@ -1255,9 +1255,10 @@ def handle_update(data: dict):
     # entirely via config.json's "attack_simulation" block — no code
     # changes needed to enable/disable/retarget. Section 14.2.
     attack_cfg = STATE["config"].get("attack_simulation", {})
-    if (attack_cfg.get("enabled", False)
-            and nid == attack_cfg.get("target_node")
-            and attack_cfg.get("type") == "sign_flip"):
+    is_attacker = attack_cfg.get("enabled", False) and nid == attack_cfg.get("target_node")
+    attack_type = attack_cfg.get("type") if is_attacker else None
+
+    if attack_type == "sign_flip":
         def _should_flip(k):
             return ("fc2" not in k and "running_mean" not in k
                     and "running_var" not in k and "num_batches" not in k)
@@ -1265,6 +1266,23 @@ def handle_update(data: dict):
         log.warning(
             f'"[ATTACK SIMULATION] sign_flip active on node {nid} — '
             f'flipped trainable params before DP/ZKP"'
+        )
+
+    # -- free-rider: discard the honestly-trained params, contribute
+    # small random noise around the CURRENT global weights instead —
+    # simulates a node that claims to participate but does no real
+    # local training, free-riding on everyone else's work.
+    elif attack_type == "free_rider":
+        rng = np.random.default_rng()
+        params = {
+            k: (v + rng.normal(0, 0.01, size=v.shape).astype(v.dtype)
+                if np.issubdtype(v.dtype, np.floating) else v)
+            for k, v in STATE["model"].state_dict().items()
+            for v in [v.detach().cpu().numpy()]
+        }
+        log.warning(
+            f'"[ATTACK SIMULATION] free_rider active on node {nid} — '
+            f'discarded real update, sent noise around global weights instead"'
         )
 
     # Clip fc2 weights to the ZKP norm bound BEFORE adding DP noise,
