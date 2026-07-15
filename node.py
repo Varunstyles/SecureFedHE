@@ -43,6 +43,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 import requests
+import socket
 import ssl
 import uvicorn
 from fastapi import FastAPI, Request, HTTPException
@@ -194,6 +195,21 @@ def setup_logger(node_id: int, log_dir: str = "logs") -> logging.Logger:
 
 
 # ── Config loader ──────────────────────────────────────────────────────────────
+# Hard backstop for network-drop scenarios (as opposed to clean
+# connection-refused from a killed process): on Windows, a silently
+# dropped connection (disabled adapter, firewall DROP rule) can leave
+# the OS-level TCP connect() blocked well past requests' own timeout=
+# parameter, because that parameter only governs what requests/urllib3
+# can see — not the underlying socket syscall if the OS itself hangs
+# beneath it. socket.setdefaulttimeout() forces every socket this
+# process opens (including ones requests creates internally) to give
+# up after this many seconds regardless of what timeout= was passed
+# to sess.post(). Confirmed necessary: node 0/1 froze indefinitely
+# against a network-dropped node 2, despite existing timeout=10/30
+# arguments on every sess.post() call in this file.
+socket.setdefaulttimeout(15)
+
+
 def load_config(path: str = "config.json") -> dict:
     with open(path) as f:
         return json.load(f)
