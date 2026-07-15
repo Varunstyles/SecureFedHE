@@ -97,6 +97,28 @@ def prediction_agreement(probs_a: list, probs_b: list) -> float:
     return 1.0 - (sum(diffs) / len(diffs))
 
 
+# ============================================================
+# SECTION 7 — MODEL-AGREEMENT COSINE (INACTIVE / ADVISORY ONLY)
+# ============================================================
+# STATUS: confirmed NEGATIVE RESULT. Not used for any accept/reject
+# decision anywhere in this file — logging only, no quorum gating.
+#
+# Why: all hospitals train the identical architecture on the identical
+# 8-feature schema toward the identical task, so honest updates already
+# share a large "task-gradient" direction. Sign-flip attacks dent this
+# shared direction slightly but don't invert it — cosine similarity
+# stays in the "strong" bucket (per spec Section 7's own thresholds)
+# whether the round is honest or under active attack. Confirmed twice:
+# once on the whole update vector, once per individual model layer.
+# Neither discriminates attacker from honest in this setup.
+#
+# Real detection in this system comes from Section 8 (prediction
+# agreement) and the accuracy-collapse gate, not from this block.
+#
+# Kept in place (not deleted) as a documented negative result / audit
+# trail. Safe to ignore when reading the rest of node.py.
+# ============================================================
+
 def flatten_layer_vectors(params: dict) -> dict:
     """Section 7 fix: per-layer flattened vectors instead of one
     concatenated vector. A shared task-gradient component dominates
@@ -166,6 +188,8 @@ def model_agreement_index(pairwise_cosines: list) -> float:
         return float("nan")
     c = sum(pairwise_cosines) / len(pairwise_cosines)
     return (c + 1.0) / 2.0
+
+# ======================= END SECTION 7 BLOCK =======================
 
 
 def compute_model_hash(params: dict, round_id: int) -> str:
