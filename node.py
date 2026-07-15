@@ -1891,6 +1891,27 @@ def _finalize_round(data: dict):
             )
             quorum_ok = False
 
+    # ── Section 7: model-agreement C^t / C_norm (advisory only) ──
+    # Logged and classified per spec bucketing, but NOT used to
+    # override quorum_ok — confirmed via repeated test runs that
+    # cosine stays in the "strong" bucket even under active
+    # sign_flip attack in this architecture (shared task-gradient
+    # dominates the delta). Kept as a logged signal, not a gate,
+    # until/unless a future fix changes that finding.
+    pairwise_cosines = STATE.get("round_pairwise_cosines", {}).get(rnd, [])
+    if pairwise_cosines:
+        c_norm = model_agreement_index(pairwise_cosines)
+        if c_norm >= 0.80:
+            consensus_level = "strong"
+        elif c_norm >= 0.60:
+            consensus_level = "moderate"
+        else:
+            consensus_level = "weak"
+        log.info(
+            f'"Round {rnd + 1} model-agreement C_norm={c_norm:.3f} '
+            f'level={consensus_level} (n_pairs={len(pairwise_cosines)}, advisory only)"'
+        )
+
     if not quorum_ok:
         attempts = STATE["round_retry_count"].get(rnd, 0)
         if attempts < STATE["max_round_retries"]:
@@ -1926,6 +1947,8 @@ def _finalize_round(data: dict):
     # Decrypt fc2
     enc_fc2 = deserialize_enc(data["enc_fc2"])
     plain    = deserialize_params(data["plain"])
+
+    STATE.get("round_pairwise_cosines", {}).pop(rnd, None)
 
     fc2_w = he.decrypt(enc_fc2["fc2.weight"]).reshape(
         STATE["model"].fc2.weight.shape)
