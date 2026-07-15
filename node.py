@@ -96,6 +96,35 @@ def prediction_agreement(probs_a: list, probs_b: list) -> float:
     return 1.0 - (sum(diffs) / len(diffs))
 
 
+def flatten_layer_vectors(params: dict) -> dict:
+    """Section 7 fix: per-layer flattened vectors instead of one
+    concatenated vector. A shared task-gradient component dominates
+    whole-vector cosine (confirmed negative result across dev-mode and
+    real 3-PC runs: cosine stayed 'strong' even under active sign_flip).
+    Comparing per-layer instead of concatenated avoids large, near-
+    identical shared layers swamping a smaller layer where an attack's
+    effect is proportionally bigger. Excludes fc2 (stays HE-encrypted,
+    never exposed here) — same privacy boundary as flatten_update_vector."""
+    out = {}
+    for k in sorted(params.keys()):
+        if "fc2" in k:
+            continue
+        v = params[k]
+        arr = v.detach().cpu().numpy() if hasattr(v, "detach") else np.asarray(v)
+        out[k] = arr.flatten().tolist()
+    return out
+
+
+def per_layer_cosine(vecs_a: dict, vecs_b: dict) -> dict:
+    """Cosine similarity per layer name, only for layers present in
+    both. Returns {layer_name: cosine}."""
+    result = {}
+    for k in vecs_a:
+        if k in vecs_b:
+            result[k] = cosine_similarity(vecs_a[k], vecs_b[k])
+    return result
+
+
 def flatten_update_vector(params: dict) -> list:
     """Flattens the PLAIN (non-fc2) layers of a params dict into one
     vector, for Section 7's cosine-similarity model-agreement index.
@@ -734,7 +763,7 @@ def _broadcast_conflicting_proposal(rnd: int, nid: int, real_hash: str, proof):
 
 
 def _broadcast_vote(vote: "ConsensusVote", prediction_vector: list = None,
-                     update_vector: list = None):
+                     update_vector: list = None, layer_vectors: dict = None):
     """Send our signed vote to every peer, and also record it in our
     own local QuorumTracker (a node's vote counts for itself too).
     prediction_vector (if present) rides alongside as UNSIGNED extra
@@ -758,6 +787,8 @@ def _broadcast_vote(vote: "ConsensusVote", prediction_vector: list = None,
         payload["_prediction_vector"] = prediction_vector  # unsigned, informational only
     if update_vector is not None:
         payload["_update_vector"] = update_vector  # unsigned, informational only (Section 7)
+    if layer_vectors is not None:
+        payload["_layer_vectors"] = layer_vectors  # unsigned, informational only (Section 7 fix)
 
     excluded = STATE.get("excluded_nodes", set())
     for node in nodes:
@@ -1081,6 +1112,30 @@ async def consensus_vote(request: Request):
                 f'round={vote.round_id}: cos={cos_sim:.3f}"'
             )
 
+    # Section 7 fix: per-layer cosine, addresses confirmed negative
+    # result (whole-vector cosine stayed "strong" even under active
+    # sign_flip across dev-mode and real 3-PC runs — shared task-
+    # gradient component dominates). Comparing per-layer avoids large
+    # near-identical shared layers swamping smaller ones. Advisory
+    # only, same as the whole-vector cosine above — not a quorum gate.
+    peer_layer_vectors = data.get("_layer_vectors")
+    if peer_layer_vectors is not None:
+        my_layer_vectors = STATE.get("my_layer_vectors", {}).get(vote.round_id)
+        if my_layer_vectors is None and STATE.get("my_layer_vectors"):
+            my_layer_vectors = STATE["my_layer_vectors"][max(STATE["my_layer_vectors"].keys())]
+        if my_layer_vectors is not None:
+            layer_cos = per_layer_cosine(my_layer_vectors, peer_layer_vectors)
+            if layer_cos:
+                min_layer = min(layer_cos, key=layer_cos.get)
+                STATE.setdefault("round_layer_cosines", {}).setdefault(
+                    vote.round_id, []
+                ).append(layer_cos)
+                STATE["logger"].info(
+                    f'"Per-layer cosine with node {vote.voter_node_id} round={vote.round_id}: '
+                    f'{ {k: round(v, 3) for k, v in layer_cos.items()} } '
+                    f'(min={min_layer}={layer_cos[min_layer]:.3f})"'
+                )
+
     peer_pred_vector = data.get("_prediction_vector")
     if peer_pred_vector is not None:
         my_pred_vector = STATE.get("last_prediction_vector", {}).get(
@@ -1192,6 +1247,7 @@ def execute_round():
     nid    = STATE["node_id"]
     dp     = config["privacy"]
 
+    STATE.get("round_pairwise_cosines", {}).pop(rnd, None)
     log.info(f'"Starting round {rnd + 1}"')
     STATE.setdefault("round_start_times", {})[rnd] = time.time()
 
@@ -1271,6 +1327,7 @@ def execute_round():
             f'delta-mean-abs={np.abs(_dbg_arr).mean():.6f}"'
         )
     STATE.setdefault("my_update_vector", {})[rnd] = flatten_update_vector(_delta)
+    STATE.setdefault("my_layer_vectors", {})[rnd] = flatten_layer_vectors(_delta)
 
     # ZKP proof on fc2 weights (real Groth16, norm-bound circuit)
     from distributed_simulation.zkp_math import quantize, norm_sq_int, threshold_sq_int
@@ -1529,13 +1586,18 @@ def handle_update(data: dict):
     # cosine check still runs, just one hop behind — same trade-off
     # the existing prediction-agreement mechanism already makes.
     _my_latest_update_vector = None
+    _my_latest_layer_vectors = None
     if STATE.get("my_update_vector"):
         _latest_rnd = max(STATE["my_update_vector"].keys())
         _my_latest_update_vector = STATE["my_update_vector"][_latest_rnd]
+    if STATE.get("my_layer_vectors"):
+        _latest_layer_rnd = max(STATE["my_layer_vectors"].keys())
+        _my_latest_layer_vectors = STATE["my_layer_vectors"][_latest_layer_rnd]
     _broadcast_vote(
         my_vote,
         prediction_vector=my_pred_vector,
         update_vector=_my_latest_update_vector,
+        layer_vectors=_my_latest_layer_vectors,
     )
 
     if not zkp_ok:
@@ -1597,6 +1659,7 @@ def handle_update(data: dict):
         for k, v in noised.items()
     }
     STATE.setdefault("my_update_vector", {})[rnd] = flatten_update_vector(_delta)
+    STATE.setdefault("my_layer_vectors", {})[rnd] = flatten_layer_vectors(_delta)
 
     # ── ZKP proof (real Groth16, norm-bound circuit) ────────────
     from distributed_simulation.zkp_math import quantize, norm_sq_int, threshold_sq_int
@@ -1949,6 +2012,7 @@ def _finalize_round(data: dict):
     plain    = deserialize_params(data["plain"])
 
     STATE.get("round_pairwise_cosines", {}).pop(rnd, None)
+    STATE.get("round_layer_cosines", {}).pop(rnd, None)
 
     fc2_w = he.decrypt(enc_fc2["fc2.weight"]).reshape(
         STATE["model"].fc2.weight.shape)
