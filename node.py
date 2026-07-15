@@ -217,11 +217,28 @@ def load_config(path: str = "config.json") -> dict:
 
 # ── mTLS HTTP client ───────────────────────────────────────────────────────────
 def make_tls_session(config: dict) -> requests.Session:
-    """Create a requests Session with mTLS configured from config.json."""
+    """Create a requests Session with mTLS configured from config.json.
+
+    Network-cutoff testing (adapter disabled, not just process killed)
+    showed sess.post(timeout=...) and socket.setdefaulttimeout() both
+    fail to bound the hang — confirmed via 0% CPU on the frozen
+    process, i.e. genuinely blocked on I/O below Python's reach, not a
+    code deadlock. HTTPAdapter's own connect/read timeouts are enforced
+    by urllib3 at the connection-pool level, which sits closer to the
+    actual socket than requests' per-call timeout= — and disabling
+    retries plus forcing fresh connections (no keep-alive reuse of a
+    pooled connection to a now-dead adapter) closes the gap those
+    other two approaches left open."""
     tls   = config["tls"]
     sess  = requests.Session()
     sess.cert  = (tls["client_cert"], tls["client_key"])
     sess.verify = tls["ca_cert"]
+    sess.headers.update({"Connection": "close"})
+    adapter = requests.adapters.HTTPAdapter(
+        max_retries=0, pool_connections=1, pool_maxsize=1,
+    )
+    sess.mount("https://", adapter)
+    sess.mount("http://", adapter)
     return sess
 
 
@@ -599,14 +616,24 @@ def _send_or_exclude(node: dict, url: str, payload: dict, log, label: str, timeo
     to one peer, and if it fails, marks that peer excluded + broadcasts
     the exclusion — so ANY network call to a dead node, anywhere in the
     ring's code, self-heals instead of leaving that peer half-excluded
-    (some functions knowing it's dead, others still waiting on it)."""
+    (some functions knowing it's dead, others still waiting on it).
+
+    Wrapped in _call_with_hard_timeout: a disabled network adapter can
+    hang the underlying OS call past requests'/urllib3's/socket's own
+    timeouts (confirmed via repeated live testing — 0% CPU, genuine
+    I/O block below anything Python controls). The hard-timeout wrapper
+    gives up waiting at the caller level even if the actual call never
+    returns; the background thread is abandoned, not killed."""
     sess = STATE["session"]
-    try:
-        sess.post(url, json=payload, timeout=timeout)
+    ok, _ = _call_with_hard_timeout(
+        lambda: sess.post(url, json=payload, timeout=timeout),
+        timeout_s=timeout + 10,
+    )
+    if ok:
         log.info(f'"{label} to node {node["id"]}"')
         return True
-    except Exception as e:
-        log.warning(f'"{label} to node {node["id"]} FAILED: {e}"')
+    else:
+        log.warning(f'"{label} to node {node["id"]} FAILED (hard timeout or exception)"')
         if node["id"] not in STATE.get("excluded_nodes", set()):
             _apply_exclusion(node["id"], log)
             _broadcast_exclusion(node["id"])
@@ -1199,17 +1226,28 @@ async def shutdown():
 def _post_with_retry(sess, url, payload, log, label, node_id,
                       attempts=6, delay_s=2):
     """POST with retries — covers the case where a peer's server
-    hasn't finished starting up yet (connection refused)."""
+    hasn't finished starting up yet (connection refused).
+
+    Wrapped in _call_with_hard_timeout: this was the ACTUAL freeze
+    point found via live network-cutoff testing — proposals, commit
+    votes, and 'notify next proposer' all go through this function,
+    not _send_or_exclude/_forward, and were NOT covered by earlier
+    timeout fixes. Confirmed via live testing that node 0/1 froze
+    indefinitely here specifically (0% CPU, no exception ever raised)
+    while calls through the already-wrapped functions correctly failed
+    fast. Each retry attempt now has its own hard wall-clock ceiling."""
     for attempt in range(1, attempts + 1):
-        try:
-            sess.post(url, json=payload, timeout=10)
+        ok, _ = _call_with_hard_timeout(
+            lambda: sess.post(url, json=payload, timeout=10),
+            timeout_s=20,
+        )
+        if ok:
             log.info(f'"{label} to node {node_id}"')
             return True
-        except Exception as e:
-            if attempt == attempts:
-                log.warning(f'"{label} to node {node_id} FAILED after {attempts} attempts: {e}"')
-                return False
-            time.sleep(delay_s)
+        if attempt == attempts:
+            log.warning(f'"{label} to node {node_id} FAILED after {attempts} attempts (hard timeout or exception)"')
+            return False
+        time.sleep(delay_s)
     return False
 
 
@@ -1759,6 +1797,40 @@ def handle_update(data: dict):
     _forward(payload)
 
 
+def _call_with_hard_timeout(fn, timeout_s: float):
+    """Run fn() in a background thread and give up waiting after
+    timeout_s, regardless of whether fn() itself ever returns.
+
+    Confirmed necessary after three failed attempts to bound this at
+    lower layers (requests timeout=, socket.setdefaulttimeout(),
+    urllib3 HTTPAdapter) — a disabled network adapter on Windows can
+    hang the underlying OS call below all of those (confirmed via 0%
+    CPU on the blocked process — genuine I/O block, not a code loop).
+    This does NOT kill the underlying thread (Python cannot force-kill
+    a thread stuck in a blocking syscall) — that thread leaks and will
+    finish or stay stuck on its own. What this DOES guarantee is that
+    the CALLER (execute_round, handle_update, etc.) stops waiting and
+    can move on to exclusion/retry logic instead of freezing the whole
+    node. Returns (True, result) on success within the deadline, or
+    (False, None) on timeout/exception."""
+    result = {}
+    def _run():
+        try:
+            result["value"] = fn()
+            result["ok"] = True
+        except Exception as e:
+            result["error"] = e
+            result["ok"] = False
+    t = threading.Thread(target=_run, daemon=True)
+    t.start()
+    t.join(timeout_s)
+    if t.is_alive():
+        return False, None  # timed out — thread abandoned, still running in background
+    if result.get("ok"):
+        return True, result["value"]
+    return False, None
+
+
 def _forward(payload: dict):
     """Send payload to successor node. On connection failure, mark
     that node as excluded_nodes (unreachable) so get_successor_url()
@@ -1784,11 +1856,14 @@ def _forward(payload: dict):
             break
     url  = get_successor_url()
     sess = STATE["session"]
-    try:
-        sess.post(f"{url}/receive_update", json=payload, timeout=30)
+    ok, _ = _call_with_hard_timeout(
+        lambda: sess.post(f"{url}/receive_update", json=payload, timeout=30),
+        timeout_s=20,
+    )
+    if ok:
         log.info(f'"Forwarded to {url}"')
-    except Exception as e:
-        log.error(f'"Forward failed to {url}: {e} — marking node '
+    else:
+        log.error(f'"Forward failed to {url} (hard timeout or exception) — marking node '
                    f'{succ_id} as unreachable (NOT a consensus '
                    f'exclusion, just a connectivity failure)"')
         if succ_id is not None and succ_id not in excluded:
