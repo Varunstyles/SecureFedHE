@@ -643,10 +643,14 @@ def compute_performance_contribution(scratch_model, test_loader, device,
         return 0.5
     candidate_acc = evaluate(scratch_model, test_loader, device)
     delta = candidate_acc - committed_acc
-    # +/-10 percentage points maps to the full [0, 1] range; beyond
-    # that, clip. This range is a starting point, not derived from
-    # data — tune once real P_i^t values are observed under attack.
-    P_RANGE = 0.10
+    # +/-25 percentage points maps to the full [0, 1] range; beyond
+    # that, clip. Widened from an initial 0.10 after a clean 20-round
+    # dev-mode baseline showed P swinging as low as 0.32-0.36 with NO
+    # attack active and accuracy climbing the whole time (73%->87%) —
+    # confirms 0.10 was reading normal round-to-round accuracy jitter
+    # as a bad update. Re-validate against a fresh clean baseline AND
+    # a sign_flip run before trusting this range for real decisions.
+    P_RANGE = 0.25
     scaled = 0.5 + (delta / (2 * P_RANGE))
     return max(0.0, min(1.0, scaled))
 
@@ -1487,13 +1491,6 @@ def execute_round():
         k: (v - _pre_snapshot[k] if k in _pre_snapshot else v)
         for k, v in noised.items()
     }
-    _dbg_vec = flatten_update_vector(_delta)
-    if _dbg_vec:
-        _dbg_arr = np.asarray(_dbg_vec)
-        log.warning(
-            f'"[DEBUG] round={rnd} node delta-norm={np.linalg.norm(_dbg_arr):.6f} '
-            f'delta-mean-abs={np.abs(_dbg_arr).mean():.6f}"'
-        )
     STATE.setdefault("my_update_vector", {})[rnd] = flatten_update_vector(_delta)
     # STATE.setdefault("my_layer_vectors", {})[rnd] = flatten_layer_vectors(_delta)  # Section 7 disabled
 
