@@ -1263,6 +1263,13 @@ def execute_round():
         k: (v - _pre_snapshot[k] if k in _pre_snapshot else v)
         for k, v in noised.items()
     }
+    _dbg_vec = flatten_update_vector(_delta)
+    if _dbg_vec:
+        _dbg_arr = np.asarray(_dbg_vec)
+        log.warning(
+            f'"[DEBUG] round={rnd} node delta-norm={np.linalg.norm(_dbg_arr):.6f} '
+            f'delta-mean-abs={np.abs(_dbg_arr).mean():.6f}"'
+        )
     STATE.setdefault("my_update_vector", {})[rnd] = flatten_update_vector(_delta)
 
     # ZKP proof on fc2 weights (real Groth16, norm-bound circuit)
