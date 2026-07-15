@@ -523,6 +523,9 @@ STATE = {
     "session":       None,   # mTLS requests session
     "current_round": 0,
     "is_master":     False,
+    # Section 6: trust-score history, keyed by node_id -> list of
+    # recent S_i^t values (bounded window, see TRUST_HISTORY_WINDOW).
+    "trust_score_history": {},
     "zkp_ready":     False,
     "dev_mode": False,
 }
@@ -595,6 +598,101 @@ def _handle_accusation(accuser_id: int, accused_id: int, log) -> None:
             f'— NOT excluding yet (avoids a single compromised node '
             f'unilaterally removing an honest peer)."'
         )
+
+
+# ============================================================
+# SECTION 6 — TRUST SCORING AND PEER VOTING
+# ============================================================
+# S_i^t = λ1·Z_i^t + λ2·A_i^t + λ3·P_i^t + λ4·R_i^t
+# per SecureFedHE-Consensus spec (Section 6). Combines four signals
+# into one composite trust score for each incoming update:
+#   Z_i^t — cryptographic validity (ZKP pass), binary 0/1
+#   A_i^t — behavioural agreement (Section 8 prediction agreement),
+#           already in [0, 1] by construction
+#   P_i^t — estimated performance contribution: does applying this
+#           update's plaintext layers improve validation accuracy
+#           over the current committed model, normalised to [0, 1]
+#   R_i^t — historical reliability: derived from the EXISTING
+#           node_rejection_counts tracker (Section "accountability"
+#           above), inverted and decayed so a clean recent record
+#           recovers over time rather than being permanently
+#           punished for one old strike.
+# ADVISORY for now (logged, stored in trust_score_history) — not yet
+# wired into the accept/reject vote decision or into Section 9
+# aggregation weighting. Wiring it in is a deliberate separate step,
+# so this can be tuned/validated against real attack runs first.
+
+TRUST_LAMBDA_1 = 0.35   # Z_i^t — cryptographic validity weight
+TRUST_LAMBDA_2 = 0.30   # A_i^t — behavioural agreement weight
+TRUST_LAMBDA_3 = 0.20   # P_i^t — performance contribution weight
+TRUST_LAMBDA_4 = 0.15   # R_i^t — historical reliability weight
+TRUST_HISTORY_WINDOW = 20   # bounded per-node history length
+
+
+def compute_performance_contribution(scratch_model, test_loader, device,
+                                      committed_acc: float) -> float:
+    """P_i^t: does this update's plaintext layers (already merged into
+    scratch_model by the caller, same object used for A_i^t) improve
+    validation accuracy over the last COMMITTED model, normalised to
+    [0, 1] via a simple clipped linear map. A neutral update (no
+    change) scores 0.5; clearly better scores toward 1.0; clearly
+    worse scores toward 0.0. committed_acc may be None on the very
+    first rounds (warm-up), in which case this returns a neutral 0.5
+    rather than penalising updates before there's a real baseline."""
+    if committed_acc is None:
+        return 0.5
+    candidate_acc = evaluate(scratch_model, test_loader, device)
+    delta = candidate_acc - committed_acc
+    # +/-10 percentage points maps to the full [0, 1] range; beyond
+    # that, clip. This range is a starting point, not derived from
+    # data — tune once real P_i^t values are observed under attack.
+    P_RANGE = 0.10
+    scaled = 0.5 + (delta / (2 * P_RANGE))
+    return max(0.0, min(1.0, scaled))
+
+
+def compute_historical_reliability(node_id: int) -> float:
+    """R_i^t: derived from the EXISTING node_rejection_counts tracker
+    (this node's own accumulated local suspicion strikes against
+    node_id — see _record_suspicion). Inverted so more strikes means
+    lower reliability, normalised to [0, 1] via the SAME exclusion
+    threshold already used to decide when to accuse someone, so R_i^t
+    reaches 0 exactly when this node would independently accuse that
+    peer, rather than using an unrelated arbitrary scale."""
+    counts = STATE.get("node_rejection_counts", {})
+    strikes = counts.get(node_id, 0.0)
+    threshold = STATE.get("exclusion_threshold", 5)
+    if threshold <= 0:
+        return 1.0
+    return max(0.0, 1.0 - (strikes / threshold))
+
+
+def compute_trust_score(node_id: int, zkp_ok: bool, agreement_score,
+                         scratch_model, test_loader, device,
+                         committed_acc, log) -> float:
+    """S_i^t = λ1·Z + λ2·A + λ3·P + λ4·R. agreement_score may be None
+    (no prior vector to compare against yet, e.g. this peer's first
+    round) — in that case A_i^t defaults to a neutral 0.5, same
+    convention as P_i^t's warm-up case, so a node isn't penalised
+    for a signal that simply isn't available yet."""
+    z = 1.0 if zkp_ok else 0.0
+    a = agreement_score if agreement_score is not None else 0.5
+    p = compute_performance_contribution(scratch_model, test_loader, device, committed_acc)
+    r = compute_historical_reliability(node_id)
+
+    s = (TRUST_LAMBDA_1 * z + TRUST_LAMBDA_2 * a
+         + TRUST_LAMBDA_3 * p + TRUST_LAMBDA_4 * r)
+
+    hist = STATE.setdefault("trust_score_history", {}).setdefault(node_id, [])
+    hist.append(s)
+    if len(hist) > TRUST_HISTORY_WINDOW:
+        hist.pop(0)
+
+    log.info(
+        f'"Trust score for node {node_id}: S={s:.3f} '
+        f'(Z={z:.2f} A={a:.2f} P={p:.2f} R={r:.2f}) advisory only"'
+    )
+    return s
 
 
 def _broadcast_accusation(accused_id: int) -> None:
@@ -1160,48 +1258,40 @@ async def consensus_vote(request: Request):
     # models have actually diverged from each other (e.g. a stalled
     # or slowly-poisoned round that any single node's own-history
     # check wouldn't flag).
-    peer_update_vector = data.get("_update_vector")
-    if peer_update_vector is not None:
-        # Match the sender's "latest available" semantics: compare
-        # against OUR most recent update vector too, not strictly
-        # this exact round, since one or both sides may be one hop
-        # behind their own training (see handle_update's vote path).
-        my_update_vector = STATE.get("my_update_vector", {}).get(vote.round_id)
-        if my_update_vector is None and STATE.get("my_update_vector"):
-            my_update_vector = STATE["my_update_vector"][max(STATE["my_update_vector"].keys())]
-        if my_update_vector is not None:
-            cos_sim = cosine_similarity(my_update_vector, peer_update_vector)
-            STATE.setdefault("round_pairwise_cosines", {}).setdefault(
-                vote.round_id, []
-            ).append(cos_sim)
-            STATE["logger"].info(
-                f'"Model-agreement cosine with node {vote.voter_node_id} '
-                f'round={vote.round_id}: cos={cos_sim:.3f}"'
-            )
-
-    # Section 7 fix: per-layer cosine, addresses confirmed negative
-    # result (whole-vector cosine stayed "strong" even under active
-    # sign_flip across dev-mode and real 3-PC runs — shared task-
-    # gradient component dominates). Comparing per-layer avoids large
-    # near-identical shared layers swamping smaller ones. Advisory
-    # only, same as the whole-vector cosine above — not a quorum gate.
-    peer_layer_vectors = data.get("_layer_vectors")
-    if peer_layer_vectors is not None:
-        my_layer_vectors = STATE.get("my_layer_vectors", {}).get(vote.round_id)
-        if my_layer_vectors is None and STATE.get("my_layer_vectors"):
-            my_layer_vectors = STATE["my_layer_vectors"][max(STATE["my_layer_vectors"].keys())]
-        if my_layer_vectors is not None:
-            layer_cos = per_layer_cosine(my_layer_vectors, peer_layer_vectors)
-            if layer_cos:
-                min_layer = min(layer_cos, key=layer_cos.get)
-                STATE.setdefault("round_layer_cosines", {}).setdefault(
-                    vote.round_id, []
-                ).append(layer_cos)
-                STATE["logger"].info(
-                    f'"Per-layer cosine with node {vote.voter_node_id} round={vote.round_id}: '
-                    f'{ {k: round(v, 3) for k, v in layer_cos.items()} } '
-                    f'(min={min_layer}={layer_cos[min_layer]:.3f})"'
-                )
+    # SECTION 7 DISABLED — see banner at top of file (confirmed
+    # negative result, kept as commented-out code for reference).
+    # if SECTION_7_ENABLED:
+    #     peer_update_vector = data.get("_update_vector")
+    #     if peer_update_vector is not None:
+    #         my_update_vector = STATE.get("my_update_vector", {}).get(vote.round_id)
+    #         if my_update_vector is None and STATE.get("my_update_vector"):
+    #             my_update_vector = STATE["my_update_vector"][max(STATE["my_update_vector"].keys())]
+    #         if my_update_vector is not None:
+    #             cos_sim = cosine_similarity(my_update_vector, peer_update_vector)
+    #             STATE.setdefault("round_pairwise_cosines", {}).setdefault(
+    #                 vote.round_id, []
+    #             ).append(cos_sim)
+    #             STATE["logger"].info(
+    #                 f'"Model-agreement cosine with node {vote.voter_node_id} '
+    #                 f'round={vote.round_id}: cos={cos_sim:.3f}"'
+    #             )
+    #     peer_layer_vectors = data.get("_layer_vectors")
+    #     if peer_layer_vectors is not None:
+    #         my_layer_vectors = STATE.get("my_layer_vectors", {}).get(vote.round_id)
+    #         if my_layer_vectors is None and STATE.get("my_layer_vectors"):
+    #             my_layer_vectors = STATE["my_layer_vectors"][max(STATE["my_layer_vectors"].keys())]
+    #         if my_layer_vectors is not None:
+    #             layer_cos = per_layer_cosine(my_layer_vectors, peer_layer_vectors)
+    #             if layer_cos:
+    #                 min_layer = min(layer_cos, key=layer_cos.get)
+    #                 STATE.setdefault("round_layer_cosines", {}).setdefault(
+    #                     vote.round_id, []
+    #                 ).append(layer_cos)
+    #                 STATE["logger"].info(
+    #                     f'"Per-layer cosine with node {vote.voter_node_id} round={vote.round_id}: '
+    #                     f'{ {k: round(v, 3) for k, v in layer_cos.items()} } '
+    #                     f'(min={min_layer}={layer_cos[min_layer]:.3f})"'
+    #                 )
 
     peer_pred_vector = data.get("_prediction_vector")
     if peer_pred_vector is not None:
@@ -1405,7 +1495,7 @@ def execute_round():
             f'delta-mean-abs={np.abs(_dbg_arr).mean():.6f}"'
         )
     STATE.setdefault("my_update_vector", {})[rnd] = flatten_update_vector(_delta)
-    STATE.setdefault("my_layer_vectors", {})[rnd] = flatten_layer_vectors(_delta)
+    # STATE.setdefault("my_layer_vectors", {})[rnd] = flatten_layer_vectors(_delta)  # Section 7 disabled
 
     # ZKP proof on fc2 weights (real Groth16, norm-bound circuit)
     from distributed_simulation.zkp_math import quantize, norm_sq_int, threshold_sq_int
@@ -1620,6 +1710,17 @@ def handle_update(data: dict):
             prev_vector = per_origin_prev.get(origin)
             if prev_vector is not None:
                 agreement_score = prediction_agreement(prev_vector, my_pred_vector)
+
+            # Section 6: composite trust score, reusing the SAME
+            # scratch model already built above for A_i^t — no extra
+            # forward pass beyond what P_i^t needs on its own.
+            compute_trust_score(
+                node_id=origin, zkp_ok=zkp_ok, agreement_score=agreement_score,
+                scratch_model=scratch, test_loader=STATE["test_loader"],
+                device=STATE["device"],
+                committed_acc=STATE.get("last_committed_accuracy"),
+                log=log,
+            )
         except Exception as e:
             log.warning(f'"Prediction-agreement check failed: {e}"')
 
@@ -2069,26 +2170,20 @@ def _finalize_round(data: dict):
             )
             quorum_ok = False
 
-    # ── Section 7: model-agreement C^t / C_norm (advisory only) ──
-    # Logged and classified per spec bucketing, but NOT used to
-    # override quorum_ok — confirmed via repeated test runs that
-    # cosine stays in the "strong" bucket even under active
-    # sign_flip attack in this architecture (shared task-gradient
-    # dominates the delta). Kept as a logged signal, not a gate,
-    # until/unless a future fix changes that finding.
-    pairwise_cosines = STATE.get("round_pairwise_cosines", {}).get(rnd, [])
-    if pairwise_cosines:
-        c_norm = model_agreement_index(pairwise_cosines)
-        if c_norm >= 0.80:
-            consensus_level = "strong"
-        elif c_norm >= 0.60:
-            consensus_level = "moderate"
-        else:
-            consensus_level = "weak"
-        log.info(
-            f'"Round {rnd + 1} model-agreement C_norm={c_norm:.3f} '
-            f'level={consensus_level} (n_pairs={len(pairwise_cosines)}, advisory only)"'
-        )
+    # SECTION 7 DISABLED — see banner at top of file.
+    # pairwise_cosines = STATE.get("round_pairwise_cosines", {}).get(rnd, [])
+    # if pairwise_cosines:
+    #     c_norm = model_agreement_index(pairwise_cosines)
+    #     if c_norm >= 0.80:
+    #         consensus_level = "strong"
+    #     elif c_norm >= 0.60:
+    #         consensus_level = "moderate"
+    #     else:
+    #         consensus_level = "weak"
+    #     log.info(
+    #         f'"Round {rnd + 1} model-agreement C_norm={c_norm:.3f} '
+    #         f'level={consensus_level} (n_pairs={len(pairwise_cosines)}, advisory only)"'
+    #     )
 
     if not quorum_ok:
         attempts = STATE["round_retry_count"].get(rnd, 0)
