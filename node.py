@@ -684,8 +684,20 @@ def compute_trust_score(node_id: int, zkp_ok: bool, agreement_score,
     p = compute_performance_contribution(scratch_model, test_loader, device, committed_acc)
     r = compute_historical_reliability(node_id)
 
-    s = (TRUST_LAMBDA_1 * z + TRUST_LAMBDA_2 * a
-         + TRUST_LAMBDA_3 * p + TRUST_LAMBDA_4 * r)
+    # CHANGED: additive blend (S = l1*Z + l2*A + l3*P + l4*R) showed
+    # ZERO separation between honest and sign_flip-attacked nodes in
+    # real testing — S sat at 0.86-0.89 for BOTH regardless of attack
+    # state, because a good Z/P/R average absorbed a bad A instead of
+    # being punished by it. A is the only component with proven real
+    # signal (drops to 0.42-0.56 on actually-bad updates, 0.94+ on
+    # honest ones — matches what Section 8's hard gate already uses).
+    # Multiplicative gate on A instead of additive blend: a bad A now
+    # collapses S regardless of how good the other three look, rather
+    # than being diluted by them.
+    soft_blend = (TRUST_LAMBDA_1 * z + TRUST_LAMBDA_3 * p + TRUST_LAMBDA_4 * r) / (
+        TRUST_LAMBDA_1 + TRUST_LAMBDA_3 + TRUST_LAMBDA_4
+    )
+    s = z * a * soft_blend
 
     hist = STATE.setdefault("trust_score_history", {}).setdefault(node_id, [])
     hist.append(s)
