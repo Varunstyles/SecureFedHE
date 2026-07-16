@@ -1619,6 +1619,12 @@ def execute_round():
         "commitment": commitment,
         "acc_sum":    0.0,
         "weight_sum": n_samples,
+        "_slack":     slack,  # unsigned, advisory only (Section 14.2 stale_update
+                              # detection) — same category as _prediction_vector.
+                              # Immune to per-round DP noise (fc2 is DP-exempt) and
+                              # per-round HE mask rotation, unlike enc_fc2/plain,
+                              # which change every round by design regardless of
+                              # whether real training occurred underneath.
     }
 
     # ── Broadcast the proposal BEFORE forwarding the real update ───
@@ -1730,27 +1736,26 @@ def handle_update(data: dict):
             f'voting using fallback hash, may not match other peers"'
         )
     # ── Peer-facing stale_update detector (advisory only, not gating) ──
-    # NOTE: update_hash is round-scoped (the ZKP proof bakes in `rnd`),
-    # so it changes every round even for genuinely replayed content —
-    # confirmed via code read, cannot be reused for this check. Instead
-    # hash only the round-INDEPENDENT content actually being sent: the
-    # ciphertext blob + plaintext blob themselves, excluding round/proof.
-    # A true stale_update replay reuses identical bytes here every round;
-    # an honest node's content changes every round because training
-    # genuinely produces new weights.
-    _content_hash = compute_update_hash(
-        {},  # exclude proof (it's round-scoped via `rnd`, would defeat this check)
-        {"enc_fc2": data.get("enc_fc2", ""), "plain": data.get("plain", "")},
-    )
-    per_origin_last_content_hash = STATE.setdefault("_peer_last_content_hash", {})
-    prev_content_hash = per_origin_last_content_hash.get(origin)
-    if prev_content_hash is not None and prev_content_hash == _content_hash:
-        log.warning(
-            f'"[STALE-UPDATE CHECK] node {nid} observed node {origin} '
-            f'resending identical update content ({_content_hash[:12]}...) as '
-            f'last round — possible replayed/stale update, advisory only"'
-        )
-    per_origin_last_content_hash[origin] = _content_hash
+    # Uses the origin's own transmitted `_slack` value, not enc_fc2/plain —
+    # those two fields are DESIGNED to change every round regardless of
+    # whether real training happened (fresh DP noise on `plain`, fresh HE
+    # mask rotation on `enc_fc2` keyed by round number), so hashing them
+    # can never detect staleness. `slack` is exempt from both: fc2 is
+    # DP-noise-exempt (CKKS-protected), and it's read pre-encryption — so
+    # it stays identical across rounds ONLY when the origin genuinely
+    # replays the same underlying weights. Confirmed via self-check
+    # (execute_round) already firing correctly on this exact signal.
+    peer_slack = data.get("_slack")
+    if peer_slack is not None:
+        per_origin_last_slack = STATE.setdefault("_peer_last_slack", {})
+        prev_slack = per_origin_last_slack.get(origin)
+        if prev_slack is not None and prev_slack == peer_slack:
+            log.warning(
+                f'"[STALE-UPDATE CHECK] node {nid} observed node {origin} '
+                f'resending identical slack ({peer_slack}) as last round — '
+                f'possible replayed/stale update, advisory only"'
+            )
+        per_origin_last_slack[origin] = peer_slack
 
     # ── Prediction-based agreement (Section 8) — computed BEFORE
     # the vote decision, so it can actually gate accept/reject ──
@@ -1991,6 +1996,10 @@ def handle_update(data: dict):
         "plain":      serialize_params(agg_plain),
         "commitment": my_commitment,
         "weight_sum": total_w,
+        "_slack":     slack,  # this relaying node's own slack overwrites the
+                              # origin's, matching how enc_fc2/plain are also
+                              # replaced at each hop — peers judge the node
+                              # that most recently touched the payload.
     }
 
     _forward(payload)
