@@ -1729,6 +1729,17 @@ def handle_update(data: dict):
             f'"No stored proposal for round={rnd} origin={origin} — '
             f'voting using fallback hash, may not match other peers"'
         )
+    # ── Peer-facing stale_update detector (advisory only, not gating) ──
+    per_origin_last_hash = STATE.setdefault("_peer_last_update_hash", {})
+    prev_hash = per_origin_last_hash.get(origin)
+    if prev_hash is not None and prev_hash == update_hash:
+        log.warning(
+            f'"[STALE-UPDATE CHECK] node {nid} observed node {origin} '
+            f'resending identical update_hash ({update_hash[:12]}...) as '
+            f'last round — possible replayed/stale update, advisory only"'
+        )
+    per_origin_last_hash[origin] = update_hash
+
     # ── Prediction-based agreement (Section 8) — computed BEFORE
     # the vote decision, so it can actually gate accept/reject ──
     # Build a scratch model: incoming plaintext layers + OUR OWN
