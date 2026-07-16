@@ -601,26 +601,50 @@ def _handle_accusation(accuser_id: int, accused_id: int, log) -> None:
 
 
 # ============================================================
-# SECTION 6 — TRUST SCORING AND PEER VOTING
+# SECTION 6 — TRUST SCORING AND PEER VOTING (ADVISORY ONLY)
 # ============================================================
-# S_i^t = λ1·Z_i^t + λ2·A_i^t + λ3·P_i^t + λ4·R_i^t
-# per SecureFedHE-Consensus spec (Section 6). Combines four signals
-# into one composite trust score for each incoming update:
+# STATUS: implemented and tested against sign_flip, tuned TWICE.
+# NOT gating any accept/reject decision or Section 9 aggregation —
+# deliberately kept advisory pending stronger evidence. Logged and
+# stored in trust_score_history for every incoming update.
+#
+# Formula (current): S = Z * A * soft_blend, where
+#   soft_blend = (λ1*Z + λ3*P + λ4*R) / (λ1+λ3+λ4)
+# NOT the spec's original additive S = λ1*Z + λ2*A + λ3*P + λ4*R —
+# that version was tried FIRST and showed ZERO separation between
+# honest and sign_flip-attacked nodes (S=0.86-0.89 for both,
+# indistinguishable). Switched to multiplicative gating on A (the
+# only component with proven real signal) so a bad A collapses S
+# instead of being averaged out by good Z/P/R.
+#
+# Result after the fix: real but SMALL separation — attacker ceiling
+# ~0.80-0.82 vs honest ceiling ~0.83 across two full sign_flip test
+# runs. Not decisive: no single threshold theta would cleanly reject
+# the attacker without also rejecting some honest rounds. Section 8
+# (prediction agreement, A_i^t alone) already provides the working
+# hard gate this composite score can't yet improve on.
+#
+# Component behavior observed: Z and R sit pinned at their ceiling
+# in every clean run (R has NEVER been exercised — no suspicion
+# events occurred in any test so far, so its real-world behavior is
+# still unvalidated). P is noisy and compressed toward 0.5 regardless
+# of honesty even after widening P_RANGE 0.10->0.25 — likely still
+# reading normal round-to-round accuracy jitter as signal.
+#
 #   Z_i^t — cryptographic validity (ZKP pass), binary 0/1
-#   A_i^t — behavioural agreement (Section 8 prediction agreement),
-#           already in [0, 1] by construction
-#   P_i^t — estimated performance contribution: does applying this
-#           update's plaintext layers improve validation accuracy
-#           over the current committed model, normalised to [0, 1]
-#   R_i^t — historical reliability: derived from the EXISTING
-#           node_rejection_counts tracker (Section "accountability"
-#           above), inverted and decayed so a clean recent record
-#           recovers over time rather than being permanently
-#           punished for one old strike.
-# ADVISORY for now (logged, stored in trust_score_history) — not yet
-# wired into the accept/reject vote decision or into Section 9
-# aggregation weighting. Wiring it in is a deliberate separate step,
-# so this can be tuned/validated against real attack runs first.
+#   A_i^t — behavioural agreement (Section 8 prediction agreement) —
+#           the only proven-discriminative component
+#   P_i^t — estimated performance contribution (validation accuracy
+#           delta vs committed model) — noisy, unvalidated as signal
+#   R_i^t — historical reliability, from node_rejection_counts —
+#           pinned at ceiling in every test so far, unexercised
+#
+# Kept in place (not deleted) — genuine candidate for Section 9's
+# blended aggregation weight even without being decision-grade alone
+# (a small persistent downweight can compound over many rounds).
+# Revisit only if Section 9 planning specifically needs it improved,
+# or new attack types (label_flip, backdoor, stale_update) show
+# different separation than sign_flip did.
 
 TRUST_LAMBDA_1 = 0.35   # Z_i^t — cryptographic validity weight
 TRUST_LAMBDA_2 = 0.30   # A_i^t — behavioural agreement weight
@@ -1523,6 +1547,24 @@ def execute_round():
             fc2_arr = fc2_arr * (0.4 / norm)  # target well under 0.5 to survive quantization rounding
         noised["fc2.weight"] = fc2_arr.reshape(noised["fc2.weight"].shape)
         fc2_flat = fc2_arr.tolist()
+
+    # STALE-UPDATE FINGERPRINT CHECK (advisory only, log-only, does
+    # not gate anything). A freshly-trained update's ZKP slack changes
+    # every round because the underlying weights genuinely changed.
+    # Confirmed via real stale_update test: repeated identical slack
+    # (-29434) every round the attacker resent an old update, vs
+    # naturally varying slack every round for honest nodes. Compares
+    # THIS node's own slack against its own last value — each node
+    # can self-check its own repetition here; cross-node repetition
+    # checking (on incoming updates) would need the same pattern
+    # added to handle_update()'s voter path.
+    _last_slack = STATE.get("_last_own_slack")
+    if _last_slack is not None and slack == _last_slack:
+        log.warning(
+            f'"[STALE-UPDATE CHECK] node {nid} slack unchanged from last '
+            f'round ({slack}) — possible replayed/stale update, advisory only"'
+        )
+    STATE["_last_own_slack"] = slack
         fc2_fr = quantize(fc2_flat)
         ns = norm_sq_int(fc2_fr)
         slack = bound - ns
