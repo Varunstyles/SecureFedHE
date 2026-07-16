@@ -1730,15 +1730,27 @@ def handle_update(data: dict):
             f'voting using fallback hash, may not match other peers"'
         )
     # ── Peer-facing stale_update detector (advisory only, not gating) ──
-    per_origin_last_hash = STATE.setdefault("_peer_last_update_hash", {})
-    prev_hash = per_origin_last_hash.get(origin)
-    if prev_hash is not None and prev_hash == update_hash:
+    # NOTE: update_hash is round-scoped (the ZKP proof bakes in `rnd`),
+    # so it changes every round even for genuinely replayed content —
+    # confirmed via code read, cannot be reused for this check. Instead
+    # hash only the round-INDEPENDENT content actually being sent: the
+    # ciphertext blob + plaintext blob themselves, excluding round/proof.
+    # A true stale_update replay reuses identical bytes here every round;
+    # an honest node's content changes every round because training
+    # genuinely produces new weights.
+    _content_hash = compute_update_hash(
+        {},  # exclude proof (it's round-scoped via `rnd`, would defeat this check)
+        {"enc_fc2": data.get("enc_fc2", ""), "plain": data.get("plain", "")},
+    )
+    per_origin_last_content_hash = STATE.setdefault("_peer_last_content_hash", {})
+    prev_content_hash = per_origin_last_content_hash.get(origin)
+    if prev_content_hash is not None and prev_content_hash == _content_hash:
         log.warning(
             f'"[STALE-UPDATE CHECK] node {nid} observed node {origin} '
-            f'resending identical update_hash ({update_hash[:12]}...) as '
+            f'resending identical update content ({_content_hash[:12]}...) as '
             f'last round — possible replayed/stale update, advisory only"'
         )
-    per_origin_last_hash[origin] = update_hash
+    per_origin_last_content_hash[origin] = _content_hash
 
     # ── Prediction-based agreement (Section 8) — computed BEFORE
     # the vote decision, so it can actually gate accept/reject ──
