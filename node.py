@@ -70,20 +70,32 @@ from consensus_engine import (
 )
 
 
-def compute_reference_predictions(model, test_loader, device) -> list:
+def compute_reference_predictions(model, test_loader, device,
+                                   return_labels: bool = False):
     """Run the model on the shared, fixed test set (same 110 patients on
     every node, same seed=42 split) and return flattened class-1
     probabilities. This is the 'reference set' from the design doc
     (Section 8) — used to measure behavioral agreement between nodes,
-    not for training or accuracy reporting."""
+    not for training or accuracy reporting.
+
+    return_labels=True also returns the TRUE labels for each sample,
+    same order as probs_all — needed for per-class agreement (label_flip
+    detection candidate), since overall/whole-vector agreement can't see
+    an attack that degrades one class while leaving the other intact
+    (see per_class_agreement() below)."""
     model.eval()
     probs_all = []
+    labels_all = []
     with torch.no_grad():
-        for X_batch, _ in test_loader:
+        for X_batch, y_batch in test_loader:
             X_batch = X_batch.to(device)
             logits = model(X_batch)
             probs = torch.softmax(logits, dim=-1)[:, 1]  # P(diabetic)
             probs_all.extend(probs.cpu().numpy().tolist())
+            if return_labels:
+                labels_all.extend(y_batch.cpu().numpy().tolist())
+    if return_labels:
+        return probs_all, labels_all
     return probs_all
 
 
@@ -95,6 +107,45 @@ def prediction_agreement(probs_a: list, probs_b: list) -> float:
         return 0.0
     diffs = [abs(a - b) for a, b in zip(probs_a, probs_b)]
     return 1.0 - (sum(diffs) / len(diffs))
+
+
+# ============================================================
+# PER-CLASS AGREEMENT — label_flip detection candidate
+# ============================================================
+# Overall prediction_agreement() measures whole-vector consistency —
+# confirmed BLIND to label_flip (Section 14.2 finding): a node that
+# poisons 30% of labels every round produces predictions that are
+# consistently WRONG round-to-round, which still looks "agreeable"
+# to a check that only measures self-consistency, not correctness.
+# This splits agreement by TRUE class so a real label_flip signature
+# becomes visible: one class's predictions degrade/shift sharply
+# relative to the other, because flipping labels asymmetrically
+# corrupts the gradient signal for whichever class got mislabeled
+# most that round (label_flip flips 1<->0, so both classes are hit,
+# but not always symmetrically given class imbalance in the Non-IID
+# split — Node 2's data alone is 93.2% diabetic, so a 30% flip rate
+# there disproportionately corrupts Class 1 signal).
+def per_class_agreement(probs_a: list, labels_a: list,
+                         probs_b: list, labels_b: list) -> dict:
+    """Returns {0: agreement_or_None, 1: agreement_or_None} — agreement
+    computed ONLY over samples where labels_a and labels_b agree on
+    the true class (same reference set, same true labels, so labels_a
+    should equal labels_b in practice; the check is defensive). None
+    for a class with zero samples in the reference set."""
+    result = {0: None, 1: None}
+    if (not probs_a or not probs_b or not labels_a or not labels_b
+            or len(probs_a) != len(probs_b)
+            or len(labels_a) != len(probs_a)
+            or len(labels_b) != len(probs_b)):
+        return result
+    for cls in (0, 1):
+        idx = [i for i in range(len(labels_a))
+               if labels_a[i] == cls and labels_b[i] == cls]
+        if not idx:
+            continue
+        diffs = [abs(probs_a[i] - probs_b[i]) for i in idx]
+        result[cls] = 1.0 - (sum(diffs) / len(diffs))
+    return result
 
 
 # ============================================================
@@ -1774,7 +1825,9 @@ def handle_update(data: dict):
             scratch_params = scratch.get_all_params()
             scratch_params.update(inc_plain)  # overwrite non-fc2 layers only
             scratch.set_all_params(scratch_params)
-            my_pred_vector = compute_reference_predictions(scratch, STATE["test_loader"], STATE["device"])
+            my_pred_vector, my_labels_vector = compute_reference_predictions(
+                scratch, STATE["test_loader"], STATE["device"], return_labels=True
+            )
 
             # Agreement against OUR OWN previous-round prediction vector —
             # the closest honest proxy available, since we never see the
@@ -1789,6 +1842,39 @@ def handle_update(data: dict):
             prev_vector = per_origin_prev.get(origin)
             if prev_vector is not None:
                 agreement_score = prediction_agreement(prev_vector, my_pred_vector)
+
+            # ── Per-class agreement (label_flip detection candidate) ──
+            # Advisory only, log-only — does NOT gate accept/reject yet.
+            # Confirm this actually separates honest from label_flip
+            # before considering a hard gate (same standard as every
+            # other signal in this file: prove it first, gate later).
+            per_origin_prev_labels = STATE.setdefault(
+                "my_last_own_prediction_labels", {}
+            )
+            prev_labels = per_origin_prev_labels.get(origin)
+            if prev_vector is not None and prev_labels is not None:
+                class_agreement = per_class_agreement(
+                    prev_vector, prev_labels, my_pred_vector, my_labels_vector
+                )
+                a0, a1 = class_agreement.get(0), class_agreement.get(1)
+                if a0 is not None and a1 is not None:
+                    gap = abs(a0 - a1)
+                    log.info(
+                        f'"Per-class agreement with node {origin}: '
+                        f'class0={a0:.3f} class1={a1:.3f} gap={gap:.3f}"'
+                    )
+                    PER_CLASS_GAP_ALERT = 0.15  # provisional — needs
+                    # calibration against a clean baseline run before
+                    # this threshold means anything; set loosely for
+                    # now so it logs candidates without false-flooding.
+                    if gap > PER_CLASS_GAP_ALERT:
+                        log.warning(
+                            f'"[PER-CLASS AGREEMENT CHECK] node {nid} observed '
+                            f'node {origin}: class agreement gap={gap:.3f} '
+                            f'(class0={a0:.3f}, class1={a1:.3f}) — possible '
+                            f'asymmetric/label_flip-style corruption, advisory only"'
+                        )
+            per_origin_prev_labels[origin] = my_labels_vector
 
             # Section 6: composite trust score, reusing the SAME
             # scratch model already built above for A_i^t — no extra
@@ -1996,10 +2082,13 @@ def handle_update(data: dict):
         "plain":      serialize_params(agg_plain),
         "commitment": my_commitment,
         "weight_sum": total_w,
-        "_slack":     slack,  # this relaying node's own slack overwrites the
-                              # origin's, matching how enc_fc2/plain are also
-                              # replaced at each hop — peers judge the node
-                              # that most recently touched the payload.
+        # NOTE: deliberately do NOT overwrite "_slack" here. The origin's
+        # slack (data["_slack"], set once in execute_round()) must survive
+        # every hop unchanged — it's the signal for whether the ORIGIN
+        # replayed a stale update, not whether THIS relaying node did.
+        # Overwriting it caused a false attribution: a relaying node's own
+        # fresh slack could coincidentally match a stale value stored
+        # under a different origin's key from an earlier round.
     }
 
     _forward(payload)
