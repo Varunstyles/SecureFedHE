@@ -1547,6 +1547,12 @@ def execute_round():
             fc2_arr = fc2_arr * (0.4 / norm)  # target well under 0.5 to survive quantization rounding
         noised["fc2.weight"] = fc2_arr.reshape(noised["fc2.weight"].shape)
         fc2_flat = fc2_arr.tolist()
+        fc2_fr = quantize(fc2_flat)
+        ns = norm_sq_int(fc2_fr)
+        slack = bound - ns
+        retry += 1
+    if slack < 0:
+        raise RuntimeError(f"Could not bring update within ZKP norm bound after {retry} retries (slack={slack})")
 
     # STALE-UPDATE FINGERPRINT CHECK (advisory only, log-only, does
     # not gate anything). A freshly-trained update's ZKP slack changes
@@ -1565,12 +1571,6 @@ def execute_round():
             f'round ({slack}) — possible replayed/stale update, advisory only"'
         )
     STATE["_last_own_slack"] = slack
-        fc2_fr = quantize(fc2_flat)
-        ns = norm_sq_int(fc2_fr)
-        slack = bound - ns
-        retry += 1
-    if slack < 0:
-        raise RuntimeError(f"Could not bring update within ZKP norm bound after {retry} retries (slack={slack})")
     _prove_result = {}
     def _run_prove():
         sys.setrecursionlimit(1000000)
