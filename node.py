@@ -871,6 +871,9 @@ def _send_or_exclude(node: dict, url: str, payload: dict, log, label: str, timeo
             f'"{label} to node {node["id"]} FAILED (hard timeout or exception) '
             f'— consecutive failure streak {streak}/{CONSECUTIVE_FAILURE_THRESHOLD}"'
         )
+        if STATE.get("training_complete", False):
+            log.info(f'"{label} to node {node["id"]} failed post-completion — ignoring, not excluding."')
+            return False
         if (streak >= CONSECUTIVE_FAILURE_THRESHOLD
                 and node["id"] not in STATE.get("excluded_nodes", set())):
             _apply_exclusion(node["id"], log)
@@ -1255,6 +1258,7 @@ async def sync_weights(request: Request):
     STATE["logger"].info(f'"Synced weights from master for round {rnd}"')
 
     if STATE["current_round"] >= STATE["config"]["ring"]["rounds"]:
+        STATE["training_complete"] = True
         STATE["logger"].info(f'"Training complete after {STATE["current_round"]} rounds"')
         print(f"[Node {STATE['node_id']}] Training complete!")
 
@@ -1576,6 +1580,10 @@ def execute_round():
     rnd    = STATE["current_round"]
     nid    = STATE["node_id"]
     dp     = config["privacy"]
+
+    if STATE.get("training_complete", False):
+        log.info('"execute_round() aborted — training already marked complete."')
+        return
 
     if nid in STATE.get("excluded_nodes", set()):
         log.warning(
@@ -2262,7 +2270,8 @@ def _forward(payload: dict):
             )
 
 def _proposal_watchdog(rnd: int, expected_proposer: int):
-    """Runs after handing off proposing duty to expected_proposer for
+    if STATE.get("training_complete", False):
+        return    """Runs after handing off proposing duty to expected_proposer for
     round `rnd`. If no proposal for this round arrives within timeout_s
     (the proposer died mid-broadcast, or never started at all — a gap
     the failed-send exclusion checks can't catch, since nothing was
@@ -2276,6 +2285,9 @@ def _proposal_watchdog(rnd: int, expected_proposer: int):
     time.sleep(timeout_s)
 
     # If the round already advanced, or the proposal did arrive, stand down.
+    if STATE.get("training_complete", False):
+        log.info(f'"Watchdog fired but training already complete — ignoring, not excluding node {expected_proposer}."')
+        return
     if STATE["current_round"] != rnd:
         return
     if any(p.round_id == rnd and p.origin_node_id == expected_proposer
@@ -2486,6 +2498,7 @@ def _finalize_round(data: dict):
                     _notify_next_proposer(STATE["current_round"], next_proposer)
                     threading.Thread(target=_proposal_watchdog, args=(STATE["current_round"], next_proposer), daemon=True).start()
             else:
+                STATE["training_complete"] = True
                 log.info(f'"Training complete after {STATE["current_round"]} rounds"')
                 print(f"[Node {STATE['node_id']}] Training complete!")
             return
@@ -2642,6 +2655,7 @@ def _finalize_round(data: dict):
             threading.Thread(target=_proposal_watchdog, args=(STATE["current_round"], next_proposer), daemon=True).start()
     else:
         rounds_done = STATE["current_round"]
+        STATE["training_complete"] = True
         log.info(f'"Training complete after {rounds_done} rounds"')
         print(f"[Node {STATE['node_id']}] Training complete!")
 
