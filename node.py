@@ -594,7 +594,16 @@ def _record_suspicion(node_id: int, log, weight: float = 1.0) -> None:
     ACCUSATION so peers can independently corroborate it. Exclusion
     only happens once a quorum of *different accusers* have each
     independently reached their own threshold against the same
-    origin — see _handle_accusation()."""
+    origin — see _handle_accusation().
+
+    Never self-accuses: a node's own strikes against ITSELF (e.g. its
+    own proposer round repeatedly failing quorum) carry no meaningful
+    signal — it always already knows what it did, and a self-accusation
+    only produces confusing 'node X accused by node X' log noise
+    without changing the actual corroboration outcome, since the real
+    exclusion is always driven by other peers' independent strikes."""
+    if node_id == STATE["node_id"]:
+        return
     counts = STATE.setdefault("node_rejection_counts", {})
     counts[node_id] = counts.get(node_id, 0) + weight
     if (counts[node_id] >= STATE.get("exclusion_threshold", 5)
@@ -827,10 +836,16 @@ def _apply_exclusion(node_id: int, log) -> None:
 
 def _send_or_exclude(node: dict, url: str, payload: dict, log, label: str, timeout: int = 10) -> bool:
     """Shared helper for all broadcast/notify functions: sends one POST
-    to one peer, and if it fails, marks that peer excluded + broadcasts
-    the exclusion — so ANY network call to a dead node, anywhere in the
-    ring's code, self-heals instead of leaving that peer half-excluded
-    (some functions knowing it's dead, others still waiting on it).
+    to one peer. Only marks that peer excluded (unreachable) after
+    CONSECUTIVE_FAILURE_THRESHOLD separate calls to it have all failed —
+    a single timeout is NOT sufficient grounds, since bursts of
+    simultaneous broadcast traffic from multiple nodes (accusations +
+    skip notices + exclusion notices overlapping in the same round)
+    can transiently congest the connection pool and cause an ordinary,
+    reachable peer to miss one 10s deadline. Confirmed via live testing:
+    a single-failure trigger caused a full ring collapse — three nodes
+    excluding each other in a cascade purely from timing congestion,
+    with no actual node failure or misbehavior involved.
 
     Wrapped in _call_with_hard_timeout: a disabled network adapter can
     hang the underlying OS call past requests'/urllib3's/socket's own
@@ -838,17 +853,26 @@ def _send_or_exclude(node: dict, url: str, payload: dict, log, label: str, timeo
     I/O block below anything Python controls). The hard-timeout wrapper
     gives up waiting at the caller level even if the actual call never
     returns; the background thread is abandoned, not killed."""
+    CONSECUTIVE_FAILURE_THRESHOLD = 3
     sess = STATE["session"]
     ok, _ = _call_with_hard_timeout(
         lambda: sess.post(url, json=payload, timeout=timeout),
         timeout_s=timeout + 10,
     )
     if ok:
+        STATE.setdefault("_peer_failure_streak", {})[node["id"]] = 0
         log.info(f'"{label} to node {node["id"]}"')
         return True
     else:
-        log.warning(f'"{label} to node {node["id"]} FAILED (hard timeout or exception)"')
-        if node["id"] not in STATE.get("excluded_nodes", set()):
+        streak_map = STATE.setdefault("_peer_failure_streak", {})
+        streak = streak_map.get(node["id"], 0) + 1
+        streak_map[node["id"]] = streak
+        log.warning(
+            f'"{label} to node {node["id"]} FAILED (hard timeout or exception) '
+            f'— consecutive failure streak {streak}/{CONSECUTIVE_FAILURE_THRESHOLD}"'
+        )
+        if (streak >= CONSECUTIVE_FAILURE_THRESHOLD
+                and node["id"] not in STATE.get("excluded_nodes", set())):
             _apply_exclusion(node["id"], log)
             _broadcast_exclusion(node["id"])
         return False
@@ -971,9 +995,19 @@ def _broadcast_proposal(proposal: "UpdateProposal"):
             sess, url, proposal.to_dict(),
             log, "Sent proposal", node["id"],
         )
-        if not ok and node["id"] not in STATE.get("excluded_nodes", set()):
-            _apply_exclusion(node["id"], log)
-            _broadcast_exclusion(node["id"])
+        if ok:
+            STATE.setdefault("_peer_failure_streak", {})[node["id"]] = 0
+        else:
+            streak_map = STATE.setdefault("_peer_failure_streak", {})
+            streak = streak_map.get(node["id"], 0) + 1
+            streak_map[node["id"]] = streak
+            log.warning(
+                f'"Proposal broadcast to node {node["id"]} failed after '
+                f'internal retries — consecutive failure streak {streak}/3"'
+            )
+            if streak >= 3 and node["id"] not in STATE.get("excluded_nodes", set()):
+                _apply_exclusion(node["id"], log)
+                _broadcast_exclusion(node["id"])
 
 
 def _broadcast_conflicting_proposal(rnd: int, nid: int, real_hash: str, proof):
@@ -1014,9 +1048,19 @@ def _broadcast_conflicting_proposal(rnd: int, nid: int, real_hash: str, proof):
             sess, url, fake_proposal.to_dict(),
             log, "Sent conflicting proposal", node["id"],
         )
-        if not ok and node["id"] not in STATE.get("excluded_nodes", set()):
-            _apply_exclusion(node["id"], log)
-            _broadcast_exclusion(node["id"])
+        if ok:
+            STATE.setdefault("_peer_failure_streak", {})[node["id"]] = 0
+        else:
+            streak_map = STATE.setdefault("_peer_failure_streak", {})
+            streak = streak_map.get(node["id"], 0) + 1
+            streak_map[node["id"]] = streak
+            log.warning(
+                f'"Conflicting-proposal broadcast to node {node["id"]} failed after '
+                f'internal retries — consecutive failure streak {streak}/3"'
+            )
+            if streak >= 3 and node["id"] not in STATE.get("excluded_nodes", set()):
+                _apply_exclusion(node["id"], log)
+                _broadcast_exclusion(node["id"])
 
 
 def _broadcast_vote(vote: "ConsensusVote", prediction_vector: list = None,
@@ -1533,6 +1577,13 @@ def execute_round():
     nid    = STATE["node_id"]
     dp     = config["privacy"]
 
+    if nid in STATE.get("excluded_nodes", set()):
+        log.warning(
+            f'"execute_round() aborted — this node ({nid}) has been excluded, '
+            f'refusing to propose or retry further."'
+        )
+        return
+
     STATE.get("round_pairwise_cosines", {}).pop(rnd, None)
     log.info(f'"Starting round {rnd + 1}"')
     STATE.setdefault("round_start_times", {})[rnd] = time.time()
@@ -1928,9 +1979,18 @@ def handle_update(data: dict):
 
     # Gate on prediction agreement (tau=0.75 per design doc Section 8).
     # Only applies once we have a real prior vector to compare against —
-    # the very first round for this peer can't be gated yet.
+    # the very first round for this peer can't be gated yet. Also skip
+    # during early-training warm-up (same window as the accuracy gate,
+    # ACC_GATE_WARMUP_ROUNDS): early rounds are naturally noisy on this
+    # non-IID split, and this gate has no tolerance band the way the
+    # accuracy gate does — confirmed via live testing that an honest
+    # node's very first proposing round can fail this gate purely from
+    # normal early-training variance, not misbehavior.
     PREDICTION_AGREEMENT_TAU = 0.75
-    if decision and agreement_score is not None and agreement_score < PREDICTION_AGREEMENT_TAU:
+    PREDICTION_GATE_WARMUP_ROUNDS = 5
+    if rnd < PREDICTION_GATE_WARMUP_ROUNDS:
+        pass  # skip the gate entirely during warm-up
+    elif decision and agreement_score is not None and agreement_score < PREDICTION_AGREEMENT_TAU:
         decision, reason = False, "prediction_disagreement"
         log.warning(
             f'"Update round={rnd} from node {origin} REJECTED on prediction '
@@ -2392,6 +2452,12 @@ def _finalize_round(data: dict):
     #     )
 
     if not quorum_ok:
+        if STATE["node_id"] in STATE.get("excluded_nodes", set()):
+            log.warning(
+                f'"Round {rnd + 1} quorum retry aborted — this node has been '
+                f'excluded mid-round, not retrying further."'
+            )
+            return
         attempts = STATE["round_retry_count"].get(rnd, 0)
         if attempts < STATE["max_round_retries"]:
             STATE["round_retry_count"][rnd] = attempts + 1
@@ -2475,6 +2541,12 @@ def _finalize_round(data: dict):
         )
 
     if not acc_ok:
+        if STATE["node_id"] in STATE.get("excluded_nodes", set()):
+            log.warning(
+                f'"Round {rnd + 1} accuracy-gate retry aborted — this node has '
+                f'been excluded mid-round, not retrying further."'
+            )
+            return
         attempts = STATE["round_retry_count"].get(rnd, 0)
         if attempts < STATE["max_round_retries"]:
             STATE["round_retry_count"][rnd] = attempts + 1
