@@ -564,6 +564,7 @@ app = FastAPI(title="SecureFedHE Node")
 # Global node state
 STATE = {
     "node_id":       None,
+    "model_lock":    threading.Lock(),
     "config":        None,
     "model":         None,
     "loader":        None,
@@ -1533,21 +1534,22 @@ def execute_round():
     # compute Δw = trained - start afterward, instead of using
     # absolute trained weights (which are dominated by the shared
     # synced starting point and made cosine agreement meaningless).
-    STATE["_pre_training_snapshot"] = {
-        k: v.detach().cpu().numpy().copy() if hasattr(v, "detach") else np.asarray(v).copy()
-        for k, v in STATE["model"].state_dict().items()
-    }
-    try:
-        params = local_train(
-            STATE["model"], STATE["loader"],
-            epochs=config["model"]["local_epochs"],
-            lr=config["model"]["lr"],
-            device=STATE["device"],
-            label_flip_frac=_lf_frac,
-            backdoor_frac=_bd_frac,
-            backdoor_target_class=_bd_target
-        )
-    except Exception as e:
+    with STATE["model_lock"]:
+        STATE["_pre_training_snapshot"] = {
+            k: v.detach().cpu().numpy().copy() if hasattr(v, "detach") else np.asarray(v).copy()
+            for k, v in STATE["model"].state_dict().items()
+        }
+        try:
+            params = local_train(
+                STATE["model"], STATE["loader"],
+                epochs=config["model"]["local_epochs"],
+                lr=config["model"]["lr"],
+                device=STATE["device"],
+                label_flip_frac=_lf_frac,
+                backdoor_frac=_bd_frac,
+                backdoor_target_class=_bd_target
+            )
+        except Exception as e:
         log.error(f'"Round {rnd + 1} local_train CRASHED: {e!r} — retrying round."')
         time.sleep(0.5)
         threading.Thread(target=execute_round, daemon=True).start()
@@ -1821,7 +1823,8 @@ def handle_update(data: dict):
             inc_plain = deserialize_params(data["plain"])
             scratch = DiabetesNet(input_dim=STATE["model"].input_dim,
                                    num_classes=STATE["model"].num_classes).to(STATE["device"])
-            scratch.load_state_dict(STATE["model"].state_dict())
+            with STATE["model_lock"]:
+                scratch.load_state_dict(STATE["model"].state_dict())
             scratch_params = scratch.get_all_params()
             scratch_params.update(inc_plain)  # overwrite non-fc2 layers only
             scratch.set_all_params(scratch_params)
@@ -1968,19 +1971,20 @@ def handle_update(data: dict):
             f'stamping trigger on {_bd_frac:.0%} of samples, forcing class {_bd_target}"'
         )
 
-    STATE["_pre_training_snapshot"] = {
-        k: v.detach().cpu().numpy().copy() if hasattr(v, "detach") else np.asarray(v).copy()
-        for k, v in STATE["model"].state_dict().items()
-    }
-    params = local_train(
-        STATE["model"], STATE["loader"],
-        epochs=config["model"]["local_epochs"],
-        lr=config["model"]["lr"],
-        device=STATE["device"],
-        label_flip_frac=_lf_frac,
-        backdoor_frac=_bd_frac,
-        backdoor_target_class=_bd_target
-    )
+    with STATE["model_lock"]:
+        STATE["_pre_training_snapshot"] = {
+            k: v.detach().cpu().numpy().copy() if hasattr(v, "detach") else np.asarray(v).copy()
+            for k, v in STATE["model"].state_dict().items()
+        }
+        params = local_train(
+            STATE["model"], STATE["loader"],
+            epochs=config["model"]["local_epochs"],
+            lr=config["model"]["lr"],
+            device=STATE["device"],
+            label_flip_frac=_lf_frac,
+            backdoor_frac=_bd_frac,
+            backdoor_target_class=_bd_target
+        )
 
     params = apply_attack_simulation(params, nid, log)
 
