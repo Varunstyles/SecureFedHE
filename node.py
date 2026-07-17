@@ -1171,11 +1171,24 @@ async def consensus_accuse(request: Request):
 async def round_skipped(request: Request):
     """Worker receives notice that master skipped a round after
     exhausting retries. Advance our round counter to match, so we
-    don't reject the next round's proposal as wrong_round forever."""
+    don't reject the next round's proposal as wrong_round forever.
+    Also strikes the round's proposer — a peer independently
+    witnessing repeated round failure is legitimate grounds for
+    suspicion, regardless of whether the cause was a quorum failure
+    or an accuracy-gate failure (see `reason` field)."""
     data = await request.json()
     rnd = data["round"]
+    origin = data.get("origin")
+    reason = data.get("reason", "unknown")
     STATE["current_round"] = rnd + 1
     STATE["logger"].info(f'"Round {rnd + 1} skip acknowledged — advancing to round {rnd + 2}"')
+    if origin is not None and origin != STATE["node_id"]:
+        weight = 1.0 if reason == "quorum_failure" else 1.5
+        STATE["logger"].warning(
+            f'"[SKIP STRIKE] round {rnd + 1} skipped, proposer={origin}, '
+            f'reason={reason} — recording independent strike"'
+        )
+        _record_suspicion(origin, STATE["logger"], weight=weight)
     return {"status": "ok"}
 
 @app.post("/sync_weights")
@@ -1191,7 +1204,8 @@ async def sync_weights(request: Request):
     silently assumed away."""
     data   = await request.json()
     params = {k: np.array(v, dtype=np.float32) for k, v in data["params"].items()}
-    set_params(STATE["model"], params)
+    with STATE["model_lock"]:
+        set_params(STATE["model"], params)
     rnd = data["round"]
     STATE["current_round"] = rnd + 1
     STATE["logger"].info(f'"Synced weights from master for round {rnd}"')
@@ -1309,7 +1323,19 @@ async def consensus_propose(request: Request):
     update_hash) — before the actual update arrives via the ring."""
     data = await request.json()
     proposal = UpdateProposal.from_dict(data)
-    STATE["pending_proposals"][(proposal.round_id, proposal.origin_node_id)] = proposal
+    key = (proposal.round_id, proposal.origin_node_id)
+    existing = STATE["pending_proposals"].get(key)
+    if (existing is not None and existing.update_hash != proposal.update_hash
+            and proposal.origin_node_id != STATE["node_id"]):
+        STATE["logger"].warning(
+            f'"[EQUIVOCATION DETECTED] node {proposal.origin_node_id} sent '
+            f'a DIFFERENT proposal hash for round={proposal.round_id} than '
+            f'previously received (was={existing.update_hash[:12]}..., '
+            f'now={proposal.update_hash[:12]}...) — striking directly, '
+            f'this is direct first-hand evidence of conflicting_proposal"'
+        )
+        _record_suspicion(proposal.origin_node_id, STATE["logger"], weight=5.0)
+    STATE["pending_proposals"][key] = proposal
     STATE["logger"].info(
         f'"Proposal received: round={proposal.round_id} '
         f'origin={proposal.origin_node_id} hash={proposal.update_hash[:12]}..."'
@@ -1550,10 +1576,10 @@ def execute_round():
                 backdoor_target_class=_bd_target
             )
         except Exception as e:
-        log.error(f'"Round {rnd + 1} local_train CRASHED: {e!r} — retrying round."')
-        time.sleep(0.5)
-        threading.Thread(target=execute_round, daemon=True).start()
-        return
+            log.error(f'"Round {rnd + 1} local_train CRASHED: {e!r} — retrying round."')
+            time.sleep(0.5)
+            threading.Thread(target=execute_round, daemon=True).start()
+            return
     params = apply_attack_simulation(params, nid, log)
 
     # Clip fc2 weights to the ZKP norm bound BEFORE adding DP noise,
@@ -2254,11 +2280,15 @@ def _notify_next_proposer(rnd: int, proposer_id: int, _depth: int = 0):
             _notify_next_proposer(rnd, fallback, _depth=_depth + 1)
 
 
-def _broadcast_skip(rnd: int):
+def _broadcast_skip(rnd: int, origin: int = None, reason: str = "unknown"):
     """Tell workers a round was skipped (quorum/accuracy gate failed
     after all retries) so they advance their round counter too —
     otherwise they stay stuck on the skipped round and reject every
-    future proposal as wrong_round forever."""
+    future proposal as wrong_round forever. origin/reason let peers
+    independently strike the actual proposer responsible, distinguishing
+    a quorum failure (weaker signal — could be an honest slow node)
+    from an accuracy-gate failure (stronger signal — their update
+    concretely degraded the model)."""
     log    = STATE["logger"]
     nodes  = STATE["config"]["ring"]["nodes"]
     nid    = STATE["node_id"]
@@ -2269,7 +2299,7 @@ def _broadcast_skip(rnd: int):
         if node["id"] == nid or node["id"] in excluded:
             continue
         url = f"{scheme}://{node['ip']}:{node['port']}/round_skipped"
-        _send_or_exclude(node, url, {"round": rnd}, log, "Sent skip notice")
+        _send_or_exclude(node, url, {"round": rnd, "origin": origin, "reason": reason}, log, "Sent skip notice")
 
 
 def _broadcast_weights(params: dict, model_hash: str = None):
@@ -2378,8 +2408,9 @@ def _finalize_round(data: dict):
                 f'{STATE["max_round_retries"]} retries. Skipping round, model NOT updated."'
             )
             STATE["round_retry_count"].pop(rnd, None)
+            _record_suspicion(origin, log)
             STATE["current_round"] += 1
-            _broadcast_skip(rnd)
+            _broadcast_skip(rnd, origin=origin, reason="quorum_failure")
             if STATE["current_round"] < STATE["config"]["ring"]["rounds"]:
                 next_proposer = get_proposer_for_round(STATE["current_round"])
                 if next_proposer == STATE["node_id"]:
@@ -2474,7 +2505,7 @@ def _finalize_round(data: dict):
             # "erratic" relative to a corrupted baseline too).
             _record_suspicion(origin, log)
             STATE["current_round"] += 1
-            _broadcast_skip(rnd)
+            _broadcast_skip(rnd, origin=origin, reason="accuracy_gate_failure")
             if STATE["current_round"] < STATE["config"]["ring"]["rounds"]:
                 next_proposer = get_proposer_for_round(STATE["current_round"])
                 if next_proposer == STATE["node_id"]:
@@ -2490,7 +2521,8 @@ def _finalize_round(data: dict):
 
     STATE["last_committed_accuracy"] = candidate_acc
     STATE["round_retry_count"].pop(rnd, None)
-    set_params(model, new_params)
+    with STATE["model_lock"]:
+        set_params(model, new_params)
 
     # ── Stage 2: master computes + votes on its own model hash ──
     hashable_params = {k: np.array(v, dtype=np.float32).tolist() for k, v in new_params.items()}
@@ -2632,12 +2664,9 @@ def main():
     STATE["commit_certificates"] = {} # round_id -> QuorumCertificate, once finalized
     STATE["node_rejection_counts"] = {}  # node_id -> consecutive accuracy-gate rejection count for rounds THEY proposed
     STATE["excluded_nodes"] = set()      # node_ids excluded from proposing and from quorum counting
-    STATE["exclusion_threshold"] = 999   # TEMP: effectively disabled while the detection
-    # signal is being redesigned (proposer-blame fix landed, but confirming exclusion
-    # actually targets the right node takes many rounds — see report Section 3.9/3.10).
-    # Strikes still accumulate and log normally, so this run still produces useful
-    # data for later, it just won't ever cross threshold and actually exclude anyone.
-    # Restore to 5 (or whatever validated value) once ready to re-test exclusion.
+    STATE["exclusion_threshold"] = 5   # restored after conflicting_proposal validation;
+    # proposer-blame fix landed for both quorum-failure and accuracy-gate skip paths,
+    # so strikes now accumulate correctly on both. Re-tested against conflicting_proposal.
 
     # ── State ───────────────────────────────────────────────────
     STATE.update({
