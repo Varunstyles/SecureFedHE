@@ -122,23 +122,37 @@ def main():
     save_cert(ca_cert, os.path.join(CERTS_DIR, "ca.crt"))
     print("      done: certs/ca.crt  (valid 10 years)")
 
-    print("\n[2/3] Generating shared node certificate...")
-    print(f"      IPs covered: {all_ips}")
-    node_key, node_cert = generate_node_cert(ca_key, ca_cert, "SecureFedHE Node", all_ips)
-    save_key(node_key,  os.path.join(CERTS_DIR, "server.key"))
-    save_cert(node_cert, os.path.join(CERTS_DIR, "server.crt"))
-    save_key(node_key,  os.path.join(CERTS_DIR, "client.key"))
-    save_cert(node_cert, os.path.join(CERTS_DIR, "client.crt"))
-    print("      done: certs/server.crt + certs/client.crt  (valid 1 year)")
+    print("\n[2/3] Generating per-node certificates...")
+    print(f"      {len(nodes)} node(s) found in config")
+    for n in nodes:
+        nid = n["id"]
+        node_ips = [n["ip"], "127.0.0.1"]
+        node_dir = os.path.join(CERTS_DIR, f"node_{nid}")
+        os.makedirs(node_dir, exist_ok=True)
+        node_key, node_cert = generate_node_cert(
+            ca_key, ca_cert, f"SecureFedHE Node {nid}", node_ips
+        )
+        save_key(node_key,  os.path.join(node_dir, "server.key"))
+        save_cert(node_cert, os.path.join(node_dir, "server.crt"))
+        save_key(node_key,  os.path.join(node_dir, "client.key"))
+        save_cert(node_cert, os.path.join(node_dir, "client.crt"))
+        print(f"      done: certs/node_{nid}/  (CN=SecureFedHE Node {nid}, valid 1 year)")
 
     print("\n[3/3] Certificate summary:")
-    for fname in ["ca.crt", "ca.key", "server.crt", "server.key", "client.crt", "client.key"]:
-        path = os.path.join(CERTS_DIR, fname)
-        size = os.path.getsize(path)
-        print(f"      {path:<30} {size:>6} bytes")
+    print(f"      {os.path.join(CERTS_DIR, 'ca.crt'):<40} {os.path.getsize(os.path.join(CERTS_DIR, 'ca.crt')):>6} bytes")
+    for n in nodes:
+        nid = n["id"]
+        node_dir = os.path.join(CERTS_DIR, f"node_{nid}")
+        for fname in ["server.crt", "server.key", "client.crt", "client.key"]:
+            path = os.path.join(node_dir, fname)
+            size = os.path.getsize(path)
+            print(f"      {path:<40} {size:>6} bytes")
 
     print("\n" + "=" * 55)
-    print("  Done. Copy the entire certs/ folder to all PCs.")
+    print("  Done. Distribute per-node:")
+    print("    -> certs/ca.crt goes to EVERY PC (shared trust root)")
+    print("    -> certs/node_<id>/  goes ONLY to that node's own PC")
+    print("  Never copy another node's client.key/server.key anywhere else.")
     print("  Keep ca.key SECRET — delete it after distributing.")
     print("=" * 55)
 
@@ -146,10 +160,13 @@ def main():
     from cryptography.x509 import load_pem_x509_certificate
     with open(os.path.join(CERTS_DIR, "ca.crt"), "rb") as f:
         loaded_ca = load_pem_x509_certificate(f.read())
-    with open(os.path.join(CERTS_DIR, "server.crt"), "rb") as f:
-        loaded_srv = load_pem_x509_certificate(f.read())
-    assert loaded_ca.subject == loaded_srv.issuer, "CA mismatch"
-    print("  CA correctly signed server certificate")
+    for n in nodes:
+        nid = n["id"]
+        srv_path = os.path.join(CERTS_DIR, f"node_{nid}", "server.crt")
+        with open(srv_path, "rb") as f:
+            loaded_srv = load_pem_x509_certificate(f.read())
+        assert loaded_ca.subject == loaded_srv.issuer, f"CA mismatch for node {nid}"
+    print(f"  CA correctly signed all {len(nodes)} node certificates")
     print("  All checks passed\n")
 
 

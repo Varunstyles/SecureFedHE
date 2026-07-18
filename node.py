@@ -2794,16 +2794,19 @@ def main():
         peer_pubkeys = {}  # filled in via /consensus/pubkey exchange at ring start
     else:
         my_private_key = load_private_key(config["tls"]["client_key"])
+        peer_cert_paths = config["tls"].get("peer_certs", {})
         for n in nodes:
             if n["id"] == nid:
                 continue
-            # NOTE: all nodes currently share one client cert (see
-            # generate_certs.py's "shared node certificate"), so this
-            # verifies "signed by a valid ring member" rather than
-            # cryptographically distinguishing WHICH member signed it.
-            # Fine for Stage 1 hard-rejection logic; revisit if per-node
-            # signer attribution becomes a requirement later.
-            peer_pubkeys[n["id"]] = load_public_key_from_cert(config["tls"]["client_cert"])
+            # Each peer's OWN cert, not a shared one — a vote's signature
+            # now cryptographically identifies exactly which node signed
+            # it. peer_certs must be populated (see generate_certs.py's
+            # per-node output) or this will KeyError, which is correct:
+            # we should refuse to start rather than silently fall back
+            # to a shared-identity trust model.
+            cert_path = peer_cert_paths[str(n["id"])]
+            peer_pubkeys[n["id"]] = load_public_key_from_cert(cert_path)
+
 
     STATE["consensus_privkey"] = my_private_key
     STATE["consensus_peer_pubkeys"] = peer_pubkeys
