@@ -823,10 +823,18 @@ def _apply_exclusion(node_id: int, log) -> None:
     """Locally mark a node excluded and adjust quorum. Called both
     when THIS node decides to exclude someone, and when it receives
     an exclusion notice from a peer — so all nodes converge to the
-    same excluded_nodes set regardless of who detected it first."""
+    same excluded_nodes set regardless of who detected it first.
+
+    Quorum follows classical BFT: with `remaining` trusted nodes, we
+    can safely tolerate f = floor((remaining - 1) / 3) additional
+    faults, so quorum_required = remaining - f. This matches the
+    3f+1 rule (e.g. 4 nodes -> quorum 3, 7 nodes -> quorum 5) instead
+    of the old remaining-1 shortcut, which was only coincidentally
+    correct at exactly 4 nodes and unsafe below or overly strict above."""
     STATE.setdefault("excluded_nodes", set()).add(node_id)
     remaining = len(STATE["config"]["ring"]["nodes"]) - len(STATE["excluded_nodes"])
-    STATE["quorum_required"] = max(1, remaining - 1)
+    tolerable_faults = (remaining - 1) // 3
+    STATE["quorum_required"] = max(1, remaining - tolerable_faults)
     log.error(
         f'"Node {node_id} EXCLUDED from proposing and quorum. '
         f'Quorum requirement adjusted to {STATE["quorum_required"]} '
@@ -1228,6 +1236,8 @@ async def round_skipped(request: Request):
     origin = data.get("origin")
     reason = data.get("reason", "unknown")
     STATE["current_round"] = rnd + 1
+    if origin is not None:
+        STATE.get("_peer_proposal_retry_count", {}).pop((rnd, origin), None)
     STATE["logger"].info(f'"Round {rnd + 1} skip acknowledged — advancing to round {rnd + 2}"')
     if origin is not None and origin != STATE["node_id"]:
         weight = 1.0 if reason == "quorum_failure" else 1.5
@@ -1373,16 +1383,56 @@ async def consensus_propose(request: Request):
     proposal = UpdateProposal.from_dict(data)
     key = (proposal.round_id, proposal.origin_node_id)
     existing = STATE["pending_proposals"].get(key)
+    # A genuinely different hash for the same (round, origin) can mean
+    # two very different things: real equivocation (attacker sends
+    # different hashes to different peers in the SAME broadcast pass),
+    # or an honest node legitimately RETRYING the round after its own
+    # quorum failure (fresh local_train() -> new weights -> new hash,
+    # see execute_round()'s retry path). These look identical from a
+    # single peer's point of view unless we account for time: a real
+    # equivocation broadcast lands within the same pass (sub-second
+    # gap between the two proposals reaching us), while a legitimate
+    # retry only happens after the round's own retry delay/quorum
+    # timeout, which is always several seconds at minimum. Anything
+    # slower than this floor is treated as an honest retry, not struck.
+    EQUIVOCATION_MIN_GAP_S = 3.0
     if (existing is not None and existing.update_hash != proposal.update_hash
             and proposal.origin_node_id != STATE["node_id"]):
+        gap = proposal.timestamp - existing.timestamp
+        if gap < EQUIVOCATION_MIN_GAP_S:
+            STATE["logger"].warning(
+                f'"[EQUIVOCATION DETECTED] node {proposal.origin_node_id} sent '
+                f'a DIFFERENT proposal hash for round={proposal.round_id} than '
+                f'previously received (was={existing.update_hash[:12]}..., '
+                f'now={proposal.update_hash[:12]}..., gap={gap:.2f}s) — striking '
+                f'directly, this is direct first-hand evidence of conflicting_proposal"'
+            )
+            _record_suspicion(proposal.origin_node_id, STATE["logger"], weight=5.0)
+        else:
+            STATE["logger"].info(
+                f'"Proposal for round={proposal.round_id} origin='
+                f'{proposal.origin_node_id} changed hash after {gap:.2f}s — '
+                f'treating as a legitimate round retry, not equivocation."'
+            )
+    # Peer-side ceiling on retries for the same round: the proposer's
+    # own retry cap (max_round_retries, enforced in _finalize_round)
+    # only protects the proposer's node. Without a matching cap here,
+    # peers will vote on an unbounded number of re-proposals for a
+    # round that keeps failing quorum, and the ring never advances —
+    # confirmed via live testing: a round stuck alternating between
+    # retries can loop indefinitely with no COMMIT and no SKIP, since
+    # nothing on the peer side ever declares the round abandoned.
+    retry_seen = STATE.setdefault("_peer_proposal_retry_count", {})
+    retry_seen[key] = retry_seen.get(key, 0) + 1
+    if retry_seen[key] > STATE.get("max_round_retries", 3) + 1:
         STATE["logger"].warning(
-            f'"[EQUIVOCATION DETECTED] node {proposal.origin_node_id} sent '
-            f'a DIFFERENT proposal hash for round={proposal.round_id} than '
-            f'previously received (was={existing.update_hash[:12]}..., '
-            f'now={proposal.update_hash[:12]}...) — striking directly, '
-            f'this is direct first-hand evidence of conflicting_proposal"'
+            f'"Round {proposal.round_id + 1} origin={proposal.origin_node_id} '
+            f'has been re-proposed {retry_seen[key]} times, exceeding this '
+            f'peer\'s patience — refusing to vote further, waiting for a '
+            f'skip/commit notice from the proposer instead."'
         )
-        _record_suspicion(proposal.origin_node_id, STATE["logger"], weight=5.0)
+        return {"status": "ignored", "reason": "too_many_retries"}
+
     STATE["pending_proposals"][key] = proposal
     STATE["logger"].info(
         f'"Proposal received: round={proposal.round_id} '
@@ -2270,8 +2320,7 @@ def _forward(payload: dict):
             )
 
 def _proposal_watchdog(rnd: int, expected_proposer: int):
-    if STATE.get("training_complete", False):
-        return    """Runs after handing off proposing duty to expected_proposer for
+    """Runs after handing off proposing duty to expected_proposer for
     round `rnd`. If no proposal for this round arrives within timeout_s
     (the proposer died mid-broadcast, or never started at all — a gap
     the failed-send exclusion checks can't catch, since nothing was
@@ -2280,6 +2329,8 @@ def _proposal_watchdog(rnd: int, expected_proposer: int):
     Cancels itself quietly if the round already moved on by the time
     the timeout fires (proposal arrived, or a peer's exclusion notice
     already advanced us)."""
+    if STATE.get("training_complete", False):
+        return
     log = STATE["logger"]
     timeout_s = STATE["config"]["ring"].get("timeout_s", 30)
     time.sleep(timeout_s)
@@ -2303,6 +2354,9 @@ def _proposal_watchdog(rnd: int, expected_proposer: int):
     _apply_exclusion(expected_proposer, log)
     _broadcast_exclusion(expected_proposer)
 
+    if STATE.get("training_complete", False):
+        log.info(f'"Training completed during exclusion handling — not appointing a fallback proposer."')
+        return  # training finished while we were excluding; no round left to hand off
     if STATE["current_round"] != rnd:
         return  # exclusion broadcast or a race already moved things on
 
@@ -2742,7 +2796,8 @@ def main():
     STATE["consensus_privkey"] = my_private_key
     STATE["consensus_peer_pubkeys"] = peer_pubkeys
     STATE["quorum_trackers"] = {}   # (round_id, update_hash) -> QuorumTracker
-    STATE["quorum_required"] = 2    # 2-of-3 for this ring size
+    _n_nodes = len(config["ring"]["nodes"])
+    STATE["quorum_required"] = max(1, _n_nodes - (_n_nodes - 1) // 3)  # e.g. 3-of-4, 5-of-7
     STATE["round_retry_count"] = {} # round_id -> number of quorum-failed retries so far
     STATE["max_round_retries"] = 3  # after this many failed quorum attempts, skip the round instead of retrying forever
     STATE["pending_proposals"] = {} # (round_id, origin_node_id) -> UpdateProposal, sent before the ring update arrives
