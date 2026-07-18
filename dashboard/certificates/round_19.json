@@ -1,0 +1,41 @@
+{
+  "round_id": 19,
+  "update_hash": "9695ad7ad011186395cac1d9a52f5827ddcd9e6ac4e77f06a3290dd83f143954",
+  "accepted_by": [
+    3,
+    0,
+    1
+  ],
+  "rejected_by": [],
+  "votes": [
+    {
+      "round_id": 19,
+      "update_hash": "9695ad7ad011186395cac1d9a52f5827ddcd9e6ac4e77f06a3290dd83f143954",
+      "voter_node_id": 3,
+      "decision": true,
+      "reason_code": "zkp_ok",
+      "signature": "71c6a7b6513ba6c3e56b7fc07da81b2e53e4ebed6ad6412d1f713eefd0e119e2b82ffb9fc51beab3b77d6e8d6dc0090737f5a21d2aececbb47daeb06cd8973c6e23933f464c85264b68f817f3b0ef82b7c799916784428b7eebdba33ac9c015406a8959dd3fd18946bfff03c72b9fbcc3c71b38598149c30da7753057f798f9aa5d309eb2f07af9217a8dcbd2254a0070345c49d9fc4c342934be8204548f77bc1091850b83906221e56c836a19743c7d7463a37128f5931ea7ad19aee693f2da008cb743c44de5b2364e3aa09f78604d4f977591c3f59aae79a2cb3ace2e83daaa5fcfcd828d4cba6b710cf5df6bb5c03c4410b9dfcaac7938a522f252c4908",
+      "timestamp": 1784414101.607835
+    },
+    {
+      "round_id": 19,
+      "update_hash": "9695ad7ad011186395cac1d9a52f5827ddcd9e6ac4e77f06a3290dd83f143954",
+      "voter_node_id": 0,
+      "decision": true,
+      "reason_code": "zkp_ok",
+      "signature": "3748bb5fe3469537b543a085b227866d583f5c0fffb4fe55db937efdb22a61ceacb1de4538ef2f98c67d9b6eaa728cb9b51324acd621555fb92f0960dbc9ecb97271d900b8ba843a7a59cc80320fc4425cbe99f25dc1e456af6bafd39aaef8c6b53e59fb5979c3183a5172645bd803c36564d974f016cdb6023e237f52459f40e4969ed45d0c6ad4de2c805eaa4fe475f5f66b4581d0d129cb3f95be5d701f1ffc71331a14492018eb01ea29ae2e5336b733e60e37304aab54985dab3eecd95f41923361bd99082ccc449a0cc6c467aa22511e292357349e7de2770f70f4a3ccdf7b5f9e76d9db73e259dc0c26867c8a38d24020e9e69499b388540c491eb499",
+      "timestamp": 1784414101.637688
+    },
+    {
+      "round_id": 19,
+      "update_hash": "9695ad7ad011186395cac1d9a52f5827ddcd9e6ac4e77f06a3290dd83f143954",
+      "voter_node_id": 1,
+      "decision": true,
+      "reason_code": "zkp_ok",
+      "signature": "a8e2f02981dd16a8ab643212865e88648556cccfe01adc11d473d132938ca5e4d1d0b6798fbd247abba8c9d4e1600d29837d4c7ea81e27de6d2c82ee4e8e2248c80811b75490530fc792a3915685b2464b01122aff0bb2fd31b4f062df385611ef9e2b1092b5fdcf98b049b61eb84e1d830626caf8dbffc6ba51c630827ec88344c27f554abfb2bd291c789a5e885aeb982071ea3daf0b2a3b7d450db7c1d28d45544ee81e0baf2779f8282e13f74f12dae4acc32e1faa4ada38627bf37e37ed0cad401142a0170bbb1e7c73c3ac75bd9d35ae31db58487b0ce5ef2eb276d96f8f285173f71d285424f72c8e50cfdd71bed8e3723ffc7491952d3a4be7baf93a",
+      "timestamp": 1784414101.6797254
+    }
+  ],
+  "quorum_required": 3,
+  "formed_at": 1784414101.6877434
+}

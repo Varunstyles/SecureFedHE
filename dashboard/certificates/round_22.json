@@ -1,0 +1,31 @@
+{
+  "round_id": 22,
+  "update_hash": "f5e2063644fa7245b5962b5894624e4fb746f42f4e50facb0efba9db91e2c1a5",
+  "accepted_by": [
+    1,
+    0
+  ],
+  "rejected_by": [],
+  "votes": [
+    {
+      "round_id": 22,
+      "update_hash": "f5e2063644fa7245b5962b5894624e4fb746f42f4e50facb0efba9db91e2c1a5",
+      "voter_node_id": 1,
+      "decision": true,
+      "reason_code": "zkp_ok",
+      "signature": "426d1952813bff6be2678e10f3819279f5cb951884f78f23fbc9c64f69cc6bf23f9fc6df38383de5d6d9d5d92088a3de75db4c725cba069bea281c4f8f5bce103f52e55d0f3d0721983e295b2c3a4a12875bf8f9e87369f7fef83765841972f8f5b87d6669379c60edfde1105dbd2779e1be1bf1fde7d2c02a0e80551834017e0b127674e0e19055eb25a1cc7e5108437f8235477ec5e60150f844281df81ac9fea90332b1b478cd851e293a9aaac1255cda282c51965ce12af8d951578bc4e855c89528448669f25c2ce18657bb5ca5af945963ba4f5ef98e8375188ef59dbdfa40068624a32a0d9cc322a43c0b9a3f8fb0b50dd3090b72777f392eb670248f",
+      "timestamp": 1783813194.0651338
+    },
+    {
+      "round_id": 22,
+      "update_hash": "f5e2063644fa7245b5962b5894624e4fb746f42f4e50facb0efba9db91e2c1a5",
+      "voter_node_id": 0,
+      "decision": true,
+      "reason_code": "zkp_ok",
+      "signature": "3d5708560df2fe39fe5ba931948b1d60db1873f41b3bff93c0230f56d4aac2e63724b7544d0eb1bb4b64bbe1c2afd14f73e717e24afe44542fdbb2c52f3f4152ce021d7b35c57f76a6727efc2c1f2c4d3ace9f26f809057e2b797768759e4a8503659932762ffb053b6c1c13d277c17fbb75bf25eb3bf038ee89a80f567d80070c9efae7c2afac177e7ae54835b25952eb62cdeac295af637a2be1a52b05a687571a94c068c93cce392db098c748332cbae267ab2093bf1049ec357580c9827229f8433fdf1c6f0d5abf5a88bb4f2e0cd1f9d05d6fd5e357e0f5d126fb117dd5b66d7af2112f143099ca7ab8dd90abe6b076984943e17127fffd21c5be3acc0c",
+      "timestamp": 1783813194.0961602
+    }
+  ],
+  "quorum_required": 2,
+  "formed_at": 1783813194.0995252
+}
