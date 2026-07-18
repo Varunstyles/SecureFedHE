@@ -38,14 +38,25 @@ def main():
                          help="BACKDOOR_TRIGGER_VALUE from node.py (default 99.0)")
     parser.add_argument("--checkpoint", type=str,
                          default=str(ROOT / "dashboard" / "model_latest.pt"))
+    parser.add_argument("--num-clients", type=int, default=3,
+                         help="Number of hospital nodes in the ring this "
+                              "checkpoint came from — MUST match the actual "
+                              "training run (e.g. 4 for your 4-node tests), "
+                              "or the test-set partition won't match what "
+                              "the ring actually evaluated against.")
     args = parser.parse_args()
 
     device = torch.device("cpu")
 
     # Same seed/params as node.py's runtime data load, so this is the
-    # exact same held-out test set the ring evaluated against.
+    # exact same held-out test set the ring evaluated against. num_clients
+    # MUST match how many nodes actually ran the training ring being
+    # checked — hardcoding this caused a silent partition mismatch when
+    # checking a 4-node run against a 3-node test split (confirmed: the
+    # script's own hospital-partition printout showed 3 hospitals with
+    # different patient counts than the real 4-node training logs).
     _, test_loader, _, _ = load_diabetes_datasets(
-        num_clients=3, alpha=0.5, seed=42
+        num_clients=args.num_clients, alpha=0.5, seed=42
     )
 
     model = DiabetesNet(input_dim=8, num_classes=2).to(device)
