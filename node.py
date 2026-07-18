@@ -410,9 +410,21 @@ class SecureAggregator:
 
 # ── Local training ─────────────────────────────────────────────────────────────
 # Fixed trigger stamped on the last feature slot for the backdoor attack.
-# Out-of-normal-range value so it's a clean, consistent signal the model
-# can learn to associate with the target class, distinct from real data.
-BACKDOOR_TRIGGER_VALUE = 99.0
+# NOTE: this value lives in NORMALIZED feature space, not raw units —
+# the DataLoader (diabetes_loader.py's DiabetesDataset) z-score normalizes
+# every feature BEFORE it ever reaches local_train(), so stamping here
+# stamps the already-normalized tensor directly. The original value of
+# 99.0 was ~30-40x the normal range of any z-scored feature (which
+# typically sits in roughly [-3, 3]) — confirmed via check_backdoor.py
+# testing that this broke BatchNorm numerically (saturated activations)
+# rather than cleanly triggering a learned backdoor pathway, making
+# "no backdoor detected" results from that trigger value inconclusive
+# rather than a real negative finding. 6.0 is abnormal enough to be a
+# clean, learnable, out-of-distribution signal (real z-scored ages
+# never naturally reach 6 standard deviations) while staying in a
+# range BatchNorm's running statistics can still process without
+# saturating.
+BACKDOOR_TRIGGER_VALUE = 6.0
 
 def local_train(model: DiabetesNet, loader: DataLoader, epochs: int,
                 lr: float, device: torch.device,

@@ -34,8 +34,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--target-class", type=int, default=1,
                          help="backdoor_target_class used in config.json (default 1)")
-    parser.add_argument("--trigger-value", type=float, default=99.0,
-                         help="BACKDOOR_TRIGGER_VALUE from node.py (default 99.0)")
+    parser.add_argument("--trigger-value", type=float, default=6.0,
+                         help="BACKDOOR_TRIGGER_VALUE from node.py (default 6.0 — "
+                              "this lives in NORMALIZED feature space, not raw "
+                              "units, since features are z-scored before the "
+                              "model ever sees them; must match node.py exactly")
     parser.add_argument("--checkpoint", type=str,
                          default=str(ROOT / "dashboard" / "model_latest.pt"))
     parser.add_argument("--num-clients", type=int, default=3,
