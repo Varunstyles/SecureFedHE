@@ -635,9 +635,11 @@ def _handle_accusation(accuser_id: int, accused_id: int, log) -> None:
     Only exclude accused_id once a quorum of DISTINCT accusers (not
     counting the accused themselves) have each raised this — so one
     compromised node's skewed judgment can never unilaterally remove
-    an honest peer. This mirrors the same 2-of-3 principle already
-    used for update-admission and commit voting, applied here to
-    exclusion decisions."""
+    an honest peer. Uses the SAME 3f+1 formula as commit/vote quorum
+    (see _apply_exclusion) rather than requiring unanimity — a single
+    slow or temporarily-unreachable honest node should not be able to
+    block a legitimate exclusion that the rest of the honest majority
+    has already independently corroborated."""
     if accused_id == STATE["node_id"]:
         # Don't let a peer's accusation immediately doom us without
         # our own corroborating view — still record it, but the
@@ -646,30 +648,39 @@ def _handle_accusation(accuser_id: int, accused_id: int, log) -> None:
         pass
     accusers = STATE.setdefault("accusations", {}).setdefault(accused_id, set())
     accusers.add(accuser_id)
-    # With M=3 total nodes, excluding the accused leaves 2 possible
-    # accusers. Require BOTH of them (not just 1) to agree before
-    # excluding — this is the actual fix: a single node's suspicion,
-    # even if broadcast, can never be enough on its own. If the ring
-    # ever grows beyond 3 nodes, this keeps requiring all remaining
-    # non-accused nodes to agree, which is conservative (favors
-    # safety over responsiveness) and can be relaxed later once this
-    # is validated to work correctly at M=3.
-    total_other_nodes = len(STATE["config"]["ring"]["nodes"]) - 1
-    corroboration_quorum = max(2, total_other_nodes)
-    if (len(accusers) >= corroboration_quorum
-            and accused_id not in STATE.get("excluded_nodes", set())):
+    # Corroboration quorum follows the same 3f+1 rule as commit/vote
+    # quorum: among the `remaining` trusted nodes EXCLUDING the accused
+    # (who cannot corroborate an accusation against themselves), we
+    # tolerate f = floor((remaining - 1) / 3) additional faults, so
+    # quorum_required = remaining - f. Previously this required EVERY
+    # remaining non-accused node to agree (unanimity), which meant one
+    # honest node being slow/offline could block a legitimate exclusion
+    # indefinitely — a liveness hole, not a safety one, but a real gap
+    # against the system's own stated BFT guarantee.
+    remaining = len(STATE["config"]["ring"]["nodes"]) - len(STATE.get("excluded_nodes", set()))
+    remaining_excluding_accused = max(1, remaining - 1)
+    tolerable_faults = (remaining_excluding_accused - 1) // 3
+    corroboration_quorum = max(1, remaining_excluding_accused - tolerable_faults)
+
+    already_excluded = accused_id in STATE.get("excluded_nodes", set())
+    if len(accusers) >= corroboration_quorum and not already_excluded:
         log.error(
             f'"Node {accused_id} accused by {len(accusers)} independent '
             f'peers ({sorted(accusers)}) — quorum-corroborated, excluding."'
         )
         _apply_exclusion(accused_id, log)
         _broadcast_exclusion(accused_id)
+    elif already_excluded:
+        log.info(
+            f'"Node {accused_id} accused by node {accuser_id} — already '
+            f'excluded, this accusation is redundant (late-arriving vote)."'
+        )
     else:
         log.warning(
             f'"Node {accused_id} accused by node {accuser_id}, but only '
             f'{len(accusers)}/{corroboration_quorum} distinct accusers so far '
-            f'— NOT excluding yet (avoids a single compromised node '
-            f'unilaterally removing an honest peer)."'
+            f'(3f+1 quorum) — NOT excluding yet (avoids a single '
+            f'compromised node unilaterally removing an honest peer)."'
         )
 
 
