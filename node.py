@@ -2470,6 +2470,99 @@ def _broadcast_weights(params: dict, model_hash: str = None):
         url = f"{scheme}://{node['ip']}:{node['port']}/sync_weights"
         _send_or_exclude(node, url, payload, log, "Broadcast weights")
 
+# ============================================================
+# BACKDOOR TRIGGER PROBE — live defense, runs every round
+# ============================================================
+# Actively tests the candidate model with synthetic out-of-distribution
+# inputs before it's trusted, instead of only detecting a backdoor
+# after the fact (see check_backdoor.py, which does this same check
+# but only as a manual post-training forensic tool). No real z-scored
+# patient feature should ever naturally reach 4+ standard deviations,
+# so any (feature, probe_value) combination that reliably forces one
+# class is evidence of a planted trigger, not real patient behavior.
+# Same detection threshold as check_backdoor.py's own validated
+# "REAL" verdict (flip_rate > 0.7 and jump > 0.3), reused here so the
+# live gate and the forensic tool agree on what counts as a backdoor.
+BACKDOOR_PROBE_VALUES = [4.0, 5.0, 6.0, 7.0, 8.0]
+BACKDOOR_PROBE_FLIP_THRESHOLD = 0.7
+BACKDOOR_PROBE_JUMP_THRESHOLD = 0.3
+BACKDOOR_PROBE_WARMUP_ROUNDS = 5  # same warm-up window as the accuracy gate —
+# an undertrained model can show spurious trigger-sensitivity that has
+# nothing to do with a real planted backdoor.
+
+
+def probe_for_backdoor(model: "DiabetesNet", test_loader, device, log,
+                        rnd: int) -> tuple:
+    """Probe the candidate model with synthetic out-of-distribution
+    inputs across every feature slot, looking for the signature of a
+    planted trigger: a single (feature, value) combination that
+    reliably forces predictions to one class regardless of the
+    sample's real data. Returns (detected: bool, details: dict).
+    Skipped during warm-up, same rationale as the accuracy gate."""
+    if rnd < BACKDOOR_PROBE_WARMUP_ROUNDS:
+        return False, {}
+
+    model.eval()
+    X_all, y_all = [], []
+    with torch.no_grad():
+        for X_batch, y_batch in test_loader:
+            X_all.append(X_batch)
+            y_all.append(y_batch)
+    X_all = torch.cat(X_all).to(device)
+    y_all = torch.cat(y_all).to(device)
+
+    with torch.no_grad():
+        clean_preds = model(X_all).argmax(dim=1)
+
+    num_features = X_all.shape[1]
+    worst = {"flip_rate": 0.0, "jump": 0.0, "feature": None, "value": None, "target": None}
+
+    for feat_idx in range(num_features):
+        for probe_val in BACKDOOR_PROBE_VALUES:
+            for sign in (1.0, -1.0):  # both tails — backdoor could push
+                                       # either direction, not just positive
+                X_probe = X_all.clone()
+                X_probe[:, feat_idx] = probe_val * sign
+                with torch.no_grad():
+                    probe_preds = model(X_probe).argmax(dim=1)
+
+                # Check both possible target classes (0 and 1) — same
+                # logic as check_backdoor.py's flip_rate/jump, just
+                # run for every class since a live probe doesn't know
+                # in advance which class an attacker might target.
+                for target in (0, 1):
+                    non_target_mask = (y_all != target)
+                    if not non_target_mask.any():
+                        continue
+                    flip_rate = (probe_preds[non_target_mask] == target).float().mean().item()
+                    natural_rate = (clean_preds == target).float().mean().item()
+                    jump = flip_rate - natural_rate
+
+                    if flip_rate > worst["flip_rate"] and jump > worst["jump"]:
+                        worst = {
+                            "flip_rate": flip_rate, "jump": jump,
+                            "feature": feat_idx, "value": probe_val * sign,
+                            "target": target,
+                        }
+
+    detected = (worst["flip_rate"] > BACKDOOR_PROBE_FLIP_THRESHOLD
+                and worst["jump"] > BACKDOOR_PROBE_JUMP_THRESHOLD)
+    if detected:
+        log.warning(
+            f'"[BACKDOOR PROBE] Round {rnd + 1} SUSPICIOUS: feature={worst["feature"]} '
+            f'value={worst["value"]:.1f} forces class={worst["target"]} '
+            f'flip_rate={worst["flip_rate"]:.3f} jump={worst["jump"]:.3f} '
+            f'(thresholds: flip>{BACKDOOR_PROBE_FLIP_THRESHOLD}, jump>{BACKDOOR_PROBE_JUMP_THRESHOLD})"'
+        )
+    else:
+        log.info(
+            f'"[BACKDOOR PROBE] Round {rnd + 1} clean — worst case '
+            f'flip_rate={worst["flip_rate"]:.3f} jump={worst["jump"]:.3f} '
+            f'(feature={worst["feature"]}, value={worst["value"]})"'
+        )
+    return detected, worst
+
+
 def _finalize_round(data: dict):
     """Master: check quorum was reached on this update, then decrypt
     aggregated fc2, update model, log accuracy. If quorum was NOT
@@ -2668,6 +2761,54 @@ def _finalize_round(data: dict):
             _record_suspicion(origin, log)
             STATE["current_round"] += 1
             _broadcast_skip(rnd, origin=origin, reason="accuracy_gate_failure")
+            if STATE["current_round"] < STATE["config"]["ring"]["rounds"]:
+                next_proposer = get_proposer_for_round(STATE["current_round"])
+                if next_proposer == STATE["node_id"]:
+                    time.sleep(0.5)
+                    threading.Thread(target=execute_round, daemon=True).start()
+                else:
+                    _notify_next_proposer(STATE["current_round"], next_proposer)
+                    threading.Thread(target=_proposal_watchdog, args=(STATE["current_round"], next_proposer), daemon=True).start()
+            else:
+                log.info(f'"Training complete after {STATE["current_round"]} rounds"')
+                print(f"[Node {STATE['node_id']}] Training complete!")
+            return
+
+    # ── Fourth gate: backdoor trigger probe ──────────────────────
+    # Runs AFTER the accuracy gate passes — a model that already
+    # failed on accuracy is rejected regardless, no need to also
+    # probe it. This is the live counterpart to check_backdoor.py.
+    backdoor_detected, probe_details = probe_for_backdoor(
+        scratch_model, STATE["test_loader"], STATE["device"], log, rnd
+    )
+    if backdoor_detected:
+        if STATE["node_id"] in STATE.get("excluded_nodes", set()):
+            log.warning(
+                f'"Round {rnd + 1} backdoor-probe retry aborted — this node '
+                f'has been excluded mid-round, not retrying further."'
+            )
+            return
+        attempts = STATE["round_retry_count"].get(rnd, 0)
+        if attempts < STATE["max_round_retries"]:
+            STATE["round_retry_count"][rnd] = attempts + 1
+            log.warning(
+                f'"Round {rnd + 1} REJECTED on backdoor probe '
+                f'(attempt {attempts + 1}/{STATE["max_round_retries"]}). Retrying round."'
+            )
+            time.sleep(0.5)
+            threading.Thread(target=execute_round, daemon=True).start()
+            return
+        else:
+            log.error(
+                f'"Round {rnd + 1} REJECTED on backdoor probe after '
+                f'{STATE["max_round_retries"]} retries. Skipping round, model NOT updated."'
+            )
+            STATE["round_retry_count"].pop(rnd, None)
+            _record_suspicion(origin, log, weight=2.0)  # strong signal — synthetic
+            # probe, not statistical noise, so weighted higher than a plain
+            # quorum-failure strike (1.0) but same tier as accuracy-gate (1.5+)
+            STATE["current_round"] += 1
+            _broadcast_skip(rnd, origin=origin, reason="backdoor_probe_failure")
             if STATE["current_round"] < STATE["config"]["ring"]["rounds"]:
                 next_proposer = get_proposer_for_round(STATE["current_round"])
                 if next_proposer == STATE["node_id"]:
