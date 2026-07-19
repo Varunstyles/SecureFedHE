@@ -2903,6 +2903,15 @@ def main():
 
     node_name = node_cfg["name"]
     logger.info(f'"Starting node {nid}: {node_name}"')
+    _atk_dbg = config.get("attack_simulation", {})
+    _atk_enabled = _atk_dbg.get("enabled")
+    _atk_target = _atk_dbg.get("target_node")
+    _atk_type = _atk_dbg.get("type")
+    _dbg_msg = (
+        f'"[CONFIG DEBUG] attack_simulation loaded: enabled={_atk_enabled} '
+        f'target_node={_atk_target} type={_atk_type} config_path={args.config}"'
+    )
+    logger.info(_dbg_msg)
 
     # ── ZKP setup (real Groth16, norm-bound circuit) ────────────
     # Load the SHARED trusted setup from disk (generated once via
