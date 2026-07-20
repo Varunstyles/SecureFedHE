@@ -1979,6 +1979,67 @@ def handle_update(data: dict):
     if zkp_ok:
         try:
             inc_plain = deserialize_params(data["plain"])
+
+            # ── Backdoor candidate #3: directional self-consistency of
+            # fc_in column 7 (Age, the trigger slot) — log-only, no gating.
+            # Rationale: prior two attempts (output trigger-probe, column-7
+            # L2 norm) both collapsed to a magnitude statistic and got
+            # swamped by ordinary task-relevant weight growth shared by
+            # every node. A backdoor re-injects the SAME trigger->target
+            # mapping every round, so its column-7 update direction should
+            # be abnormally stable round-to-round (high self-cosine),
+            # while an honest node's direction should drift more as local
+            # minibatches vary. This tracks DIRECTION, not size.
+            try:
+                col7 = inc_plain["fc_in.weight"][:, 7]
+                prev_col7_map = STATE.setdefault("per_origin_prev_col7", {})
+                prev_delta_map = STATE.setdefault("per_origin_prev_col7_delta", {})
+                prev_col7 = prev_col7_map.get(origin)
+                if prev_col7 is not None:
+                    delta_t = col7 - prev_col7
+                    prev_delta = prev_delta_map.get(origin)
+                    if prev_delta is not None:
+                        dn, pn = np.linalg.norm(delta_t), np.linalg.norm(prev_delta)
+                        if dn > 1e-8 and pn > 1e-8:
+                            cos_sim = float(np.dot(delta_t, prev_delta) / (dn * pn))
+                            log.info(
+                                f'"fc_in col7 delta self-cosine for node {origin}: '
+                                f'{cos_sim:.4f} (delta_norm={dn:.4f})"'
+                            )
+                    prev_delta_map[origin] = delta_t
+                prev_col7_map[origin] = col7.copy()
+            except Exception as _e:
+                log.info(f'"fc_in col7 self-cosine check skipped: {_e}"')
+
+            # ── Backdoor candidate signal (log-only, NOT gating) ──
+            # fc_in.weight column 7 corresponds directly to the last
+            # input feature — the same slot the backdoor trigger stamps
+            # (see BACKDOOR_TRIGGER_VALUE / local_train). fc_in is
+            # plaintext + DP-noised (sigma is tiny here, ~0.016), sent
+            # in `plain` like every other non-fc2 layer — no new crypto
+            # exposure. A node teaching itself "input[7] huge -> force
+            # output" should show unusual weight magnitude on exactly
+            # this column vs. its own history / vs. peers. Unvalidated —
+            # log only, prove separation before ever gating on this.
+            fc_in_w = inc_plain.get("fc_in.weight")
+            if fc_in_w is not None and fc_in_w.shape[1] > 7:
+                trigger_col_norm = float(np.linalg.norm(fc_in_w[:, 7]))
+                log.info(
+                    f'"[BACKDOOR CANDIDATE] fc_in trigger-col(7) norm from '
+                    f'node {origin}: {trigger_col_norm:.4f}"'
+                )
+                col_history = STATE.setdefault("per_origin_trigger_col", {})
+                origin_col_hist = col_history.setdefault(origin, [])
+                origin_col_hist.append(trigger_col_norm)
+                if len(origin_col_hist) > 4:
+                    origin_col_hist.pop(0)
+                rolling_col_mean = sum(origin_col_hist) / len(origin_col_hist)
+                log.info(
+                    f'"[BACKDOOR CANDIDATE] rolling trigger-col norm for '
+                    f'node {origin}: mean={rolling_col_mean:.4f} over last '
+                    f'{len(origin_col_hist)} round(s)"'
+                )
+
             scratch = DiabetesNet(input_dim=STATE["model"].input_dim,
                                    num_classes=STATE["model"].num_classes).to(STATE["device"])
             with STATE["model_lock"]:
