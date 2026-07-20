@@ -140,3 +140,5 @@ class RejectionReason:
     UNKNOWN_SENDER = "unknown_sender"
     TIMEOUT = "timeout"
     OK = "zkp_ok"
+    PREDICTION_DISAGREEMENT = "prediction_disagreement"
+    PER_CLASS_AGREEMENT_GAP = "per_class_agreement_gap"

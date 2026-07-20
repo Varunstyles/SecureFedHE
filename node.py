@@ -1976,6 +1976,7 @@ def handle_update(data: dict):
     # without breaking the HE boundary around fc2.
     my_pred_vector = None
     agreement_score = None
+    class_gap_flag = False
     if zkp_ok:
         try:
             inc_plain = deserialize_params(data["plain"])
@@ -2024,17 +2025,42 @@ def handle_update(data: dict):
                         f'"Per-class agreement with node {origin}: '
                         f'class0={a0:.3f} class1={a1:.3f} gap={gap:.3f}"'
                     )
-                    PER_CLASS_GAP_ALERT = 0.15  # provisional — needs
-                    # calibration against a clean baseline run before
-                    # this threshold means anything; set loosely for
-                    # now so it logs candidates without false-flooding.
-                    if gap > PER_CLASS_GAP_ALERT:
+
+                    # Rolling window per peer, not a single-round threshold.
+                    # A single elevated gap is often honest noise (confirmed
+                    # live: an honest node hit gap=0.197 in one round with
+                    # no attack active). Label-flip's real signature is a
+                    # SUSTAINED elevated gap across a node's rounds, not one
+                    # outlier — so gate on the rolling mean instead.
+                    GAP_WINDOW_SIZE = 4
+                    GAP_ROLLING_ALERT = 0.06  # mean gap over the window;
+                    # looser than the old single-round 0.15 since an
+                    # average is naturally less noisy than one sample.
+                    gap_history = STATE.setdefault("per_origin_gap_history", {})
+                    origin_history = gap_history.setdefault(origin, [])
+                    origin_history.append(gap)
+                    if len(origin_history) > GAP_WINDOW_SIZE:
+                        origin_history.pop(0)
+
+                    rolling_mean = sum(origin_history) / len(origin_history)
+                    log.info(
+                        f'"Per-class rolling gap for node {origin}: '
+                        f'mean={rolling_mean:.3f} over last '
+                        f'{len(origin_history)} round(s)"'
+                    )
+
+                    if (
+                        len(origin_history) >= GAP_WINDOW_SIZE
+                        and rolling_mean > GAP_ROLLING_ALERT
+                    ):
                         log.warning(
                             f'"[PER-CLASS AGREEMENT CHECK] node {nid} observed '
-                            f'node {origin}: class agreement gap={gap:.3f} '
-                            f'(class0={a0:.3f}, class1={a1:.3f}) — possible '
-                            f'asymmetric/label_flip-style corruption, advisory only"'
+                            f'node {origin}: SUSTAINED class agreement gap, '
+                            f'rolling mean={rolling_mean:.3f} over '
+                            f'{len(origin_history)} rounds — possible '
+                            f'asymmetric/label_flip-style corruption"'
                         )
+                        class_gap_flag = True
             per_origin_prev_labels[origin] = my_labels_vector
 
             # Section 6: composite trust score, reusing the SAME
@@ -2050,6 +2076,13 @@ def handle_update(data: dict):
         except Exception as e:
             log.warning(f'"Prediction-agreement check failed: {e}"')
 
+    # Warm-up window shared by every behavioral gate below (prediction
+    # agreement, per-class agreement): early rounds are naturally noisy
+    # on this non-IID split, confirmed via live testing that an honest
+    # node's very first proposing round can fail these gates purely
+    # from normal early-training variance, not misbehavior.
+    PREDICTION_GATE_WARMUP_ROUNDS = 5
+
     decision, reason = evaluate_update_for_vote(
         zkp_ok=zkp_ok,
         expected_round=STATE["current_round"],
@@ -2060,19 +2093,12 @@ def handle_update(data: dict):
 
     # Gate on prediction agreement (tau=0.75 per design doc Section 8).
     # Only applies once we have a real prior vector to compare against —
-    # the very first round for this peer can't be gated yet. Also skip
-    # during early-training warm-up (same window as the accuracy gate,
-    # ACC_GATE_WARMUP_ROUNDS): early rounds are naturally noisy on this
-    # non-IID split, and this gate has no tolerance band the way the
-    # accuracy gate does — confirmed via live testing that an honest
-    # node's very first proposing round can fail this gate purely from
-    # normal early-training variance, not misbehavior.
+    # the very first round for this peer can't be gated yet.
     PREDICTION_AGREEMENT_TAU = 0.75
-    PREDICTION_GATE_WARMUP_ROUNDS = 5
     if rnd < PREDICTION_GATE_WARMUP_ROUNDS:
         pass  # skip the gate entirely during warm-up
     elif decision and agreement_score is not None and agreement_score < PREDICTION_AGREEMENT_TAU:
-        decision, reason = False, "prediction_disagreement"
+        decision, reason = False, RejectionReason.PREDICTION_DISAGREEMENT
         log.warning(
             f'"Update round={rnd} from node {origin} REJECTED on prediction '
             f'agreement: A={agreement_score:.3f} < tau={PREDICTION_AGREEMENT_TAU}"'
@@ -2082,6 +2108,21 @@ def handle_update(data: dict):
         # blended round) — origin here is specifically whose individual
         # update just failed behavioral agreement, observed independently
         # by this peer before any aggregation happens.
+        _record_suspicion(origin, log)
+
+    # Gate on per-class agreement gap — promoted from advisory-only to a
+    # real gate. Independent signal from the whole-vector prediction
+    # agreement above: two nodes can agree on average across all
+    # predictions while diverging sharply on ONE class, which is what
+    # label-flipping specifically produces. Same warm-up window as the
+    # prediction-agreement gate, since both rely on the same early-round
+    # noisy scratch-model predictions.
+    if rnd >= PREDICTION_GATE_WARMUP_ROUNDS and decision and class_gap_flag:
+        decision, reason = False, RejectionReason.PER_CLASS_AGREEMENT_GAP
+        log.warning(
+            f'"Update round={rnd} from node {origin} REJECTED on '
+            f'per-class agreement gap"'
+        )
         _record_suspicion(origin, log)
 
     my_vote = make_vote(
