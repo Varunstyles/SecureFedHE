@@ -2774,53 +2774,23 @@ def _finalize_round(data: dict):
                 print(f"[Node {STATE['node_id']}] Training complete!")
             return
 
-    # ── Fourth gate: backdoor trigger probe ──────────────────────
-    # Runs AFTER the accuracy gate passes — a model that already
-    # failed on accuracy is rejected regardless, no need to also
-    # probe it. This is the live counterpart to check_backdoor.py.
+    # ── Fourth gate: backdoor trigger probe — DISABLED ───────────
+    # Section 14.2 negative result: tested via probe_for_backdoor()
+    # against a synthetic OOD trigger sweep (8 features x 5 magnitudes
+    # x 2 signs, flip_rate>0.7 / jump>0.3 thresholds). Confirmed via
+    # paired live tests (backdoor-attack-enabled vs clean baseline,
+    # both full 20-round runs) that jump values overlap almost
+    # completely between honest and attacked rounds (clean: 0.545-
+    # 0.727, attacked: 0.509-0.618) — no threshold separates them.
+    # Kept in place as a documented negative result, same as Section 7's
+    # cosine-similarity check (see banner above) — not wired into the
+    # accept/reject path. See probe_for_backdoor() for the retained
+    # implementation and check_backdoor.py for the original forensic
+    # tool this was based on.
     backdoor_detected, probe_details = probe_for_backdoor(
         scratch_model, STATE["test_loader"], STATE["device"], log, rnd
     )
-    if backdoor_detected:
-        if STATE["node_id"] in STATE.get("excluded_nodes", set()):
-            log.warning(
-                f'"Round {rnd + 1} backdoor-probe retry aborted — this node '
-                f'has been excluded mid-round, not retrying further."'
-            )
-            return
-        attempts = STATE["round_retry_count"].get(rnd, 0)
-        if attempts < STATE["max_round_retries"]:
-            STATE["round_retry_count"][rnd] = attempts + 1
-            log.warning(
-                f'"Round {rnd + 1} REJECTED on backdoor probe '
-                f'(attempt {attempts + 1}/{STATE["max_round_retries"]}). Retrying round."'
-            )
-            time.sleep(0.5)
-            threading.Thread(target=execute_round, daemon=True).start()
-            return
-        else:
-            log.error(
-                f'"Round {rnd + 1} REJECTED on backdoor probe after '
-                f'{STATE["max_round_retries"]} retries. Skipping round, model NOT updated."'
-            )
-            STATE["round_retry_count"].pop(rnd, None)
-            _record_suspicion(origin, log, weight=2.0)  # strong signal — synthetic
-            # probe, not statistical noise, so weighted higher than a plain
-            # quorum-failure strike (1.0) but same tier as accuracy-gate (1.5+)
-            STATE["current_round"] += 1
-            _broadcast_skip(rnd, origin=origin, reason="backdoor_probe_failure")
-            if STATE["current_round"] < STATE["config"]["ring"]["rounds"]:
-                next_proposer = get_proposer_for_round(STATE["current_round"])
-                if next_proposer == STATE["node_id"]:
-                    time.sleep(0.5)
-                    threading.Thread(target=execute_round, daemon=True).start()
-                else:
-                    _notify_next_proposer(STATE["current_round"], next_proposer)
-                    threading.Thread(target=_proposal_watchdog, args=(STATE["current_round"], next_proposer), daemon=True).start()
-            else:
-                log.info(f'"Training complete after {STATE["current_round"]} rounds"')
-                print(f"[Node {STATE['node_id']}] Training complete!")
-            return
+    # NOTE: result intentionally not used to gate accept/reject.
 
     STATE["last_committed_accuracy"] = candidate_acc
     STATE["round_retry_count"].pop(rnd, None)
