@@ -816,8 +816,7 @@ def compute_trust_score(node_id: int, zkp_ok: bool, agreement_score,
         f'"Trust score for node {node_id}: S={s:.3f} '
         f'(Z={z:.2f} A={a:.2f} P={p:.2f} R={r:.2f}) advisory only"'
     )
-    return s
-
+    return s, p
 
 def _broadcast_accusation(accused_id: int) -> None:
     """Tell peers this node independently suspects accused_id, so they
@@ -2066,12 +2065,49 @@ def handle_update(data: dict):
             # Section 6: composite trust score, reusing the SAME
             # scratch model already built above for A_i^t — no extra
             # forward pass beyond what P_i^t needs on its own.
-            compute_trust_score(
+            _s, _p = compute_trust_score(
                 node_id=origin, zkp_ok=zkp_ok, agreement_score=agreement_score,
                 scratch_model=scratch, test_loader=STATE["test_loader"],
                 device=STATE["device"],
                 committed_acc=STATE.get("last_committed_accuracy"),
                 log=log,
+            )
+
+            # Rolling P per peer — same pattern as the per-class gap
+            # rolling window. NOTE: a clean 20-round baseline showed P
+            # ranging 0.43-0.74 (mean~0.53) with ZERO attack active,
+            # and a label_flip-attacked node's P sat at 0.43-0.55
+            # (mean~0.51) — i.e. the two distributions already overlap
+            # almost entirely even before averaging. This is being
+            # tried anyway per team decision, but expect it may show
+            # the same non-separation the per-class gap rolling
+            # average showed. Log-only for now — NOT gating — until
+            # proven to actually separate honest from attacked.
+            P_WINDOW_SIZE = 4
+            p_history = STATE.setdefault("per_origin_p_history", {})
+            origin_p_history = p_history.setdefault(origin, [])
+            origin_p_history.append(_p)
+            if len(origin_p_history) > P_WINDOW_SIZE:
+                origin_p_history.pop(0)
+            p_rolling_mean = sum(origin_p_history) / len(origin_p_history)
+            log.info(
+                f'"Rolling P for node {origin}: mean={p_rolling_mean:.3f} '
+                f'over last {len(origin_p_history)} round(s)"'
+            )
+
+            # Joint A+P signal — tried after rolling A (per-class gap)
+            # and rolling P independently both failed to separate
+            # attacker from honest. Quick correlation check on prior
+            # label_flip run data showed A and P are ~uncorrelated and
+            # near-identical in mean between attacker/honest already,
+            # so this is unlikely to manufacture separation that
+            # neither input has alone — logging only, not gating,
+            # to get a real answer without pre-deciding it.
+            a_for_joint = agreement_score if agreement_score is not None else 0.5
+            joint_signal = a_for_joint * p_rolling_mean
+            log.info(
+                f'"Joint A*P_rolling for node {origin}: {joint_signal:.3f} '
+                f'(A={a_for_joint:.3f}, P_rolling={p_rolling_mean:.3f})"'
             )
         except Exception as e:
             log.warning(f'"Prediction-agreement check failed: {e}"')
