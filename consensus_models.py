@@ -142,3 +142,4 @@ class RejectionReason:
     OK = "zkp_ok"
     PREDICTION_DISAGREEMENT = "prediction_disagreement"
     PER_CLASS_AGREEMENT_GAP = "per_class_agreement_gap"
+    STALE_UPDATE_REPLAY = "stale_update_replay"

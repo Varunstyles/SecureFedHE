@@ -1956,16 +1956,25 @@ def handle_update(data: dict):
     # replays the same underlying weights. Confirmed via self-check
     # (execute_round) already firing correctly on this exact signal.
     peer_slack = data.get("_slack")
+    is_stale_replay = False
     if peer_slack is not None:
         per_origin_last_slack = STATE.setdefault("_peer_last_slack", {})
         prev_slack = per_origin_last_slack.get(origin)
         if prev_slack is not None and prev_slack == peer_slack:
+            is_stale_replay = True
             log.warning(
                 f'"[STALE-UPDATE CHECK] node {nid} observed node {origin} '
                 f'resending identical slack ({peer_slack}) as last round — '
-                f'possible replayed/stale update, advisory only"'
+                f'REJECTING as replayed/stale update"'
             )
-        per_origin_last_slack[origin] = peer_slack
+        # Only advance the cache on non-stale rounds — if we advanced it
+        # to the replayed value here, a genuinely fresh update next round
+        # that happens to differ would look fine, but a THIRD consecutive
+        # replay would be missed (prev_slack would already equal peer_slack
+        # going in). Freezing prev_slack on a detected replay keeps every
+        # subsequent identical resend caught, not just the first.
+        if not is_stale_replay:
+            per_origin_last_slack[origin] = peer_slack
 
     # ── Prediction-based agreement (Section 8) — computed BEFORE
     # the vote decision, so it can actually gate accept/reject ──
@@ -2010,35 +2019,6 @@ def handle_update(data: dict):
                 prev_col7_map[origin] = col7.copy()
             except Exception as _e:
                 log.info(f'"fc_in col7 self-cosine check skipped: {_e}"')
-
-            # ── Backdoor candidate signal (log-only, NOT gating) ──
-            # fc_in.weight column 7 corresponds directly to the last
-            # input feature — the same slot the backdoor trigger stamps
-            # (see BACKDOOR_TRIGGER_VALUE / local_train). fc_in is
-            # plaintext + DP-noised (sigma is tiny here, ~0.016), sent
-            # in `plain` like every other non-fc2 layer — no new crypto
-            # exposure. A node teaching itself "input[7] huge -> force
-            # output" should show unusual weight magnitude on exactly
-            # this column vs. its own history / vs. peers. Unvalidated —
-            # log only, prove separation before ever gating on this.
-            fc_in_w = inc_plain.get("fc_in.weight")
-            if fc_in_w is not None and fc_in_w.shape[1] > 7:
-                trigger_col_norm = float(np.linalg.norm(fc_in_w[:, 7]))
-                log.info(
-                    f'"[BACKDOOR CANDIDATE] fc_in trigger-col(7) norm from '
-                    f'node {origin}: {trigger_col_norm:.4f}"'
-                )
-                col_history = STATE.setdefault("per_origin_trigger_col", {})
-                origin_col_hist = col_history.setdefault(origin, [])
-                origin_col_hist.append(trigger_col_norm)
-                if len(origin_col_hist) > 4:
-                    origin_col_hist.pop(0)
-                rolling_col_mean = sum(origin_col_hist) / len(origin_col_hist)
-                log.info(
-                    f'"[BACKDOOR CANDIDATE] rolling trigger-col norm for '
-                    f'node {origin}: mean={rolling_col_mean:.4f} over last '
-                    f'{len(origin_col_hist)} round(s)"'
-                )
 
             scratch = DiabetesNet(input_dim=STATE["model"].input_dim,
                                    num_classes=STATE["model"].num_classes).to(STATE["device"])
@@ -2167,6 +2147,12 @@ def handle_update(data: dict):
         log.warning(
             f'"Update round={rnd} from node {origin} REJECTED on prediction '
             f'agreement: A={agreement_score:.3f} < tau={PREDICTION_AGREEMENT_TAU}"'
+        )
+    elif decision and is_stale_replay:
+        decision, reason = False, RejectionReason.STALE_UPDATE_REPLAY
+        log.warning(
+            f'"Update round={rnd} from node {origin} REJECTED on stale-update '
+            f'replay: identical slack to previous round"'
         )
         # ── Node-level accountability: this is a REAL per-contributor
         # signal (unlike the accuracy gate, which judges the whole
