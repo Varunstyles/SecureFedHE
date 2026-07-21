@@ -1930,6 +1930,21 @@ def handle_update(data: dict):
     # bucket.
     proposal_key = (rnd, origin)
     proposal = STATE["pending_proposals"].get(proposal_key)
+    if proposal is None:
+        # Race: the ring-relay payload (this call, on its own daemon
+        # thread) can outrun the /consensus/propose broadcast for the
+        # SAME round, especially once several rounds are mid-retry
+        # simultaneously — confirmed live: dozens of "No stored
+        # proposal" fallback-hash votes in a row once quorum retries
+        # stacked up, each one a near-guaranteed mismatch/reject that
+        # just adds more retries on top. Give propose a short bounded
+        # window to land before conceding to the fallback path.
+        import time as _time
+        for _ in range(20):  # ~1s total, 50ms steps
+            _time.sleep(0.05)
+            proposal = STATE["pending_proposals"].get(proposal_key)
+            if proposal is not None:
+                break
     if proposal is not None:
         update_hash = proposal.update_hash
     else:
@@ -2666,9 +2681,36 @@ def _finalize_round(data: dict):
     model  = STATE["model"]
     rnd    = data["round"]
 
+    # ── Single-finalize guard ────────────────────────────────────
+    # handle_update() runs each incoming payload on its own daemon
+    # thread, and under retry storms several payloads for the SAME
+    # round can be in flight concurrently. Without a guard here,
+    # multiple threads can each pass the quorum check and independently
+    # re-finalize/re-commit/re-checkpoint the same round — confirmed
+    # live: "Round 13 complete" logged 5+ times with differing
+    # accuracies, and the training-complete counter climbing past the
+    # configured round count (21, 22, 23...). This is a pre-existing
+    # gap (no lock was ever taken here); it only became visible once
+    # the propose-race fix widened the window during which duplicate
+    # in-flight payloads for one round could overlap.
+    finalized = STATE.setdefault("_finalized_rounds", set())
+    with STATE["model_lock"]:
+        if rnd in finalized:
+            log.info(f'"_finalize_round({rnd}) skipped — already finalized by another thread."')
+            return
+
     # ── Quorum gate ──────────────────────────────────────────────
     origin = data["origin_id"]
     proposal = STATE["pending_proposals"].get((rnd, origin))
+    if proposal is None:
+        # Same propose/ring-relay race as handle_update — give the
+        # proposal a short bounded window to land before falling back.
+        import time as _time
+        for _ in range(20):  # ~1s total, 50ms steps
+            _time.sleep(0.05)
+            proposal = STATE["pending_proposals"].get((rnd, origin))
+            if proposal is not None:
+                break
     if proposal is not None:
         update_hash = proposal.update_hash
     else:
@@ -2888,6 +2930,7 @@ def _finalize_round(data: dict):
     STATE["round_retry_count"].pop(rnd, None)
     with STATE["model_lock"]:
         set_params(model, new_params)
+        STATE.setdefault("_finalized_rounds", set()).add(rnd)
 
     # ── Stage 2: master computes + votes on its own model hash ──
     hashable_params = {k: np.array(v, dtype=np.float32).tolist() for k, v in new_params.items()}
