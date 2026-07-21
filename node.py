@@ -862,6 +862,20 @@ def _apply_exclusion(node_id: int, log) -> None:
         f'Quorum requirement adjusted to {STATE["quorum_required"]} '
         f'of {remaining} remaining trusted nodes."'
     )
+    # Confirmed live: an excluded node's terminal goes quiet afterward
+    # (no more proposals/votes routed to it) since it's simply no longer
+    # part of the ring — from the outside this looks identical to a
+    # hang, which previously led to a node being closed manually while
+    # actually just idling correctly post-exclusion. Make that state
+    # unambiguous in this node's own log so it's never mistaken for a
+    # crash or stall again.
+    if node_id == STATE["node_id"]:
+        log.error(
+            '"*** THIS NODE HAS BEEN EXCLUDED from the consensus ring. '
+            'No further rounds will be routed to it. This is expected '
+            'behavior, not a crash or hang — it is now safe to close '
+            'this process. ***"'
+        )
 
 
 def _send_or_exclude(node: dict, url: str, payload: dict, log, label: str, timeout: int = 10) -> bool:
@@ -3035,7 +3049,7 @@ def main():
     # ── Data ────────────────────────────────────────────────────
     loaders, test_loader, NORM_MEAN, NORM_STD = load_diabetes_datasets(
         num_clients=len(nodes),
-        alpha=0.5,
+        alpha=0.1,
         seed=42
     )
     my_loader = loaders[nid]
