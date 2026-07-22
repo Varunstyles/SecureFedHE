@@ -24,6 +24,7 @@ Or use launch.py which handles all the above automatically.
 """
 
 import os
+import math
 os.environ["PYTHONIOENCODING"] = "utf-8"
 import sys
 sys.setrecursionlimit(1000000)
@@ -105,7 +106,10 @@ def prediction_agreement(probs_a: list, probs_b: list) -> float:
     agreement, 0.0 = maximal disagreement."""
     if not probs_a or not probs_b or len(probs_a) != len(probs_b):
         return 0.0
-    diffs = [abs(a - b) for a, b in zip(probs_a, probs_b)]
+    diffs = [abs(a - b) for a, b in zip(probs_a, probs_b)
+             if not (math.isnan(a) or math.isnan(b))]
+    if not diffs:
+        return 0.0
     return 1.0 - (sum(diffs) / len(diffs))
 
 
@@ -140,7 +144,8 @@ def per_class_agreement(probs_a: list, labels_a: list,
         return result
     for cls in (0, 1):
         idx = [i for i in range(len(labels_a))
-               if labels_a[i] == cls and labels_b[i] == cls]
+               if labels_a[i] == cls and labels_b[i] == cls
+               and not (math.isnan(probs_a[i]) or math.isnan(probs_b[i]))]
         if not idx:
             continue
         diffs = [abs(probs_a[i] - probs_b[i]) for i in idx]
@@ -517,6 +522,28 @@ def apply_attack_simulation(params: dict, nid: int, log) -> dict:
         log.warning(
             f'"[ATTACK SIMULATION] free_rider active on node {nid} — '
             f'discarded real update, sent noise around global weights instead"'
+        )
+
+    elif attack_type == "gradient_norm":
+        # Scales the trained DELTA (not absolute weights, same reasoning
+        # as sign_flip) by a large factor to simulate a gradient-norm/
+        # scaling attack — attacker amplifies its own update to dominate
+        # the aggregate. Tests whether ZKP norm-clipping (Section on
+        # ZKP norm violation) catches and clips this before it reaches
+        # aggregation, or whether it silently distorts the global model.
+        scale = attack_cfg.get("norm_scale", 20.0)
+        _pre_snapshot = STATE.get("_pre_training_snapshot", {})
+        new_params = {}
+        for k, v in params.items():
+            if k in _pre_snapshot and np.issubdtype(v.dtype, np.floating):
+                delta = v - _pre_snapshot[k]
+                new_params[k] = _pre_snapshot[k] + delta * scale
+            else:
+                new_params[k] = v
+        params = new_params
+        log.warning(
+            f'"[ATTACK SIMULATION] gradient_norm active on node {nid} — '
+            f'scaled trainable DELTA by {scale}x before DP/ZKP"'
         )
 
     elif attack_type == "stale_update":
@@ -1727,6 +1754,38 @@ def execute_round():
             return
     params = apply_attack_simulation(params, nid, log)
 
+    # Structural fc2 delta cap — applied to EVERY node, EVERY round,
+    # independent of trust score, suspicion, or any detection signal.
+    # fc2 is the one layer that stays homomorphically encrypted end to
+    # end, so no peer or gate can ever inspect its content (Section
+    # 8.6 CONFIRMED FINDING: targeted backdoor bypasses every existing
+    # defense because its signature lives entirely in this layer).
+    # Rather than trying to detect a backdoor here, this bounds how
+    # far fc2 is allowed to MOVE from this round's starting point in a
+    # single round, regardless of who sent it or how trusted they are
+    # — a structural damage limit, not a detector. Applied to the
+    # DELTA (trained - start), not the absolute weight, because a
+    # backdoor doesn't need a large absolute norm, it needs a
+    # directed shift that compounds round over round; capping only
+    # absolute magnitude (the existing clip below) does nothing to
+    # slow that compounding.
+    fc2_delta_cap = config["privacy"].get("fc2_delta_cap", 0.15)
+    if "fc2.weight" in _pre_snapshot:
+        fc2_delta = params["fc2.weight"] - _pre_snapshot["fc2.weight"]
+        fc2_delta_norm = np.linalg.norm(fc2_delta.flatten())
+        log.info(
+            f'"[FC2 DELTA NORM] node {nid} round={rnd} — '
+            f'fc2 delta norm this round: {fc2_delta_norm:.4f}"'
+        )
+        if fc2_delta_norm > fc2_delta_cap:
+            fc2_delta = fc2_delta * (fc2_delta_cap / fc2_delta_norm)
+            params["fc2.weight"] = _pre_snapshot["fc2.weight"] + fc2_delta
+            log.info(
+                f'"[FC2 DELTA CAP] node {nid} round={rnd} — fc2 delta '
+                f'norm {fc2_delta_norm:.4f} exceeded structural cap '
+                f'{fc2_delta_cap}, capped (damage-bound, not detection)"'
+            )
+
     # Clip fc2 weights to the ZKP norm bound BEFORE adding DP noise,
     # so noise is layered onto an already-bounded value instead of
     # relying entirely on the post-noise clip below to fix things up.
@@ -2288,6 +2347,27 @@ def handle_update(data: dict):
         )
 
     params = apply_attack_simulation(params, nid, log)
+
+    # Structural fc2 delta cap — see execute_round for full rationale.
+    # Fetched here (not after, as in execute_round) because this path
+    # needs the snapshot before the clip, not after.
+    _pre_snapshot_early = STATE.get("_pre_training_snapshot", {})
+    fc2_delta_cap = config["privacy"].get("fc2_delta_cap", 0.15)
+    if "fc2.weight" in _pre_snapshot_early:
+        fc2_delta = params["fc2.weight"] - _pre_snapshot_early["fc2.weight"]
+        fc2_delta_norm = np.linalg.norm(fc2_delta.flatten())
+        log.info(
+            f'"[FC2 DELTA NORM] node {nid} round={rnd} — '
+            f'fc2 delta norm this round: {fc2_delta_norm:.4f}"'
+        )
+        if fc2_delta_norm > fc2_delta_cap:
+            fc2_delta = fc2_delta * (fc2_delta_cap / fc2_delta_norm)
+            params["fc2.weight"] = _pre_snapshot_early["fc2.weight"] + fc2_delta
+            log.info(
+                f'"[FC2 DELTA CAP] node {nid} round={rnd} — fc2 delta '
+                f'norm {fc2_delta_norm:.4f} exceeded structural cap '
+                f'{fc2_delta_cap}, capped (damage-bound, not detection)"'
+            )
 
     # Clip fc2 weights to the ZKP norm bound BEFORE adding DP noise,
     # so noise is layered onto an already-bounded value instead of
