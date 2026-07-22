@@ -905,7 +905,7 @@ def _apply_exclusion(node_id: int, log) -> None:
         )
 
 
-def _send_or_exclude(node: dict, url: str, payload: dict, log, label: str, timeout: int = 10) -> bool:
+def _send_or_exclude(node: dict, url: str, payload: dict, log, label: str, timeout: int = 25) -> bool:
     """Shared helper for all broadcast/notify functions: sends one POST
     to one peer. Only marks that peer excluded (unreachable) after
     CONSECUTIVE_FAILURE_THRESHOLD separate calls to it have all failed —
@@ -1182,11 +1182,24 @@ def _broadcast_vote(vote: "ConsensusVote", prediction_vector: list = None,
         payload["_layer_vectors"] = layer_vectors  # unsigned, informational only (Section 7 fix)
 
     excluded = STATE.get("excluded_nodes", set())
+    send_threads = []
     for node in nodes:
         if node["id"] == nid or node["id"] in excluded:
             continue
         url = f"{scheme}://{node['ip']}:{node['port']}/consensus/vote"
-        _send_or_exclude(node, url, payload, log, "Sent consensus vote")
+        t = threading.Thread(
+            target=_send_or_exclude,
+            args=(node, url, payload, log, "Sent consensus vote"),
+            daemon=True,
+        )
+        t.start()
+        send_threads.append(t)
+    # Don't block execute_round waiting on slow peers — but do give fast
+    # sends a moment to actually leave before this function returns, so
+    # we're not silently dropping payloads on process exit. This bound
+    # is deliberately short; it does NOT wait for slow/stalled peers.
+    for t in send_threads:
+        t.join(timeout=0.1)
 
 def _wait_for_key_exchange(timeout_s: float = 30) -> bool:
     """Block until this node has a shared secret with every peer, or timeout."""
@@ -1787,7 +1800,7 @@ def execute_round():
     # directed shift that compounds round over round; capping only
     # absolute magnitude (the existing clip below) does nothing to
     # slow that compounding.
-    fc2_delta_cap = config["privacy"].get("fc2_delta_cap", 0.15)
+    fc2_delta_cap = config["privacy"].get("fc2_delta_cap", 0.5)
     if "fc2.weight" in _pre_snapshot:
         fc2_delta = params["fc2.weight"] - _pre_snapshot["fc2.weight"]
         fc2_delta_norm = np.linalg.norm(fc2_delta.flatten())
@@ -2370,7 +2383,7 @@ def handle_update(data: dict):
     # Fetched here (not after, as in execute_round) because this path
     # needs the snapshot before the clip, not after.
     _pre_snapshot_early = STATE.get("_pre_training_snapshot", {})
-    fc2_delta_cap = config["privacy"].get("fc2_delta_cap", 0.15)
+    fc2_delta_cap = config["privacy"].get("fc2_delta_cap", 0.5)
     if "fc2.weight" in _pre_snapshot_early:
         fc2_delta = params["fc2.weight"] - _pre_snapshot_early["fc2.weight"]
         fc2_delta_norm = np.linalg.norm(fc2_delta.flatten())
