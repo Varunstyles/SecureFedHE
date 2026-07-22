@@ -2486,10 +2486,14 @@ def _proposal_watchdog(rnd: int, expected_proposer: int):
     Cancels itself quietly if the round already moved on by the time
     the timeout fires (proposal arrived, or a peer's exclusion notice
     already advanced us)."""
-    if STATE.get("training_complete", False):
-        return
     log = STATE["logger"]
     timeout_s = STATE["config"]["ring"].get("timeout_s", 30)
+    log.info(f'"[WATCHDOG SPAWNED] round={rnd} expected_proposer={expected_proposer} '
+             f'timeout_s={timeout_s} spawned_at={time.strftime("%H:%M:%S")}"')
+    if STATE.get("training_complete", False):
+        log.info(f'"[WATCHDOG] round={rnd} expected_proposer={expected_proposer} '
+                  f'training already complete at spawn — not sleeping."')
+        return
     time.sleep(timeout_s)
 
     # If the round already advanced, or the proposal did arrive, stand down.
@@ -2503,10 +2507,13 @@ def _proposal_watchdog(rnd: int, expected_proposer: int):
         return
     if expected_proposer in STATE.get("excluded_nodes", set()):
         return
+    if STATE["node_id"] in STATE.get("excluded_nodes", set()):
+        log.info(f'"[WATCHDOG] round={rnd} — this node itself is excluded, standing down."')
+        return
 
     log.warning(
-        f'"No proposal received from node {expected_proposer} for round {rnd} '
-        f'after {timeout_s}s — treating as unreachable/stalled."'
+        f'"[WATCHDOG FIRING] No proposal received from node {expected_proposer} for round {rnd} '
+        f'after {timeout_s}s — treating as unreachable/stalled. fired_at={time.strftime("%H:%M:%S")}"'
     )
     _apply_exclusion(expected_proposer, log)
     _broadcast_exclusion(expected_proposer)
