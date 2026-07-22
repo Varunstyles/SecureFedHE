@@ -1807,7 +1807,7 @@ def execute_round():
     # is structurally pinned near 1.0 regardless of what a node does
     # to its own local delta (this was the actual bug behind sign_flip
     # and free_rider both showing cos=1.000 under attack).
-    _pre_snapshot = STATE.get("_pre_training_snapshot", {})
+    # (_pre_snapshot already fetched above for the fc2 delta cap.)
     _delta = {
         k: (v - _pre_snapshot[k] if k in _pre_snapshot else v)
         for k, v in noised.items()
