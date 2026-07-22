@@ -1754,6 +1754,8 @@ def execute_round():
             return
     params = apply_attack_simulation(params, nid, log)
 
+    _pre_snapshot = STATE.get("_pre_training_snapshot", {})
+
     # Structural fc2 delta cap — applied to EVERY node, EVERY round,
     # independent of trust score, suspicion, or any detection signal.
     # fc2 is the one layer that stays homomorphically encrypted end to
