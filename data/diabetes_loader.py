@@ -407,12 +407,39 @@ def _partition_noniid_dirichlet(
     num_classes = len(np.unique(labels))
     client_indices: List[List[int]] = [[] for _ in range(num_clients)]
 
+    # Minimum samples each client must receive PER CLASS. At low alpha
+    # (e.g. 0.1), rng.dirichlet can legitimately assign a near-zero share
+    # to some client, and int-truncation then rounds that to exactly 0 —
+    # confirmed live: alpha=0.1 crashed DataLoader with num_samples=0 for
+    # an empty client. This floor guarantees every client can always build
+    # a non-empty, non-degenerate loader, regardless of how extreme alpha
+    # gets, while leaving the skew intact for every sample above the floor.
+    MIN_SAMPLES_PER_CLIENT_PER_CLASS = 1
+
     for cls in range(num_classes):
         cls_idx = np.where(labels == cls)[0]
         rng.shuffle(cls_idx)
+        n_cls = len(cls_idx)
+
+        if n_cls < num_clients * MIN_SAMPLES_PER_CLIENT_PER_CLASS:
+            for i, idx in enumerate(cls_idx):
+                client_indices[i % num_clients].append(int(idx))
+            continue
+
         proportions = rng.dirichlet(np.repeat(alpha, num_clients))
-        proportions = (proportions * len(cls_idx)).astype(int)
-        proportions[-1] = len(cls_idx) - proportions[:-1].sum()
+        proportions = (proportions * n_cls).astype(int)
+        proportions = np.maximum(proportions, MIN_SAMPLES_PER_CLIENT_PER_CLASS)
+        overflow = proportions.sum() - n_cls
+        if overflow > 0:
+            order = np.argsort(-proportions)
+            for i in order:
+                if overflow <= 0:
+                    break
+                room = proportions[i] - MIN_SAMPLES_PER_CLIENT_PER_CLASS
+                take = min(room, overflow)
+                proportions[i] -= take
+                overflow -= take
+        proportions[-1] = n_cls - proportions[:-1].sum()
         splits = np.split(cls_idx, np.cumsum(proportions[:-1]))
         for i, split in enumerate(splits):
             client_indices[i].extend(split.tolist())

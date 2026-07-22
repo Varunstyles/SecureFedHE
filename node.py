@@ -2165,11 +2165,24 @@ def handle_update(data: dict):
         received_hash=update_hash,
     )
 
+    # ── Ablation toggles ─────────────────────────────────────────
+    # Each defense layer can be independently disabled via config for
+    # controlled result-table comparisons (baseline vs +quorum vs
+    # +agreement vs +stale-check vs full system). Defaults to True
+    # (all gates active) if not present in config, so existing configs
+    # behave exactly as before.
+    _ablation_cfg = STATE["config"].get("ablation", {})
+    GATE_PREDICTION_AGREEMENT_ENABLED = _ablation_cfg.get("prediction_agreement_gate", True)
+    GATE_STALE_UPDATE_ENABLED = _ablation_cfg.get("stale_update_gate", True)
+    GATE_PER_CLASS_GAP_ENABLED = _ablation_cfg.get("per_class_gap_gate", True)
+
     # Gate on prediction agreement (tau=0.75 per design doc Section 8).
     # Only applies once we have a real prior vector to compare against —
     # the very first round for this peer can't be gated yet.
     PREDICTION_AGREEMENT_TAU = 0.75
-    if rnd < PREDICTION_GATE_WARMUP_ROUNDS:
+    if not GATE_PREDICTION_AGREEMENT_ENABLED:
+        pass  # ablation: gate disabled entirely
+    elif rnd < PREDICTION_GATE_WARMUP_ROUNDS:
         pass  # skip the gate entirely during warm-up
     elif decision and agreement_score is not None and agreement_score < PREDICTION_AGREEMENT_TAU:
         decision, reason = False, RejectionReason.PREDICTION_DISAGREEMENT
@@ -2177,7 +2190,7 @@ def handle_update(data: dict):
             f'"Update round={rnd} from node {origin} REJECTED on prediction '
             f'agreement: A={agreement_score:.3f} < tau={PREDICTION_AGREEMENT_TAU}"'
         )
-    elif decision and is_stale_replay:
+    if GATE_STALE_UPDATE_ENABLED and decision and is_stale_replay:
         decision, reason = False, RejectionReason.STALE_UPDATE_REPLAY
         log.warning(
             f'"Update round={rnd} from node {origin} REJECTED on stale-update '
@@ -2197,7 +2210,7 @@ def handle_update(data: dict):
     # label-flipping specifically produces. Same warm-up window as the
     # prediction-agreement gate, since both rely on the same early-round
     # noisy scratch-model predictions.
-    if rnd >= PREDICTION_GATE_WARMUP_ROUNDS and decision and class_gap_flag:
+    if GATE_PER_CLASS_GAP_ENABLED and rnd >= PREDICTION_GATE_WARMUP_ROUNDS and decision and class_gap_flag:
         decision, reason = False, RejectionReason.PER_CLASS_AGREEMENT_GAP
         log.warning(
             f'"Update round={rnd} from node {origin} REJECTED on '
@@ -3049,7 +3062,7 @@ def main():
     # ── Data ────────────────────────────────────────────────────
     loaders, test_loader, NORM_MEAN, NORM_STD = load_diabetes_datasets(
         num_clients=len(nodes),
-        alpha=0.1,
+        alpha=0.5,
         seed=42
     )
     my_loader = loaders[nid]
