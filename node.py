@@ -930,22 +930,38 @@ def _send_or_exclude(node: dict, url: str, payload: dict, log, label: str, timeo
         lambda: sess.post(url, json=payload, timeout=timeout),
         timeout_s=timeout + 10,
     )
+    FAILURE_WINDOW_S = 30  # failures must be spread over at least this
+    # long to count as sustained unreachability; a burst of 3 failures
+    # inside a few seconds is congestion (confirmed live: attack-sim
+    # load on one node caused every peer's outbound sends to fail in
+    # the same short window, wrongly excluding honest, live nodes —
+    # see report §9.3.1/roadmap), not evidence the peer is actually
+    # down. Real unreachability persists across a real time span, not
+    # just three unlucky calls milliseconds apart.
     if ok:
         STATE.setdefault("_peer_failure_streak", {})[node["id"]] = 0
+        STATE.setdefault("_peer_failure_first_ts", {}).pop(node["id"], None)
         log.info(f'"{label} to node {node["id"]}"')
         return True
     else:
         streak_map = STATE.setdefault("_peer_failure_streak", {})
+        first_ts_map = STATE.setdefault("_peer_failure_first_ts", {})
+        now = time.time()
+        if node["id"] not in first_ts_map:
+            first_ts_map[node["id"]] = now
         streak = streak_map.get(node["id"], 0) + 1
         streak_map[node["id"]] = streak
+        elapsed = now - first_ts_map[node["id"]]
         log.warning(
             f'"{label} to node {node["id"]} FAILED (hard timeout or exception) '
-            f'— consecutive failure streak {streak}/{CONSECUTIVE_FAILURE_THRESHOLD}"'
+            f'— consecutive failure streak {streak}/{CONSECUTIVE_FAILURE_THRESHOLD} '
+            f'over {elapsed:.1f}s"'
         )
         if STATE.get("training_complete", False):
             log.info(f'"{label} to node {node["id"]} failed post-completion — ignoring, not excluding."')
             return False
         if (streak >= CONSECUTIVE_FAILURE_THRESHOLD
+                and elapsed >= FAILURE_WINDOW_S
                 and node["id"] not in STATE.get("excluded_nodes", set())):
             _apply_exclusion(node["id"], log)
             _broadcast_exclusion(node["id"])
