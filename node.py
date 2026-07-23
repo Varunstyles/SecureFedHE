@@ -1902,7 +1902,9 @@ def execute_round():
         pass
     _t = threading.Thread(target=_run_prove)
     _t.start()
+    _zkp_start = time.time()
     _t.join()
+    log.info(f'"[TIMING] node {nid} round={rnd} ZKP proof generation took {time.time() - _zkp_start:.2f}s"')
     if "proof" not in _prove_result:
         raise RuntimeError("ZKP proof generation failed (recursion crash) — cannot proceed this round")
 
@@ -1911,11 +1913,13 @@ def execute_round():
     commitment = {"proof": proof.to_json()}
 
     # HE encrypt fc2
+    _he_start = time.time()
     he   = STATE["he"]
     enc  = {
         "fc2.weight": he.encrypt(noised["fc2.weight"].flatten()),
         "fc2.bias":   he.encrypt(noised["fc2.bias"])
     }
+    log.info(f'"[TIMING] node {nid} round={rnd} HE encryption took {time.time() - _he_start:.2f}s"')
 
     # Cap each node's aggregation weight per design doc Section 9, so
     # no single hospital's data volume can dominate the aggregate. The
@@ -2461,7 +2465,9 @@ def handle_update(data: dict):
         pass
     _t2 = threading.Thread(target=_run_prove2)
     _t2.start()
+    _zkp2_start = time.time()
     _t2.join()
+    log.info(f'"[TIMING] node {nid} round={rnd} ZKP proof generation (voter) took {time.time() - _zkp2_start:.2f}s"')
     if "proof" not in _prove_result2:
         raise RuntimeError("ZKP proof generation failed (recursion crash) — cannot proceed this round")
     proof = _prove_result2["proof"]
@@ -2477,10 +2483,12 @@ def handle_update(data: dict):
     total_w    = inc_w + n_samples
 
     # Weighted average in encrypted space
+    _he2_start = time.time()
     my_enc = {
         "fc2.weight": he.encrypt(noised["fc2.weight"].flatten()),
         "fc2.bias":   he.encrypt(noised["fc2.bias"])
     }
+    log.info(f'"[TIMING] node {nid} round={rnd} HE encryption (voter) took {time.time() - _he2_start:.2f}s"')
     agg_enc = {}
     for k in inc_enc:
         scaled_inc = he.scale(inc_enc[k], inc_w / total_w)
