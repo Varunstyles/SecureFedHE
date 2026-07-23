@@ -905,6 +905,8 @@ def _apply_exclusion(node_id: int, log) -> None:
         )
 
 
+_send_or_exclude_lock = threading.Lock()
+
 def _send_or_exclude(node: dict, url: str, payload: dict, log, label: str, timeout: int = 25) -> bool:
     """Shared helper for all broadcast/notify functions: sends one POST
     to one peer. Only marks that peer excluded (unreachable) after
@@ -939,19 +941,21 @@ def _send_or_exclude(node: dict, url: str, payload: dict, log, label: str, timeo
     # down. Real unreachability persists across a real time span, not
     # just three unlucky calls milliseconds apart.
     if ok:
-        STATE.setdefault("_peer_failure_streak", {})[node["id"]] = 0
-        STATE.setdefault("_peer_failure_first_ts", {}).pop(node["id"], None)
+        with _send_or_exclude_lock:
+            STATE.setdefault("_peer_failure_streak", {})[node["id"]] = 0
+            STATE.setdefault("_peer_failure_first_ts", {}).pop(node["id"], None)
         log.info(f'"{label} to node {node["id"]}"')
         return True
     else:
-        streak_map = STATE.setdefault("_peer_failure_streak", {})
-        first_ts_map = STATE.setdefault("_peer_failure_first_ts", {})
-        now = time.time()
-        if node["id"] not in first_ts_map:
-            first_ts_map[node["id"]] = now
-        streak = streak_map.get(node["id"], 0) + 1
-        streak_map[node["id"]] = streak
-        elapsed = now - first_ts_map[node["id"]]
+        with _send_or_exclude_lock:
+            streak_map = STATE.setdefault("_peer_failure_streak", {})
+            first_ts_map = STATE.setdefault("_peer_failure_first_ts", {})
+            now = time.time()
+            if node["id"] not in first_ts_map:
+                first_ts_map[node["id"]] = now
+            streak = streak_map.get(node["id"], 0) + 1
+            streak_map[node["id"]] = streak
+            elapsed = now - first_ts_map[node["id"]]
         log.warning(
             f'"{label} to node {node["id"]} FAILED (hard timeout or exception) '
             f'— consecutive failure streak {streak}/{CONSECUTIVE_FAILURE_THRESHOLD} '
