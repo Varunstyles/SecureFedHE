@@ -1081,20 +1081,21 @@ def _broadcast_proposal(proposal: "UpdateProposal"):
     STATE["pending_proposals"][(proposal.round_id, proposal.origin_node_id)] = proposal
 
     excluded = STATE.get("excluded_nodes", set())
-    for node in nodes:
-        if node["id"] == nid or node["id"] in excluded:
-            continue
+
+    def _send_one_proposal(node):
         url = f"{scheme}://{node['ip']}:{node['port']}/consensus/propose"
         ok = _post_with_retry(
             sess, url, proposal.to_dict(),
             log, "Sent proposal", node["id"],
         )
-        if ok:
-            STATE.setdefault("_peer_failure_streak", {})[node["id"]] = 0
-        else:
-            streak_map = STATE.setdefault("_peer_failure_streak", {})
-            streak = streak_map.get(node["id"], 0) + 1
-            streak_map[node["id"]] = streak
+        with _send_or_exclude_lock:
+            if ok:
+                STATE.setdefault("_peer_failure_streak", {})[node["id"]] = 0
+            else:
+                streak_map = STATE.setdefault("_peer_failure_streak", {})
+                streak = streak_map.get(node["id"], 0) + 1
+                streak_map[node["id"]] = streak
+        if not ok:
             log.warning(
                 f'"Proposal broadcast to node {node["id"]} failed after '
                 f'internal retries — consecutive failure streak {streak}/3"'
@@ -1102,6 +1103,16 @@ def _broadcast_proposal(proposal: "UpdateProposal"):
             if streak >= 3 and node["id"] not in STATE.get("excluded_nodes", set()):
                 _apply_exclusion(node["id"], log)
                 _broadcast_exclusion(node["id"])
+
+    threads = []
+    for node in nodes:
+        if node["id"] == nid or node["id"] in excluded:
+            continue
+        th = threading.Thread(target=_send_one_proposal, args=(node,), daemon=True)
+        th.start()
+        threads.append(th)
+    for th in threads:
+        th.join()
 
 
 def _broadcast_conflicting_proposal(rnd: int, nid: int, real_hash: str, proof):
@@ -1123,12 +1134,7 @@ def _broadcast_conflicting_proposal(rnd: int, nid: int, real_hash: str, proof):
     )
     STATE["pending_proposals"][(rnd, nid)] = real_proposal
 
-    for node in nodes:
-        if node["id"] == nid or node["id"] in excluded:
-            continue
-        # Fake hash unique per recipient, so no two peers see the same
-        # value — deterministic per (round, recipient) so it's still
-        # reproducible for debugging, but never matches the real hash.
+    def _send_one_conflicting(node):
         fake_hash = compute_update_hash(
             {"conflicting_for_peer": node["id"]},
             {"round": rnd, "origin": nid},
@@ -1142,12 +1148,14 @@ def _broadcast_conflicting_proposal(rnd: int, nid: int, real_hash: str, proof):
             sess, url, fake_proposal.to_dict(),
             log, "Sent conflicting proposal", node["id"],
         )
-        if ok:
-            STATE.setdefault("_peer_failure_streak", {})[node["id"]] = 0
-        else:
-            streak_map = STATE.setdefault("_peer_failure_streak", {})
-            streak = streak_map.get(node["id"], 0) + 1
-            streak_map[node["id"]] = streak
+        with _send_or_exclude_lock:
+            if ok:
+                STATE.setdefault("_peer_failure_streak", {})[node["id"]] = 0
+            else:
+                streak_map = STATE.setdefault("_peer_failure_streak", {})
+                streak = streak_map.get(node["id"], 0) + 1
+                streak_map[node["id"]] = streak
+        if not ok:
             log.warning(
                 f'"Conflicting-proposal broadcast to node {node["id"]} failed after '
                 f'internal retries — consecutive failure streak {streak}/3"'
@@ -1155,6 +1163,16 @@ def _broadcast_conflicting_proposal(rnd: int, nid: int, real_hash: str, proof):
             if streak >= 3 and node["id"] not in STATE.get("excluded_nodes", set()):
                 _apply_exclusion(node["id"], log)
                 _broadcast_exclusion(node["id"])
+
+    threads = []
+    for node in nodes:
+        if node["id"] == nid or node["id"] in excluded:
+            continue
+        th = threading.Thread(target=_send_one_conflicting, args=(node,), daemon=True)
+        th.start()
+        threads.append(th)
+    for th in threads:
+        th.join()
 
 
 def _broadcast_vote(vote: "ConsensusVote", prediction_vector: list = None,
@@ -2728,11 +2746,20 @@ def _broadcast_weights(params: dict, model_hash: str = None):
                "round":  STATE["current_round"],
                "model_hash": model_hash}
     excluded = STATE.get("excluded_nodes", set())
+    threads = []
     for node in nodes:
         if node["id"] == nid or node["id"] in excluded:
             continue
         url = f"{scheme}://{node['ip']}:{node['port']}/sync_weights"
-        _send_or_exclude(node, url, payload, log, "Broadcast weights")
+        th = threading.Thread(
+            target=_send_or_exclude,
+            args=(node, url, payload, log, "Broadcast weights"),
+            daemon=True,
+        )
+        th.start()
+        threads.append(th)
+    for th in threads:
+        th.join()
 
 # ============================================================
 # BACKDOOR TRIGGER PROBE — live defense, runs every round
