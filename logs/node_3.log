@@ -2751,3 +2751,7 @@
 {"time":"2026-07-24 14:43:06,447","level":"INFO","node":3,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
 {"time":"2026-07-24 14:43:06,448","level":"INFO","node":3,"msg":"Round 20 complete | accuracy=0.8727 | duration=54.69s"}
 {"time":"2026-07-24 14:43:06,448","level":"INFO","node":3,"msg":"Training complete after 20 rounds"}
+{"time":"2026-07-26 03:17:23,268","level":"INFO","node":3,"msg":"Starting node 3: Community Wellness Center"}
+{"time":"2026-07-26 03:17:23,268","level":"INFO","node":3,"msg":"[CONFIG DEBUG] attack_simulation loaded: enabled=True target_node=2 type=stale_update config_path=config_dev.json"}
+{"time":"2026-07-26 03:17:23,648","level":"WARNING","node":3,"msg":"DEV MODE: running without TLS"}
+{"time":"2026-07-26 03:17:23,648","level":"INFO","node":3,"msg":"Listening on 127.0.0.1:8003 | TLS=False"}

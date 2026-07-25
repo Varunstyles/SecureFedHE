@@ -2943,3 +2943,7 @@
 {"time":"2026-07-24 14:43:06,410","level":"INFO","node":2,"msg":"Training complete after 20 rounds"}
 {"time":"2026-07-24 14:43:06,410","level":"INFO","node":2,"msg":"Sent commit vote to node 3"}
 {"time":"2026-07-24 14:52:11,777","level":"INFO","node":2,"msg":"Watchdog fired but training already complete — ignoring, not excluding node 3."}
+{"time":"2026-07-26 03:17:23,268","level":"INFO","node":2,"msg":"Starting node 2: Rural Health Centre"}
+{"time":"2026-07-26 03:17:23,268","level":"INFO","node":2,"msg":"[CONFIG DEBUG] attack_simulation loaded: enabled=True target_node=2 type=stale_update config_path=config_dev.json"}
+{"time":"2026-07-26 03:17:23,623","level":"WARNING","node":2,"msg":"DEV MODE: running without TLS"}
+{"time":"2026-07-26 03:17:23,623","level":"INFO","node":2,"msg":"Listening on 127.0.0.1:8002 | TLS=False"}

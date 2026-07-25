@@ -4028,3 +4028,7 @@
 {"time":"2026-07-24 14:43:06,410","level":"INFO","node":0,"msg":"Training complete after 20 rounds"}
 {"time":"2026-07-24 14:43:06,427","level":"INFO","node":0,"msg":"Sent commit vote to node 3"}
 {"time":"2026-07-24 14:47:05,028","level":"INFO","node":0,"msg":"Watchdog fired but training already complete — ignoring, not excluding node 1."}
+{"time":"2026-07-26 03:17:23,268","level":"INFO","node":0,"msg":"Starting node 0: City General Hospital"}
+{"time":"2026-07-26 03:17:23,268","level":"INFO","node":0,"msg":"[CONFIG DEBUG] attack_simulation loaded: enabled=True target_node=2 type=stale_update config_path=config_dev.json"}
+{"time":"2026-07-26 03:17:23,623","level":"WARNING","node":0,"msg":"DEV MODE: running without TLS"}
+{"time":"2026-07-26 03:17:23,623","level":"INFO","node":0,"msg":"Listening on 127.0.0.1:8000 | TLS=False"}
