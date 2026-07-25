@@ -312,7 +312,7 @@ main {
 /* ─── CHART WRAPPERS ─────────────────────────────────────────────────────────── */
 .chart-wrap {
   position: relative;
-  height: 260px;
+  height: 420px;
 }
 
 .chart-wrap--dist {

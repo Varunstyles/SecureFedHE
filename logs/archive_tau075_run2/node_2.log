@@ -1,0 +1,434 @@
+{"time":"2026-07-21 16:33:16,033","level":"INFO","node":2,"msg":"Starting node 2: Rural Health Centre"}
+{"time":"2026-07-21 16:33:16,034","level":"INFO","node":2,"msg":"[CONFIG DEBUG] attack_simulation loaded: enabled=False target_node=2 type=free_rider config_path=config_dev.json"}
+{"time":"2026-07-21 16:33:16,068","level":"WARNING","node":2,"msg":"DEV MODE: running without TLS"}
+{"time":"2026-07-21 16:33:16,068","level":"INFO","node":2,"msg":"Listening on 127.0.0.1:8002 | TLS=False"}
+{"time":"2026-07-21 16:33:19,548","level":"INFO","node":2,"msg":"Key exchange complete with node 1"}
+{"time":"2026-07-21 16:33:19,565","level":"INFO","node":2,"msg":"Consensus pubkey received from node 1"}
+{"time":"2026-07-21 16:33:21,102","level":"INFO","node":2,"msg":"Sent consensus pubkey to node 0"}
+{"time":"2026-07-21 16:33:21,112","level":"INFO","node":2,"msg":"Sent public key to node 0"}
+{"time":"2026-07-21 16:33:21,127","level":"INFO","node":2,"msg":"Sent consensus pubkey to node 1"}
+{"time":"2026-07-21 16:33:21,138","level":"INFO","node":2,"msg":"Sent public key to node 1"}
+{"time":"2026-07-21 16:33:21,157","level":"INFO","node":2,"msg":"Sent consensus pubkey to node 3"}
+{"time":"2026-07-21 16:33:21,157","level":"INFO","node":2,"msg":"Sent public key to node 3"}
+{"time":"2026-07-21 16:33:23,274","level":"INFO","node":2,"msg":"Consensus pubkey received from node 3"}
+{"time":"2026-07-21 16:33:23,280","level":"INFO","node":2,"msg":"Key exchange complete with node 3"}
+{"time":"2026-07-21 16:33:30,924","level":"INFO","node":2,"msg":"Key exchange complete with node 0"}
+{"time":"2026-07-21 16:33:30,955","level":"INFO","node":2,"msg":"Consensus pubkey received from node 0"}
+{"time":"2026-07-21 16:33:37,963","level":"INFO","node":2,"msg":"Proposal received: round=0 origin=0 hash=d582aa5baad3..."}
+{"time":"2026-07-21 16:33:38,005","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=0 new=True satisfied=False"}
+{"time":"2026-07-21 16:33:47,604","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=0 new=True satisfied=False"}
+{"time":"2026-07-21 16:33:54,689","level":"INFO","node":2,"msg":"Received update from node 1, round 0"}
+{"time":"2026-07-21 16:34:04,181","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:34:04,181","level":"INFO","node":2,"msg":"Trust score for node 0: S=0.429 (Z=1.00 A=0.50 P=0.50 R=1.00) advisory only"}
+{"time":"2026-07-21 16:34:04,196","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:34:04,200","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:34:04,204","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:34:11,337","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:34:20,853","level":"INFO","node":2,"msg":"Prediction agreement with node 3 round=0: A=0.537"}
+{"time":"2026-07-21 16:34:20,853","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=0 new=True satisfied=True"}
+{"time":"2026-07-21 16:34:27,926","level":"INFO","node":2,"msg":"Synced weights from master for round 0"}
+{"time":"2026-07-21 16:34:27,936","level":"INFO","node":2,"msg":"Sent commit vote to node 0"}
+{"time":"2026-07-21 16:34:34,202","level":"INFO","node":2,"msg":"Proposal received: round=1 origin=1 hash=4911af570bf0..."}
+{"time":"2026-07-21 16:34:34,244","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=1 new=True satisfied=False"}
+{"time":"2026-07-21 16:34:34,253","level":"INFO","node":2,"msg":"Received update from node 1, round 1"}
+{"time":"2026-07-21 16:34:43,865","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:34:43,866","level":"INFO","node":2,"msg":"Trust score for node 1: S=0.429 (Z=1.00 A=0.50 P=0.50 R=1.00) advisory only"}
+{"time":"2026-07-21 16:34:43,880","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:34:43,906","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:34:43,933","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:34:49,803","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:34:59,446","level":"INFO","node":2,"msg":"Prediction agreement with node 3 round=1: A=0.974"}
+{"time":"2026-07-21 16:34:59,446","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=1 new=True satisfied=True"}
+{"time":"2026-07-21 16:35:15,135","level":"INFO","node":2,"msg":"Prediction agreement with node 0 round=1: A=0.966"}
+{"time":"2026-07-21 16:35:15,135","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=1 new=True satisfied=True"}
+{"time":"2026-07-21 16:35:21,116","level":"INFO","node":2,"msg":"Synced weights from master for round 1"}
+{"time":"2026-07-21 16:35:21,134","level":"INFO","node":2,"msg":"Sent commit vote to node 1"}
+{"time":"2026-07-21 16:35:21,185","level":"INFO","node":2,"msg":"My turn — starting round 3 as proposer."}
+{"time":"2026-07-21 16:35:21,185","level":"INFO","node":2,"msg":"Starting round 3"}
+{"time":"2026-07-21 16:35:27,360","level":"INFO","node":2,"msg":"Sent proposal to node 0"}
+{"time":"2026-07-21 16:35:27,360","level":"INFO","node":2,"msg":"Sent proposal to node 1"}
+{"time":"2026-07-21 16:35:27,360","level":"INFO","node":2,"msg":"Sent proposal to node 3"}
+{"time":"2026-07-21 16:35:27,381","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:35:27,384","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:35:27,389","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:35:27,396","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:35:37,104","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=2 new=True satisfied=False"}
+{"time":"2026-07-21 16:35:52,775","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=2 new=True satisfied=True"}
+{"time":"2026-07-21 16:36:08,434","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=2 new=True satisfied=True"}
+{"time":"2026-07-21 16:36:14,505","level":"INFO","node":2,"msg":"Received update from node 1, round 2"}
+{"time":"2026-07-21 16:36:14,505","level":"INFO","node":2,"msg":"Round 3 complete — aggregating"}
+{"time":"2026-07-21 16:36:14,509","level":"INFO","node":2,"msg":"Round 3 accuracy gate skipped (warm-up period, candidate_acc=0.7091)"}
+{"time":"2026-07-21 16:36:14,548","level":"INFO","node":2,"msg":"Commit vote recorded: node 0 decision=True round=2 satisfied=False"}
+{"time":"2026-07-21 16:36:14,551","level":"INFO","node":2,"msg":"Broadcast weights to node 0"}
+{"time":"2026-07-21 16:36:14,580","level":"INFO","node":2,"msg":"Commit vote recorded: node 1 decision=True round=2 satisfied=True"}
+{"time":"2026-07-21 16:36:14,581","level":"INFO","node":2,"msg":"Round 3 COMMITTED — model hash agreed by [2, 0, 1]"}
+{"time":"2026-07-21 16:36:14,582","level":"INFO","node":2,"msg":"Commit certificate saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\certificates\round_2.json"}
+{"time":"2026-07-21 16:36:14,586","level":"INFO","node":2,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-21 16:36:14,620","level":"INFO","node":2,"msg":"Commit vote recorded: node 3 decision=True round=2 satisfied=True"}
+{"time":"2026-07-21 16:36:14,622","level":"INFO","node":2,"msg":"Broadcast weights to node 3"}
+{"time":"2026-07-21 16:36:14,629","level":"INFO","node":2,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-21 16:36:14,629","level":"INFO","node":2,"msg":"Round 3 complete | accuracy=0.7091 | duration=53.44s"}
+{"time":"2026-07-21 16:36:14,629","level":"INFO","node":2,"msg":"Round 4 belongs to node 3 — waiting for their proposal."}
+{"time":"2026-07-21 16:36:14,634","level":"INFO","node":2,"msg":"Notified next proposer to node 3"}
+{"time":"2026-07-21 16:36:20,881","level":"INFO","node":2,"msg":"Proposal received: round=3 origin=3 hash=0e03636c5048..."}
+{"time":"2026-07-21 16:36:20,896","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=3 new=True satisfied=False"}
+{"time":"2026-07-21 16:36:30,578","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=3 new=True satisfied=False"}
+{"time":"2026-07-21 16:36:46,388","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=3 new=True satisfied=True"}
+{"time":"2026-07-21 16:36:52,501","level":"INFO","node":2,"msg":"Received update from node 1, round 3"}
+{"time":"2026-07-21 16:37:02,057","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:37:02,067","level":"INFO","node":2,"msg":"Trust score for node 3: S=0.434 (Z=1.00 A=0.50 P=0.54 R=1.00) advisory only"}
+{"time":"2026-07-21 16:37:02,081","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:37:02,101","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:37:02,121","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:37:08,219","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:37:08,293","level":"INFO","node":2,"msg":"Synced weights from master for round 3"}
+{"time":"2026-07-21 16:37:08,299","level":"INFO","node":2,"msg":"Sent commit vote to node 3"}
+{"time":"2026-07-21 16:37:14,442","level":"INFO","node":2,"msg":"Proposal received: round=4 origin=0 hash=28aef204c6cf..."}
+{"time":"2026-07-21 16:37:14,468","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=4 new=True satisfied=False"}
+{"time":"2026-07-21 16:37:24,197","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=4 new=True satisfied=False"}
+{"time":"2026-07-21 16:37:30,349","level":"INFO","node":2,"msg":"Received update from node 1, round 4"}
+{"time":"2026-07-21 16:37:39,990","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:37:40,002","level":"INFO","node":2,"msg":"Per-class agreement with node 0: class0=0.862 class1=0.609 gap=0.252"}
+{"time":"2026-07-21 16:37:40,004","level":"INFO","node":2,"msg":"Per-class rolling gap for node 0: mean=0.252 over last 1 round(s)"}
+{"time":"2026-07-21 16:37:40,006","level":"INFO","node":2,"msg":"Trust score for node 0: S=0.674 (Z=1.00 A=0.78 P=0.52 R=1.00) advisory only"}
+{"time":"2026-07-21 16:37:40,036","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:37:40,065","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:37:40,096","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:37:46,117","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:37:56,112","level":"INFO","node":2,"msg":"Prediction agreement with node 3 round=4: A=0.967"}
+{"time":"2026-07-21 16:37:56,112","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=4 new=True satisfied=True"}
+{"time":"2026-07-21 16:38:02,214","level":"INFO","node":2,"msg":"Synced weights from master for round 4"}
+{"time":"2026-07-21 16:38:02,229","level":"INFO","node":2,"msg":"Sent commit vote to node 0"}
+{"time":"2026-07-21 16:38:08,594","level":"INFO","node":2,"msg":"Proposal received: round=5 origin=1 hash=0e23c6b70ec2..."}
+{"time":"2026-07-21 16:38:08,624","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=5 new=True satisfied=False"}
+{"time":"2026-07-21 16:38:08,629","level":"INFO","node":2,"msg":"Received update from node 1, round 5"}
+{"time":"2026-07-21 16:38:18,191","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:38:18,195","level":"INFO","node":2,"msg":"Per-class agreement with node 1: class0=0.726 class1=0.915 gap=0.190"}
+{"time":"2026-07-21 16:38:18,195","level":"INFO","node":2,"msg":"Per-class rolling gap for node 1: mean=0.190 over last 1 round(s)"}
+{"time":"2026-07-21 16:38:18,199","level":"INFO","node":2,"msg":"Trust score for node 1: S=0.711 (Z=1.00 A=0.79 P=0.66 R=1.00) advisory only"}
+{"time":"2026-07-21 16:38:18,217","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:38:18,239","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:38:18,270","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:38:24,392","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:38:34,048","level":"INFO","node":2,"msg":"Prediction agreement with node 3 round=5: A=0.960"}
+{"time":"2026-07-21 16:38:34,049","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=5 new=True satisfied=True"}
+{"time":"2026-07-21 16:38:49,665","level":"INFO","node":2,"msg":"Prediction agreement with node 0 round=5: A=0.944"}
+{"time":"2026-07-21 16:38:49,667","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=5 new=True satisfied=True"}
+{"time":"2026-07-21 16:38:55,903","level":"INFO","node":2,"msg":"Synced weights from master for round 5"}
+{"time":"2026-07-21 16:38:55,923","level":"INFO","node":2,"msg":"Sent commit vote to node 1"}
+{"time":"2026-07-21 16:38:55,972","level":"INFO","node":2,"msg":"My turn — starting round 7 as proposer."}
+{"time":"2026-07-21 16:38:55,972","level":"INFO","node":2,"msg":"Starting round 7"}
+{"time":"2026-07-21 16:39:02,162","level":"INFO","node":2,"msg":"Sent proposal to node 0"}
+{"time":"2026-07-21 16:39:02,178","level":"INFO","node":2,"msg":"Sent proposal to node 1"}
+{"time":"2026-07-21 16:39:02,183","level":"INFO","node":2,"msg":"Sent proposal to node 3"}
+{"time":"2026-07-21 16:39:02,191","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:39:02,196","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:39:02,202","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:39:02,215","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:39:11,917","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=6 new=True satisfied=False"}
+{"time":"2026-07-21 16:39:28,401","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=6 new=True satisfied=True"}
+{"time":"2026-07-21 16:39:45,795","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=6 new=True satisfied=True"}
+{"time":"2026-07-21 16:39:52,498","level":"INFO","node":2,"msg":"Received update from node 1, round 6"}
+{"time":"2026-07-21 16:39:52,498","level":"INFO","node":2,"msg":"Round 7 complete — aggregating"}
+{"time":"2026-07-21 16:39:52,551","level":"INFO","node":2,"msg":"[BACKDOOR PROBE] Round 7 clean — worst case flip_rate=1.000 jump=0.245 (feature=1, value=-4.0)"}
+{"time":"2026-07-21 16:39:52,598","level":"INFO","node":2,"msg":"Commit vote recorded: node 0 decision=True round=6 satisfied=False"}
+{"time":"2026-07-21 16:39:52,601","level":"INFO","node":2,"msg":"Broadcast weights to node 0"}
+{"time":"2026-07-21 16:39:52,632","level":"INFO","node":2,"msg":"Commit vote recorded: node 1 decision=True round=6 satisfied=True"}
+{"time":"2026-07-21 16:39:52,632","level":"INFO","node":2,"msg":"Round 7 COMMITTED — model hash agreed by [2, 0, 1]"}
+{"time":"2026-07-21 16:39:52,635","level":"INFO","node":2,"msg":"Commit certificate saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\certificates\round_6.json"}
+{"time":"2026-07-21 16:39:52,637","level":"INFO","node":2,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-21 16:39:52,676","level":"INFO","node":2,"msg":"Commit vote recorded: node 3 decision=True round=6 satisfied=True"}
+{"time":"2026-07-21 16:39:52,677","level":"INFO","node":2,"msg":"Broadcast weights to node 3"}
+{"time":"2026-07-21 16:39:52,679","level":"INFO","node":2,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-21 16:39:52,679","level":"INFO","node":2,"msg":"Round 7 complete | accuracy=0.8364 | duration=56.71s"}
+{"time":"2026-07-21 16:39:52,679","level":"INFO","node":2,"msg":"Round 8 belongs to node 3 — waiting for their proposal."}
+{"time":"2026-07-21 16:39:52,682","level":"INFO","node":2,"msg":"Notified next proposer to node 3"}
+{"time":"2026-07-21 16:39:59,315","level":"INFO","node":2,"msg":"Proposal received: round=7 origin=3 hash=4b8308157379..."}
+{"time":"2026-07-21 16:39:59,325","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=7 new=True satisfied=False"}
+{"time":"2026-07-21 16:40:09,395","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=7 new=True satisfied=False"}
+{"time":"2026-07-21 16:40:25,659","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=7 new=True satisfied=True"}
+{"time":"2026-07-21 16:40:32,190","level":"INFO","node":2,"msg":"Received update from node 1, round 7"}
+{"time":"2026-07-21 16:40:41,970","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:40:41,989","level":"INFO","node":2,"msg":"Per-class agreement with node 3: class0=0.928 class1=0.942 gap=0.013"}
+{"time":"2026-07-21 16:40:41,989","level":"INFO","node":2,"msg":"Per-class rolling gap for node 3: mean=0.013 over last 1 round(s)"}
+{"time":"2026-07-21 16:40:41,991","level":"INFO","node":2,"msg":"Trust score for node 3: S=0.799 (Z=1.00 A=0.93 P=0.50 R=1.00) advisory only"}
+{"time":"2026-07-21 16:40:42,002","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:40:42,012","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:40:42,025","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:40:48,046","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:40:48,168","level":"INFO","node":2,"msg":"Synced weights from master for round 7"}
+{"time":"2026-07-21 16:40:48,173","level":"INFO","node":2,"msg":"Sent commit vote to node 3"}
+{"time":"2026-07-21 16:40:54,406","level":"INFO","node":2,"msg":"Proposal received: round=8 origin=0 hash=aa1fc682c631..."}
+{"time":"2026-07-21 16:40:54,438","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=8 new=True satisfied=False"}
+{"time":"2026-07-21 16:41:04,264","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=8 new=True satisfied=False"}
+{"time":"2026-07-21 16:41:10,447","level":"INFO","node":2,"msg":"Received update from node 1, round 8"}
+{"time":"2026-07-21 16:41:20,126","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:41:20,142","level":"INFO","node":2,"msg":"fc_in col7 delta self-cosine for node 0: -0.2273 (delta_norm=0.2139)"}
+{"time":"2026-07-21 16:41:20,146","level":"INFO","node":2,"msg":"Per-class agreement with node 0: class0=0.970 class1=0.908 gap=0.063"}
+{"time":"2026-07-21 16:41:20,146","level":"INFO","node":2,"msg":"Per-class rolling gap for node 0: mean=0.158 over last 2 round(s)"}
+{"time":"2026-07-21 16:41:20,149","level":"INFO","node":2,"msg":"Trust score for node 0: S=0.810 (Z=1.00 A=0.95 P=0.48 R=1.00) advisory only"}
+{"time":"2026-07-21 16:41:20,162","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:41:20,171","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:41:20,201","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:41:26,295","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:41:36,055","level":"INFO","node":2,"msg":"Prediction agreement with node 3 round=8: A=0.973"}
+{"time":"2026-07-21 16:41:36,055","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=8 new=True satisfied=True"}
+{"time":"2026-07-21 16:41:42,253","level":"INFO","node":2,"msg":"Synced weights from master for round 8"}
+{"time":"2026-07-21 16:41:42,275","level":"INFO","node":2,"msg":"Sent commit vote to node 0"}
+{"time":"2026-07-21 16:41:48,470","level":"INFO","node":2,"msg":"Proposal received: round=9 origin=1 hash=0246dd4a13db..."}
+{"time":"2026-07-21 16:41:48,490","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=9 new=True satisfied=False"}
+{"time":"2026-07-21 16:41:48,498","level":"INFO","node":2,"msg":"Received update from node 1, round 9"}
+{"time":"2026-07-21 16:41:58,014","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:41:58,030","level":"INFO","node":2,"msg":"fc_in col7 delta self-cosine for node 1: -0.1714 (delta_norm=0.2446)"}
+{"time":"2026-07-21 16:41:58,032","level":"INFO","node":2,"msg":"Per-class agreement with node 1: class0=0.967 class1=0.944 gap=0.023"}
+{"time":"2026-07-21 16:41:58,034","level":"INFO","node":2,"msg":"Per-class rolling gap for node 1: mean=0.106 over last 2 round(s)"}
+{"time":"2026-07-21 16:41:58,034","level":"INFO","node":2,"msg":"Trust score for node 1: S=0.787 (Z=1.00 A=0.96 P=0.37 R=1.00) advisory only"}
+{"time":"2026-07-21 16:41:58,048","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:41:58,068","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:41:58,093","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:42:04,155","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:42:13,718","level":"INFO","node":2,"msg":"Prediction agreement with node 3 round=9: A=0.954"}
+{"time":"2026-07-21 16:42:13,719","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=9 new=True satisfied=True"}
+{"time":"2026-07-21 16:42:29,429","level":"INFO","node":2,"msg":"Prediction agreement with node 0 round=9: A=0.941"}
+{"time":"2026-07-21 16:42:29,429","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=9 new=True satisfied=True"}
+{"time":"2026-07-21 16:42:35,529","level":"INFO","node":2,"msg":"Synced weights from master for round 9"}
+{"time":"2026-07-21 16:42:35,540","level":"INFO","node":2,"msg":"Sent commit vote to node 1"}
+{"time":"2026-07-21 16:42:35,566","level":"INFO","node":2,"msg":"My turn — starting round 11 as proposer."}
+{"time":"2026-07-21 16:42:35,566","level":"INFO","node":2,"msg":"Starting round 11"}
+{"time":"2026-07-21 16:42:41,749","level":"INFO","node":2,"msg":"Sent proposal to node 0"}
+{"time":"2026-07-21 16:42:41,749","level":"INFO","node":2,"msg":"Sent proposal to node 1"}
+{"time":"2026-07-21 16:42:41,771","level":"INFO","node":2,"msg":"Sent proposal to node 3"}
+{"time":"2026-07-21 16:42:41,775","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:42:41,784","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:42:41,787","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:42:41,791","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:42:51,556","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=10 new=True satisfied=False"}
+{"time":"2026-07-21 16:43:07,225","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=10 new=True satisfied=True"}
+{"time":"2026-07-21 16:43:22,930","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=10 new=True satisfied=True"}
+{"time":"2026-07-21 16:43:29,108","level":"INFO","node":2,"msg":"Received update from node 1, round 10"}
+{"time":"2026-07-21 16:43:29,108","level":"INFO","node":2,"msg":"Round 11 complete — aggregating"}
+{"time":"2026-07-21 16:43:29,134","level":"WARNING","node":2,"msg":"[BACKDOOR PROBE] Round 11 SUSPICIOUS: feature=5 value=7.0 forces class=1 flip_rate=1.000 jump=0.691 (thresholds: flip>0.7, jump>0.3)"}
+{"time":"2026-07-21 16:43:29,160","level":"INFO","node":2,"msg":"Commit vote recorded: node 0 decision=True round=10 satisfied=False"}
+{"time":"2026-07-21 16:43:29,163","level":"INFO","node":2,"msg":"Broadcast weights to node 0"}
+{"time":"2026-07-21 16:43:29,177","level":"INFO","node":2,"msg":"Commit vote recorded: node 1 decision=True round=10 satisfied=True"}
+{"time":"2026-07-21 16:43:29,177","level":"INFO","node":2,"msg":"Round 11 COMMITTED — model hash agreed by [2, 0, 1]"}
+{"time":"2026-07-21 16:43:29,181","level":"INFO","node":2,"msg":"Commit certificate saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\certificates\round_10.json"}
+{"time":"2026-07-21 16:43:29,187","level":"INFO","node":2,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-21 16:43:29,203","level":"INFO","node":2,"msg":"Commit vote recorded: node 3 decision=True round=10 satisfied=True"}
+{"time":"2026-07-21 16:43:29,205","level":"INFO","node":2,"msg":"Broadcast weights to node 3"}
+{"time":"2026-07-21 16:43:29,208","level":"INFO","node":2,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-21 16:43:29,208","level":"INFO","node":2,"msg":"Round 11 complete | accuracy=0.8455 | duration=53.64s"}
+{"time":"2026-07-21 16:43:29,208","level":"INFO","node":2,"msg":"Round 12 belongs to node 3 — waiting for their proposal."}
+{"time":"2026-07-21 16:43:29,211","level":"INFO","node":2,"msg":"Notified next proposer to node 3"}
+{"time":"2026-07-21 16:43:35,296","level":"INFO","node":2,"msg":"Proposal received: round=11 origin=3 hash=be293140f1c7..."}
+{"time":"2026-07-21 16:43:35,309","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=11 new=True satisfied=False"}
+{"time":"2026-07-21 16:43:44,963","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=11 new=True satisfied=False"}
+{"time":"2026-07-21 16:44:00,791","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=11 new=True satisfied=True"}
+{"time":"2026-07-21 16:44:06,883","level":"INFO","node":2,"msg":"Received update from node 1, round 11"}
+{"time":"2026-07-21 16:44:16,499","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:44:16,499","level":"INFO","node":2,"msg":"fc_in col7 delta self-cosine for node 3: 0.0210 (delta_norm=0.1611)"}
+{"time":"2026-07-21 16:44:16,515","level":"INFO","node":2,"msg":"Per-class agreement with node 3: class0=0.973 class1=0.938 gap=0.035"}
+{"time":"2026-07-21 16:44:16,515","level":"INFO","node":2,"msg":"Per-class rolling gap for node 3: mean=0.024 over last 2 round(s)"}
+{"time":"2026-07-21 16:44:16,516","level":"INFO","node":2,"msg":"Trust score for node 3: S=0.819 (Z=1.00 A=0.96 P=0.48 R=1.00) advisory only"}
+{"time":"2026-07-21 16:44:16,547","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:44:16,567","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:44:16,606","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:44:22,595","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:44:22,747","level":"INFO","node":2,"msg":"Synced weights from master for round 11"}
+{"time":"2026-07-21 16:44:22,750","level":"INFO","node":2,"msg":"Sent commit vote to node 3"}
+{"time":"2026-07-21 16:44:28,753","level":"INFO","node":2,"msg":"Proposal received: round=12 origin=0 hash=5f11cb977878..."}
+{"time":"2026-07-21 16:44:28,781","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=12 new=True satisfied=False"}
+{"time":"2026-07-21 16:44:38,486","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=12 new=True satisfied=False"}
+{"time":"2026-07-21 16:44:44,598","level":"INFO","node":2,"msg":"Received update from node 1, round 12"}
+{"time":"2026-07-21 16:44:54,273","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:44:54,273","level":"INFO","node":2,"msg":"fc_in col7 delta self-cosine for node 0: -0.2244 (delta_norm=0.1957)"}
+{"time":"2026-07-21 16:44:54,277","level":"INFO","node":2,"msg":"Per-class agreement with node 0: class0=0.971 class1=0.934 gap=0.036"}
+{"time":"2026-07-21 16:44:54,277","level":"INFO","node":2,"msg":"Per-class rolling gap for node 0: mean=0.117 over last 3 round(s)"}
+{"time":"2026-07-21 16:44:54,279","level":"INFO","node":2,"msg":"Trust score for node 0: S=0.802 (Z=1.00 A=0.96 P=0.43 R=1.00) advisory only"}
+{"time":"2026-07-21 16:44:54,303","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:44:54,324","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:44:54,334","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:45:00,287","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:45:10,017","level":"INFO","node":2,"msg":"Prediction agreement with node 3 round=12: A=0.970"}
+{"time":"2026-07-21 16:45:10,017","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=12 new=True satisfied=True"}
+{"time":"2026-07-21 16:45:16,091","level":"INFO","node":2,"msg":"Synced weights from master for round 12"}
+{"time":"2026-07-21 16:45:16,103","level":"INFO","node":2,"msg":"Sent commit vote to node 0"}
+{"time":"2026-07-21 16:45:22,445","level":"INFO","node":2,"msg":"Proposal received: round=13 origin=1 hash=df315595f389..."}
+{"time":"2026-07-21 16:45:22,475","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=13 new=True satisfied=False"}
+{"time":"2026-07-21 16:45:22,495","level":"INFO","node":2,"msg":"Received update from node 1, round 13"}
+{"time":"2026-07-21 16:45:32,139","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:45:32,140","level":"INFO","node":2,"msg":"fc_in col7 delta self-cosine for node 1: -0.4025 (delta_norm=0.2158)"}
+{"time":"2026-07-21 16:45:32,140","level":"INFO","node":2,"msg":"Per-class agreement with node 1: class0=0.966 class1=0.942 gap=0.025"}
+{"time":"2026-07-21 16:45:32,140","level":"INFO","node":2,"msg":"Per-class rolling gap for node 1: mean=0.079 over last 3 round(s)"}
+{"time":"2026-07-21 16:45:32,145","level":"INFO","node":2,"msg":"Trust score for node 1: S=0.797 (Z=1.00 A=0.96 P=0.41 R=1.00) advisory only"}
+{"time":"2026-07-21 16:45:32,165","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:45:32,186","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:45:32,211","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:45:38,032","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:45:47,700","level":"INFO","node":2,"msg":"Prediction agreement with node 3 round=13: A=0.951"}
+{"time":"2026-07-21 16:45:47,700","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=13 new=True satisfied=True"}
+{"time":"2026-07-21 16:46:03,113","level":"INFO","node":2,"msg":"Prediction agreement with node 0 round=13: A=0.930"}
+{"time":"2026-07-21 16:46:03,113","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=13 new=True satisfied=True"}
+{"time":"2026-07-21 16:46:09,132","level":"INFO","node":2,"msg":"Synced weights from master for round 13"}
+{"time":"2026-07-21 16:46:09,143","level":"INFO","node":2,"msg":"Sent commit vote to node 1"}
+{"time":"2026-07-21 16:46:09,177","level":"INFO","node":2,"msg":"My turn — starting round 15 as proposer."}
+{"time":"2026-07-21 16:46:09,179","level":"INFO","node":2,"msg":"Starting round 15"}
+{"time":"2026-07-21 16:46:15,255","level":"INFO","node":2,"msg":"Sent proposal to node 0"}
+{"time":"2026-07-21 16:46:15,271","level":"INFO","node":2,"msg":"Sent proposal to node 1"}
+{"time":"2026-07-21 16:46:15,280","level":"INFO","node":2,"msg":"Sent proposal to node 3"}
+{"time":"2026-07-21 16:46:15,288","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:46:15,292","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:46:15,297","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:46:15,304","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:46:24,996","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=14 new=True satisfied=False"}
+{"time":"2026-07-21 16:46:40,640","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=14 new=True satisfied=True"}
+{"time":"2026-07-21 16:46:56,246","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=14 new=True satisfied=True"}
+{"time":"2026-07-21 16:47:02,382","level":"INFO","node":2,"msg":"Received update from node 1, round 14"}
+{"time":"2026-07-21 16:47:02,382","level":"INFO","node":2,"msg":"Round 15 complete — aggregating"}
+{"time":"2026-07-21 16:47:02,408","level":"WARNING","node":2,"msg":"[BACKDOOR PROBE] Round 15 SUSPICIOUS: feature=5 value=8.0 forces class=1 flip_rate=1.000 jump=0.664 (thresholds: flip>0.7, jump>0.3)"}
+{"time":"2026-07-21 16:47:02,441","level":"INFO","node":2,"msg":"Commit vote recorded: node 0 decision=True round=14 satisfied=False"}
+{"time":"2026-07-21 16:47:02,441","level":"INFO","node":2,"msg":"Broadcast weights to node 0"}
+{"time":"2026-07-21 16:47:02,458","level":"INFO","node":2,"msg":"Commit vote recorded: node 1 decision=True round=14 satisfied=True"}
+{"time":"2026-07-21 16:47:02,459","level":"INFO","node":2,"msg":"Round 15 COMMITTED — model hash agreed by [2, 0, 1]"}
+{"time":"2026-07-21 16:47:02,460","level":"INFO","node":2,"msg":"Commit certificate saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\certificates\round_14.json"}
+{"time":"2026-07-21 16:47:02,463","level":"INFO","node":2,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-21 16:47:02,497","level":"INFO","node":2,"msg":"Commit vote recorded: node 3 decision=True round=14 satisfied=True"}
+{"time":"2026-07-21 16:47:02,499","level":"INFO","node":2,"msg":"Broadcast weights to node 3"}
+{"time":"2026-07-21 16:47:02,503","level":"INFO","node":2,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-21 16:47:02,503","level":"INFO","node":2,"msg":"Round 15 complete | accuracy=0.8727 | duration=53.32s"}
+{"time":"2026-07-21 16:47:02,503","level":"INFO","node":2,"msg":"Round 16 belongs to node 3 — waiting for their proposal."}
+{"time":"2026-07-21 16:47:02,509","level":"INFO","node":2,"msg":"Notified next proposer to node 3"}
+{"time":"2026-07-21 16:47:08,606","level":"INFO","node":2,"msg":"Proposal received: round=15 origin=3 hash=ea7d7aa76d00..."}
+{"time":"2026-07-21 16:47:08,630","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=15 new=True satisfied=False"}
+{"time":"2026-07-21 16:47:18,164","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=15 new=True satisfied=False"}
+{"time":"2026-07-21 16:47:34,094","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=15 new=True satisfied=True"}
+{"time":"2026-07-21 16:47:40,209","level":"INFO","node":2,"msg":"Received update from node 1, round 15"}
+{"time":"2026-07-21 16:47:49,827","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:47:49,827","level":"INFO","node":2,"msg":"fc_in col7 delta self-cosine for node 3: -0.0392 (delta_norm=0.1916)"}
+{"time":"2026-07-21 16:47:49,832","level":"INFO","node":2,"msg":"Per-class agreement with node 3: class0=0.978 class1=0.934 gap=0.043"}
+{"time":"2026-07-21 16:47:49,832","level":"INFO","node":2,"msg":"Per-class rolling gap for node 3: mean=0.031 over last 3 round(s)"}
+{"time":"2026-07-21 16:47:49,833","level":"INFO","node":2,"msg":"Trust score for node 3: S=0.816 (Z=1.00 A=0.96 P=0.46 R=1.00) advisory only"}
+{"time":"2026-07-21 16:47:49,846","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:47:49,868","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:47:49,880","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:47:55,816","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:47:55,899","level":"INFO","node":2,"msg":"Synced weights from master for round 15"}
+{"time":"2026-07-21 16:47:55,904","level":"INFO","node":2,"msg":"Sent commit vote to node 3"}
+{"time":"2026-07-21 16:48:01,995","level":"INFO","node":2,"msg":"Proposal received: round=16 origin=0 hash=0de24809a362..."}
+{"time":"2026-07-21 16:48:02,017","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=16 new=True satisfied=False"}
+{"time":"2026-07-21 16:48:11,712","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=False reason=per_class_agreement_gap round=16 new=True satisfied=False"}
+{"time":"2026-07-21 16:48:17,926","level":"INFO","node":2,"msg":"Received update from node 1, round 16"}
+{"time":"2026-07-21 16:48:27,610","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:48:27,610","level":"INFO","node":2,"msg":"fc_in col7 delta self-cosine for node 0: -0.1198 (delta_norm=0.2051)"}
+{"time":"2026-07-21 16:48:27,619","level":"INFO","node":2,"msg":"Per-class agreement with node 0: class0=0.971 class1=0.939 gap=0.032"}
+{"time":"2026-07-21 16:48:27,619","level":"INFO","node":2,"msg":"Per-class rolling gap for node 0: mean=0.096 over last 4 round(s)"}
+{"time":"2026-07-21 16:48:27,619","level":"WARNING","node":2,"msg":"[PER-CLASS AGREEMENT CHECK] node 2 observed node 0: SUSTAINED class agreement gap, rolling mean=0.096 over 4 rounds — possible asymmetric/label_flip-style corruption"}
+{"time":"2026-07-21 16:48:27,621","level":"INFO","node":2,"msg":"Trust score for node 0: S=0.814 (Z=1.00 A=0.96 P=0.46 R=1.00) advisory only"}
+{"time":"2026-07-21 16:48:27,621","level":"WARNING","node":2,"msg":"Update round=16 from node 0 REJECTED on per-class agreement gap"}
+{"time":"2026-07-21 16:48:27,641","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:48:27,663","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:48:27,675","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:48:33,679","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:48:43,202","level":"INFO","node":2,"msg":"Prediction agreement with node 3 round=16: A=0.968"}
+{"time":"2026-07-21 16:48:43,203","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=False reason=per_class_agreement_gap round=16 new=True satisfied=False"}
+{"time":"2026-07-21 16:48:55,724","level":"INFO","node":2,"msg":"Proposal for round=16 origin=0 changed hash after 53.70s — treating as a legitimate round retry, not equivocation."}
+{"time":"2026-07-21 16:48:55,725","level":"INFO","node":2,"msg":"Proposal received: round=16 origin=0 hash=8e51dc68bb3b..."}
+{"time":"2026-07-21 16:48:55,759","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=16 new=True satisfied=False"}
+{"time":"2026-07-21 16:49:05,445","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=16 new=True satisfied=False"}
+{"time":"2026-07-21 16:49:11,553","level":"INFO","node":2,"msg":"Received update from node 1, round 16"}
+{"time":"2026-07-21 16:49:21,102","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:49:21,104","level":"INFO","node":2,"msg":"fc_in col7 delta self-cosine for node 0: -0.3549 (delta_norm=0.1572)"}
+{"time":"2026-07-21 16:49:21,104","level":"INFO","node":2,"msg":"Per-class agreement with node 0: class0=0.952 class1=0.921 gap=0.032"}
+{"time":"2026-07-21 16:49:21,104","level":"INFO","node":2,"msg":"Per-class rolling gap for node 0: mean=0.041 over last 4 round(s)"}
+{"time":"2026-07-21 16:49:21,110","level":"INFO","node":2,"msg":"Trust score for node 0: S=0.748 (Z=1.00 A=0.94 P=0.43 R=0.80) advisory only"}
+{"time":"2026-07-21 16:49:21,131","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:49:21,150","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:49:21,163","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:49:27,164","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:49:36,774","level":"INFO","node":2,"msg":"Prediction agreement with node 3 round=16: A=0.897"}
+{"time":"2026-07-21 16:49:36,774","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=16 new=True satisfied=True"}
+{"time":"2026-07-21 16:49:42,812","level":"INFO","node":2,"msg":"Synced weights from master for round 16"}
+{"time":"2026-07-21 16:49:42,824","level":"INFO","node":2,"msg":"Sent commit vote to node 0"}
+{"time":"2026-07-21 16:49:49,192","level":"INFO","node":2,"msg":"Proposal received: round=17 origin=1 hash=3491e0cf5ab0..."}
+{"time":"2026-07-21 16:49:49,236","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=17 new=True satisfied=False"}
+{"time":"2026-07-21 16:49:49,247","level":"INFO","node":2,"msg":"Received update from node 1, round 17"}
+{"time":"2026-07-21 16:49:58,875","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:49:58,875","level":"INFO","node":2,"msg":"fc_in col7 delta self-cosine for node 1: -0.2138 (delta_norm=0.2208)"}
+{"time":"2026-07-21 16:49:58,875","level":"INFO","node":2,"msg":"Per-class agreement with node 1: class0=0.951 class1=0.932 gap=0.019"}
+{"time":"2026-07-21 16:49:58,875","level":"INFO","node":2,"msg":"Per-class rolling gap for node 1: mean=0.064 over last 4 round(s)"}
+{"time":"2026-07-21 16:49:58,875","level":"WARNING","node":2,"msg":"[PER-CLASS AGREEMENT CHECK] node 2 observed node 1: SUSTAINED class agreement gap, rolling mean=0.064 over 4 rounds — possible asymmetric/label_flip-style corruption"}
+{"time":"2026-07-21 16:49:58,886","level":"INFO","node":2,"msg":"Trust score for node 1: S=0.776 (Z=1.00 A=0.94 P=0.37 R=1.00) advisory only"}
+{"time":"2026-07-21 16:49:58,886","level":"WARNING","node":2,"msg":"Update round=17 from node 1 REJECTED on per-class agreement gap"}
+{"time":"2026-07-21 16:49:58,908","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:49:58,929","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:49:58,949","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:50:04,843","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:50:14,443","level":"INFO","node":2,"msg":"Prediction agreement with node 3 round=17: A=0.954"}
+{"time":"2026-07-21 16:50:14,443","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=False reason=per_class_agreement_gap round=17 new=True satisfied=False"}
+{"time":"2026-07-21 16:50:30,046","level":"INFO","node":2,"msg":"Prediction agreement with node 0 round=17: A=0.937"}
+{"time":"2026-07-21 16:50:30,047","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=False reason=per_class_agreement_gap round=17 new=True satisfied=False"}
+{"time":"2026-07-21 16:50:43,118","level":"INFO","node":2,"msg":"Proposal for round=17 origin=1 changed hash after 53.95s — treating as a legitimate round retry, not equivocation."}
+{"time":"2026-07-21 16:50:43,119","level":"INFO","node":2,"msg":"Proposal received: round=17 origin=1 hash=8695f6b098ab..."}
+{"time":"2026-07-21 16:50:43,130","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=17 new=True satisfied=False"}
+{"time":"2026-07-21 16:50:43,145","level":"INFO","node":2,"msg":"Received update from node 1, round 17"}
+{"time":"2026-07-21 16:50:52,667","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:50:52,667","level":"INFO","node":2,"msg":"fc_in col7 delta self-cosine for node 1: -0.4073 (delta_norm=0.2115)"}
+{"time":"2026-07-21 16:50:52,667","level":"INFO","node":2,"msg":"Per-class agreement with node 1: class0=0.960 class1=0.928 gap=0.033"}
+{"time":"2026-07-21 16:50:52,667","level":"INFO","node":2,"msg":"Per-class rolling gap for node 1: mean=0.025 over last 4 round(s)"}
+{"time":"2026-07-21 16:50:52,677","level":"INFO","node":2,"msg":"Trust score for node 1: S=0.764 (Z=1.00 A=0.95 P=0.46 R=0.80) advisory only"}
+{"time":"2026-07-21 16:50:52,700","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:50:52,713","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:50:52,726","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:50:58,751","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:51:08,402","level":"INFO","node":2,"msg":"Prediction agreement with node 3 round=17: A=0.909"}
+{"time":"2026-07-21 16:51:08,402","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=17 new=True satisfied=True"}
+{"time":"2026-07-21 16:51:23,851","level":"INFO","node":2,"msg":"Prediction agreement with node 0 round=17: A=0.894"}
+{"time":"2026-07-21 16:51:23,852","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=17 new=True satisfied=True"}
+{"time":"2026-07-21 16:51:29,839","level":"INFO","node":2,"msg":"Synced weights from master for round 17"}
+{"time":"2026-07-21 16:51:29,852","level":"INFO","node":2,"msg":"Sent commit vote to node 1"}
+{"time":"2026-07-21 16:51:29,875","level":"INFO","node":2,"msg":"My turn — starting round 19 as proposer."}
+{"time":"2026-07-21 16:51:29,876","level":"INFO","node":2,"msg":"Starting round 19"}
+{"time":"2026-07-21 16:51:35,985","level":"INFO","node":2,"msg":"Sent proposal to node 0"}
+{"time":"2026-07-21 16:51:35,988","level":"INFO","node":2,"msg":"Sent proposal to node 1"}
+{"time":"2026-07-21 16:51:36,002","level":"INFO","node":2,"msg":"Sent proposal to node 3"}
+{"time":"2026-07-21 16:51:36,009","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:51:36,015","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:51:36,021","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:51:36,025","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:51:45,711","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=18 new=True satisfied=False"}
+{"time":"2026-07-21 16:52:01,507","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=18 new=True satisfied=True"}
+{"time":"2026-07-21 16:52:17,129","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=18 new=True satisfied=True"}
+{"time":"2026-07-21 16:52:23,204","level":"INFO","node":2,"msg":"Received update from node 1, round 18"}
+{"time":"2026-07-21 16:52:23,204","level":"INFO","node":2,"msg":"Round 19 complete — aggregating"}
+{"time":"2026-07-21 16:52:23,233","level":"WARNING","node":2,"msg":"[BACKDOOR PROBE] Round 19 SUSPICIOUS: feature=0 value=8.0 forces class=1 flip_rate=0.987 jump=0.632 (thresholds: flip>0.7, jump>0.3)"}
+{"time":"2026-07-21 16:52:23,264","level":"INFO","node":2,"msg":"Commit vote recorded: node 0 decision=True round=18 satisfied=False"}
+{"time":"2026-07-21 16:52:23,269","level":"INFO","node":2,"msg":"Broadcast weights to node 0"}
+{"time":"2026-07-21 16:52:23,293","level":"INFO","node":2,"msg":"Commit vote recorded: node 1 decision=True round=18 satisfied=True"}
+{"time":"2026-07-21 16:52:23,294","level":"INFO","node":2,"msg":"Round 19 COMMITTED — model hash agreed by [2, 0, 1]"}
+{"time":"2026-07-21 16:52:23,296","level":"INFO","node":2,"msg":"Commit certificate saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\certificates\round_18.json"}
+{"time":"2026-07-21 16:52:23,300","level":"INFO","node":2,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-21 16:52:23,321","level":"INFO","node":2,"msg":"Commit vote recorded: node 3 decision=True round=18 satisfied=True"}
+{"time":"2026-07-21 16:52:23,324","level":"INFO","node":2,"msg":"Broadcast weights to node 3"}
+{"time":"2026-07-21 16:52:23,327","level":"INFO","node":2,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-21 16:52:23,327","level":"INFO","node":2,"msg":"Round 19 complete | accuracy=0.8727 | duration=53.45s"}
+{"time":"2026-07-21 16:52:23,327","level":"INFO","node":2,"msg":"Round 20 belongs to node 3 — waiting for their proposal."}
+{"time":"2026-07-21 16:52:23,333","level":"INFO","node":2,"msg":"Notified next proposer to node 3"}
+{"time":"2026-07-21 16:52:29,478","level":"INFO","node":2,"msg":"Proposal received: round=19 origin=3 hash=c7c12c68615c..."}
+{"time":"2026-07-21 16:52:29,494","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=19 new=True satisfied=False"}
+{"time":"2026-07-21 16:52:39,324","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=19 new=True satisfied=False"}
+{"time":"2026-07-21 16:52:55,089","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=19 new=True satisfied=True"}
+{"time":"2026-07-21 16:53:01,203","level":"INFO","node":2,"msg":"Received update from node 1, round 19"}
+{"time":"2026-07-21 16:53:10,829","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-21 16:53:10,829","level":"INFO","node":2,"msg":"fc_in col7 delta self-cosine for node 3: -0.2647 (delta_norm=0.1849)"}
+{"time":"2026-07-21 16:53:10,838","level":"INFO","node":2,"msg":"Per-class agreement with node 3: class0=0.972 class1=0.949 gap=0.023"}
+{"time":"2026-07-21 16:53:10,838","level":"INFO","node":2,"msg":"Per-class rolling gap for node 3: mean=0.029 over last 4 round(s)"}
+{"time":"2026-07-21 16:53:10,840","level":"INFO","node":2,"msg":"Trust score for node 3: S=0.817 (Z=1.00 A=0.96 P=0.46 R=1.00) advisory only"}
+{"time":"2026-07-21 16:53:10,854","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-21 16:53:10,863","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-21 16:53:10,875","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-21 16:53:16,753","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-21 16:53:16,903","level":"INFO","node":2,"msg":"Synced weights from master for round 19"}
+{"time":"2026-07-21 16:53:16,903","level":"INFO","node":2,"msg":"Training complete after 20 rounds"}
+{"time":"2026-07-21 16:53:16,909","level":"INFO","node":2,"msg":"Sent commit vote to node 3"}
+{"time":"2026-07-21 16:53:29,221","level":"INFO","node":2,"msg":"Watchdog fired but training already complete — ignoring, not excluding node 3."}
+{"time":"2026-07-21 16:57:02,522","level":"INFO","node":2,"msg":"Watchdog fired but training already complete — ignoring, not excluding node 3."}

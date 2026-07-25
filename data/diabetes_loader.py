@@ -398,37 +398,42 @@ def _partition_noniid_dirichlet(
     num_clients: int,
     alpha: float = 0.5,
     seed: int = 42,
+    min_samples_per_client_per_class: int = 0,
 ) -> List[List[int]]:
     """
     Dirichlet non-IID split — each hospital gets a skewed class distribution.
     Lower alpha = more skewed = more realistic hospital demographics.
+
+    min_samples_per_client_per_class : if > 0, forces every client to receive
+    at least this many samples of every class, regardless of the Dirichlet
+    draw. This is an ARTIFICIAL FLOOR that partially undoes the intended
+    heterogeneity at extreme alpha (e.g. 0.1) — it exists only to prevent a
+    hard DataLoader crash on an empty class. Default is 0 (off): the raw,
+    unfloored Dirichlet draw is used, and a client CAN legitimately receive
+    zero samples of a class at extreme alpha. Set > 0 only when you
+    explicitly want crash-safety over a faithful stress test, and report
+    that choice in any paper describing results produced with it > 0.
     """
     rng = np.random.default_rng(seed)
     num_classes = len(np.unique(labels))
     client_indices: List[List[int]] = [[] for _ in range(num_clients)]
 
-    # Minimum samples each client must receive PER CLASS. At low alpha
-    # (e.g. 0.1), rng.dirichlet can legitimately assign a near-zero share
-    # to some client, and int-truncation then rounds that to exactly 0 —
-    # confirmed live: alpha=0.1 crashed DataLoader with num_samples=0 for
-    # an empty client. This floor guarantees every client can always build
-    # a non-empty, non-degenerate loader, regardless of how extreme alpha
-    # gets, while leaving the skew intact for every sample above the floor.
-    MIN_SAMPLES_PER_CLIENT_PER_CLASS = 1
+    MIN_SAMPLES_PER_CLIENT_PER_CLASS = min_samples_per_client_per_class
 
     for cls in range(num_classes):
         cls_idx = np.where(labels == cls)[0]
         rng.shuffle(cls_idx)
         n_cls = len(cls_idx)
 
-        if n_cls < num_clients * MIN_SAMPLES_PER_CLIENT_PER_CLASS:
+        if MIN_SAMPLES_PER_CLIENT_PER_CLASS > 0 and n_cls < num_clients * MIN_SAMPLES_PER_CLIENT_PER_CLASS:
             for i, idx in enumerate(cls_idx):
                 client_indices[i % num_clients].append(int(idx))
             continue
 
         proportions = rng.dirichlet(np.repeat(alpha, num_clients))
         proportions = (proportions * n_cls).astype(int)
-        proportions = np.maximum(proportions, MIN_SAMPLES_PER_CLIENT_PER_CLASS)
+        if MIN_SAMPLES_PER_CLIENT_PER_CLASS > 0:
+            proportions = np.maximum(proportions, MIN_SAMPLES_PER_CLIENT_PER_CLASS)
         overflow = proportions.sum() - n_cls
         if overflow > 0:
             order = np.argsort(-proportions)
@@ -440,6 +445,7 @@ def _partition_noniid_dirichlet(
                 proportions[i] -= take
                 overflow -= take
         proportions[-1] = n_cls - proportions[:-1].sum()
+        proportions = np.maximum(proportions, 0)
         splits = np.split(cls_idx, np.cumsum(proportions[:-1]))
         for i, split in enumerate(splits):
             client_indices[i].extend(split.tolist())
@@ -457,6 +463,7 @@ def load_diabetes_datasets(
     seed:         int   = 42,
     node_id:      Optional[int] = None,
     verbose:      bool  = True,
+    min_samples_per_client_per_class: int = 0,  # 0 = true unfloored Dirichlet draw
 ) -> Tuple:
     """
     Load and partition the Pima diabetes dataset across N hospital nodes.
@@ -494,7 +501,10 @@ def load_diabetes_datasets(
     std  = X_train.std(axis=0) + 1e-8
 
     # Non-IID partition
-    client_idx = _partition_noniid_dirichlet(y_train, num_clients, alpha, seed)
+    client_idx = _partition_noniid_dirichlet(
+        y_train, num_clients, alpha, seed,
+        min_samples_per_client_per_class=min_samples_per_client_per_class,
+    )
 
     # Build per-client datasets
     train_loaders = []

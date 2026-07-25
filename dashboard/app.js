@@ -22,7 +22,7 @@ const EXAMPLES = {
 const S = {
   config:         null,
   ringNodes:      [],
-  metrics:        { rounds: [], accuracy: [], current_round: 0, total_rounds: 20 },
+  metrics:        { rounds: [], accuracy: [], current_round: 0, total_rounds: 0 },
   distribution:   [],
   lastPrediction: null,
   lastFeatures:   null,
@@ -223,7 +223,13 @@ function initAccuracyChart() {
       scales: {
         x: {
           title: { display: true, text: 'Round', color: '#6b8fa8', font: { size: 11 } },
-          ticks: { color: '#6b8fa8', font: { family: "'Space Mono'", size: 10 } },
+          ticks: {
+            color: '#6b8fa8',
+            font:  { family: "'Space Mono'", size: 10 },
+            maxRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 15,
+          },
           grid:  { color: 'rgba(30,58,82,0.55)' },
         },
         y: {
@@ -245,7 +251,7 @@ function updateAccuracyChart(metrics) {
   S.metrics = metrics;
   const { rounds, accuracy, current_round, total_rounds, latest_accuracy } = metrics;
 
-  $('txt-round').textContent = `${current_round}/${total_rounds}`;
+  $('txt-round').textContent = `${current_round}/${total_rounds || S.config?.rounds || '—'}`;
   if (latest_accuracy != null) {
     $('txt-acc').textContent = latest_accuracy.toFixed(1) + '%';
   }
@@ -524,7 +530,7 @@ function updateStatus(ring, metrics) {
   const online  = ring.nodes.filter(n => n.online).length;
   const total   = ring.nodes.length;
   const round   = metrics.current_round || 0;
-  const totalR  = metrics.total_rounds  || S.config?.rounds || 20;
+  const totalR  = metrics.total_rounds || S.config?.rounds || ring.total_rounds || 0;
 
   $('txt-round').textContent = `${round}/${totalR}`;
 
