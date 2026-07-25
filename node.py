@@ -2656,22 +2656,39 @@ def _proposal_watchdog(rnd: int, expected_proposer: int):
         f'"[WATCHDOG FIRING] No proposal received from node {expected_proposer} for round {rnd} '
         f'after {timeout_s}s — treating as unreachable/stalled. fired_at={time.strftime("%H:%M:%S")}"'
     )
-    _apply_exclusion(expected_proposer, log)
-    _broadcast_exclusion(expected_proposer)
+    # SAFETY FIX: a local watchdog timeout is this node's OWN observation
+    # only — it may be a transient network partition rather than genuine
+    # node failure. Unilaterally excluding here (as before) let a single
+    # partitioned node shrink its own quorum threshold independently of
+    # the rest of the ring, which is exactly the split-brain precondition:
+    # two disjoint partitions could each independently exclude the other
+    # side and keep committing rounds on incompatible models. Route this
+    # through the SAME corroboration-quorum mechanism used for accusations
+    # (_record_suspicion / _handle_accusation) instead of excluding directly,
+    # so a real exclusion still requires independent agreement from other
+    # honest nodes, not just this node's local timeout.
+    _record_suspicion(expected_proposer, log, weight=STATE.get("exclusion_threshold", 5))
 
     if STATE.get("training_complete", False):
-        log.info(f'"Training completed during exclusion handling — not appointing a fallback proposer."')
-        return  # training finished while we were excluding; no round left to hand off
+        log.info(f'"Training completed during watchdog handling — not appointing a fallback proposer."')
+        return
     if STATE["current_round"] != rnd:
-        return  # exclusion broadcast or a race already moved things on
-
-    fallback = get_proposer_for_round(rnd)
-    if fallback == STATE["node_id"]:
-        log.info(f'"Taking over as proposer for round {rnd} after watchdog timeout."')
-        threading.Thread(target=execute_round, daemon=True).start()
+        return  # a corroborated exclusion or other race already moved things on
+    if expected_proposer in STATE.get("excluded_nodes", set()):
+        # Corroboration quorum was reached (possibly by this same call,
+        # possibly already by other peers) — safe to hand off now.
+        fallback = get_proposer_for_round(rnd)
+        if fallback == STATE["node_id"]:
+            log.info(f'"Taking over as proposer for round {rnd} after watchdog timeout."')
+            threading.Thread(target=execute_round, daemon=True).start()
+        else:
+            log.info(f'"Handing round {rnd} to node {fallback} after watchdog timeout."')
+            _notify_next_proposer(rnd, fallback)
     else:
-        log.info(f'"Handing round {rnd} to node {fallback} after watchdog timeout."')
-        _notify_next_proposer(rnd, fallback)
+        log.info(
+            f'"[WATCHDOG] round={rnd} — suspicion recorded against node {expected_proposer}, '
+            f'awaiting peer corroboration before excluding or reassigning the round."'
+        )
 
 
 def _notify_next_proposer(rnd: int, proposer_id: int, _depth: int = 0):
@@ -2692,17 +2709,37 @@ def _notify_next_proposer(rnd: int, proposer_id: int, _depth: int = 0):
     ok = _post_with_retry(sess, url, {"round": rnd}, log, "Notified next proposer", proposer_id, attempts=6, delay_s=2)
 
     if not ok:
-        excluded = STATE.setdefault("excluded_nodes", set())
-        if proposer_id not in excluded:
-            excluded.add(proposer_id)
-            remaining = len(nodes) - len(excluded)
-            log.warning(
-                f'"Node {proposer_id} unreachable for proposer handoff — '
-                f'marked excluded. {remaining} node(s) remain in the ring."'
-            )
+        # SAFETY FIX: same reasoning as _proposal_watchdog — a failed
+        # handoff attempt is this node's own local observation (its
+        # requests to proposer_id timed out), not proof the rest of
+        # the ring can't reach it either. Unilaterally excluding here
+        # let one partitioned node shrink its own quorum threshold
+        # independently, the same split-brain precondition. Route
+        # through corroboration instead of excluding directly.
+        log.warning(
+            f'"Node {proposer_id} unreachable for proposer handoff from this node — '
+            f'recording suspicion, awaiting peer corroboration rather than excluding unilaterally."'
+        )
+        _record_suspicion(proposer_id, log, weight=STATE.get("exclusion_threshold", 5))
+
         if _depth >= len(nodes):
             log.error('"All nodes unreachable for proposer handoff — cannot recover."')
             return
+        if proposer_id not in STATE.get("excluded_nodes", set()):
+            # Not yet corroborated — this node alone cannot safely
+            # reassign the round. Retry the handoff to the SAME
+            # proposer rather than skipping ahead, since other honest
+            # peers may still be able to reach them even if we can't.
+            log.info(
+                f'"[HANDOFF] node {proposer_id} not yet corroborated as excluded — '
+                f'retrying handoff to the same proposer rather than reassigning."'
+            )
+            return
+        remaining = len(nodes) - len(STATE.get("excluded_nodes", set()))
+        log.warning(
+            f'"Node {proposer_id} now corroborated as excluded by the ring. '
+            f'{remaining} node(s) remain."'
+        )
         fallback = get_proposer_for_round(rnd)
         if fallback == STATE["node_id"]:
             log.info(f'"Taking over as proposer for round {rnd} after handoff failure."')

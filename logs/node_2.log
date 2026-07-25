@@ -2947,3 +2947,243 @@
 {"time":"2026-07-26 03:17:23,268","level":"INFO","node":2,"msg":"[CONFIG DEBUG] attack_simulation loaded: enabled=True target_node=2 type=stale_update config_path=config_dev.json"}
 {"time":"2026-07-26 03:17:23,623","level":"WARNING","node":2,"msg":"DEV MODE: running without TLS"}
 {"time":"2026-07-26 03:17:23,623","level":"INFO","node":2,"msg":"Listening on 127.0.0.1:8002 | TLS=False"}
+{"time":"2026-07-26 03:17:28,644","level":"INFO","node":2,"msg":"Sent consensus pubkey to node 0"}
+{"time":"2026-07-26 03:17:28,645","level":"INFO","node":2,"msg":"Sent public key to node 0"}
+{"time":"2026-07-26 03:17:28,654","level":"INFO","node":2,"msg":"Consensus pubkey received from node 1"}
+{"time":"2026-07-26 03:17:28,661","level":"INFO","node":2,"msg":"Sent consensus pubkey to node 1"}
+{"time":"2026-07-26 03:17:28,663","level":"INFO","node":2,"msg":"Key exchange complete with node 1"}
+{"time":"2026-07-26 03:17:28,664","level":"INFO","node":2,"msg":"Sent public key to node 1"}
+{"time":"2026-07-26 03:17:28,677","level":"INFO","node":2,"msg":"Sent consensus pubkey to node 3"}
+{"time":"2026-07-26 03:17:28,682","level":"INFO","node":2,"msg":"Sent public key to node 3"}
+{"time":"2026-07-26 03:17:28,697","level":"INFO","node":2,"msg":"Consensus pubkey received from node 3"}
+{"time":"2026-07-26 03:17:28,719","level":"INFO","node":2,"msg":"Key exchange complete with node 3"}
+{"time":"2026-07-26 03:17:40,078","level":"INFO","node":2,"msg":"Key exchange complete with node 0"}
+{"time":"2026-07-26 03:17:40,094","level":"INFO","node":2,"msg":"Consensus pubkey received from node 0"}
+{"time":"2026-07-26 03:17:50,572","level":"INFO","node":2,"msg":"Proposal received: round=0 origin=0 hash=8e4b045b4ca1..."}
+{"time":"2026-07-26 03:17:50,700","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=0 new=True satisfied=False"}
+{"time":"2026-07-26 03:18:21,846","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=0 new=True satisfied=False"}
+{"time":"2026-07-26 03:18:45,277","level":"INFO","node":2,"msg":"Received update from node 1, round 0"}
+{"time":"2026-07-26 03:19:15,485","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-26 03:19:15,506","level":"INFO","node":2,"msg":"Trust score for node 0: S=0.429 (Z=1.00 A=0.50 P=0.50 R=1.00) advisory only"}
+{"time":"2026-07-26 03:19:15,527","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-26 03:19:15,527","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-26 03:19:15,527","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-26 03:19:19,333","level":"WARNING","node":2,"msg":"[ATTACK SIMULATION] stale_update active on node 2 — no cached update yet, caching this real first update"}
+{"time":"2026-07-26 03:19:19,333","level":"INFO","node":2,"msg":"[FC2 DELTA NORM] node 2 round=0 — fc2 delta norm this round: 0.0811"}
+{"time":"2026-07-26 03:19:19,340","level":"WARNING","node":2,"msg":"ZKP norm violation (clipping applied): slack=-237231, retry=0"}
+{"time":"2026-07-26 03:19:39,499","level":"INFO","node":2,"msg":"[TIMING] node 2 round=0 ZKP proof generation (voter) took 20.15s"}
+{"time":"2026-07-26 03:19:39,499","level":"INFO","node":2,"msg":"[TIMING] node 2 round=0 HE encryption (voter) took 0.00s"}
+{"time":"2026-07-26 03:19:39,514","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-26 03:19:59,866","level":"INFO","node":2,"msg":"Prediction agreement with node 3 round=0: A=0.815"}
+{"time":"2026-07-26 03:19:59,866","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=0 new=True satisfied=True"}
+{"time":"2026-07-26 03:20:07,778","level":"INFO","node":2,"msg":"Synced weights from master for round 0"}
+{"time":"2026-07-26 03:20:07,807","level":"INFO","node":2,"msg":"Sent commit vote to node 0"}
+{"time":"2026-07-26 03:20:14,196","level":"INFO","node":2,"msg":"Proposal received: round=1 origin=1 hash=066633f811cb..."}
+{"time":"2026-07-26 03:20:14,218","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=1 new=True satisfied=False"}
+{"time":"2026-07-26 03:20:14,224","level":"INFO","node":2,"msg":"Received update from node 1, round 1"}
+{"time":"2026-07-26 03:20:27,314","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-26 03:20:27,327","level":"INFO","node":2,"msg":"Trust score for node 1: S=0.429 (Z=1.00 A=0.50 P=0.50 R=1.00) advisory only"}
+{"time":"2026-07-26 03:20:27,382","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-26 03:20:27,382","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-26 03:20:27,382","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-26 03:20:27,493","level":"WARNING","node":2,"msg":"[ATTACK SIMULATION] stale_update active on node 2 — resent previous round's update unchanged"}
+{"time":"2026-07-26 03:20:27,493","level":"INFO","node":2,"msg":"[FC2 DELTA NORM] node 2 round=1 — fc2 delta norm this round: 5.9285"}
+{"time":"2026-07-26 03:20:27,508","level":"INFO","node":2,"msg":"[FC2 DELTA CAP] node 2 round=1 — fc2 delta norm 5.9285 exceeded structural cap 0.5, capped (damage-bound, not detection)"}
+{"time":"2026-07-26 03:20:27,508","level":"WARNING","node":2,"msg":"ZKP norm violation (clipping applied): slack=-31731, retry=0"}
+{"time":"2026-07-26 03:20:47,638","level":"INFO","node":2,"msg":"[TIMING] node 2 round=1 ZKP proof generation (voter) took 20.11s"}
+{"time":"2026-07-26 03:20:47,638","level":"INFO","node":2,"msg":"[TIMING] node 2 round=1 HE encryption (voter) took 0.00s"}
+{"time":"2026-07-26 03:20:47,654","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-26 03:21:13,511","level":"INFO","node":2,"msg":"Prediction agreement with node 3 round=1: A=0.991"}
+{"time":"2026-07-26 03:21:13,512","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=1 new=True satisfied=True"}
+{"time":"2026-07-26 03:21:29,505","level":"INFO","node":2,"msg":"Prediction agreement with node 0 round=1: A=0.990"}
+{"time":"2026-07-26 03:21:29,506","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=1 new=True satisfied=True"}
+{"time":"2026-07-26 03:21:35,522","level":"INFO","node":2,"msg":"Synced weights from master for round 1"}
+{"time":"2026-07-26 03:21:35,547","level":"INFO","node":2,"msg":"Sent commit vote to node 1"}
+{"time":"2026-07-26 03:21:35,568","level":"INFO","node":2,"msg":"My turn — starting round 3 as proposer."}
+{"time":"2026-07-26 03:21:35,569","level":"INFO","node":2,"msg":"Starting round 3"}
+{"time":"2026-07-26 03:21:35,604","level":"WARNING","node":2,"msg":"[ATTACK SIMULATION] stale_update active on node 2 — resent previous round's update unchanged"}
+{"time":"2026-07-26 03:21:35,604","level":"INFO","node":2,"msg":"[FC2 DELTA NORM] node 2 round=2 — fc2 delta norm this round: 0.3422"}
+{"time":"2026-07-26 03:21:35,606","level":"WARNING","node":2,"msg":"ZKP norm violation (clipping applied): slack=-31731, retry=0"}
+{"time":"2026-07-26 03:21:41,752","level":"INFO","node":2,"msg":"[TIMING] node 2 round=2 ZKP proof generation took 6.13s"}
+{"time":"2026-07-26 03:21:41,752","level":"INFO","node":2,"msg":"[TIMING] node 2 round=2 HE encryption took 0.00s"}
+{"time":"2026-07-26 03:21:41,752","level":"INFO","node":2,"msg":"Sent proposal to node 0"}
+{"time":"2026-07-26 03:21:41,764","level":"INFO","node":2,"msg":"Sent proposal to node 3"}
+{"time":"2026-07-26 03:21:41,765","level":"INFO","node":2,"msg":"Sent proposal to node 1"}
+{"time":"2026-07-26 03:21:41,771","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-26 03:21:41,774","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-26 03:21:41,774","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-26 03:21:41,778","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-26 03:21:51,357","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=2 new=True satisfied=False"}
+{"time":"2026-07-26 03:22:07,158","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=2 new=True satisfied=True"}
+{"time":"2026-07-26 03:22:22,981","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=2 new=True satisfied=True"}
+{"time":"2026-07-26 03:22:29,149","level":"INFO","node":2,"msg":"Received update from node 1, round 2"}
+{"time":"2026-07-26 03:22:29,149","level":"INFO","node":2,"msg":"Round 3 complete — aggregating"}
+{"time":"2026-07-26 03:22:29,156","level":"INFO","node":2,"msg":"Round 3 accuracy gate skipped (warm-up period, candidate_acc=0.6818)"}
+{"time":"2026-07-26 03:22:29,188","level":"INFO","node":2,"msg":"Commit vote recorded: node 0 decision=True round=2 satisfied=False"}
+{"time":"2026-07-26 03:22:29,192","level":"INFO","node":2,"msg":"Broadcast weights to node 0"}
+{"time":"2026-07-26 03:22:29,198","level":"INFO","node":2,"msg":"Commit vote recorded: node 3 decision=True round=2 satisfied=True"}
+{"time":"2026-07-26 03:22:29,198","level":"INFO","node":2,"msg":"Round 3 COMMITTED — model hash agreed by [2, 0, 3]"}
+{"time":"2026-07-26 03:22:29,203","level":"INFO","node":2,"msg":"Commit certificate saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\certificates\round_2.json"}
+{"time":"2026-07-26 03:22:29,208","level":"INFO","node":2,"msg":"Commit vote recorded: node 1 decision=True round=2 satisfied=True"}
+{"time":"2026-07-26 03:22:29,209","level":"INFO","node":2,"msg":"Broadcast weights to node 3"}
+{"time":"2026-07-26 03:22:29,212","level":"INFO","node":2,"msg":"Broadcast weights to node 1"}
+{"time":"2026-07-26 03:22:29,227","level":"INFO","node":2,"msg":"Checkpoint saved to C:\Users\mousu\OneDrive\Desktop\Set A\securefedhe\dashboard\model_latest.pt"}
+{"time":"2026-07-26 03:22:29,227","level":"INFO","node":2,"msg":"Round 3 complete | accuracy=0.6818 | duration=53.66s"}
+{"time":"2026-07-26 03:22:29,227","level":"INFO","node":2,"msg":"Round 4 belongs to node 3 — waiting for their proposal."}
+{"time":"2026-07-26 03:22:29,233","level":"INFO","node":2,"msg":"Notified next proposer to node 3"}
+{"time":"2026-07-26 03:22:29,233","level":"INFO","node":2,"msg":"[WATCHDOG SPAWNED] round=3 expected_proposer=3 timeout_s=600 spawned_at=03:22:29"}
+{"time":"2026-07-26 03:22:35,544","level":"INFO","node":2,"msg":"Proposal received: round=3 origin=3 hash=2c84ab4dae43..."}
+{"time":"2026-07-26 03:22:35,551","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=3 new=True satisfied=False"}
+{"time":"2026-07-26 03:22:45,372","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=3 new=True satisfied=False"}
+{"time":"2026-07-26 03:23:01,262","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=3 new=True satisfied=True"}
+{"time":"2026-07-26 03:23:07,502","level":"INFO","node":2,"msg":"Received update from node 1, round 3"}
+{"time":"2026-07-26 03:23:17,244","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-26 03:23:17,251","level":"INFO","node":2,"msg":"Trust score for node 3: S=0.429 (Z=1.00 A=0.50 P=0.50 R=1.00) advisory only"}
+{"time":"2026-07-26 03:23:17,276","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-26 03:23:17,278","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-26 03:23:17,278","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-26 03:23:17,309","level":"WARNING","node":2,"msg":"[ATTACK SIMULATION] stale_update active on node 2 — resent previous round's update unchanged"}
+{"time":"2026-07-26 03:23:17,309","level":"INFO","node":2,"msg":"[FC2 DELTA NORM] node 2 round=3 — fc2 delta norm this round: 0.3404"}
+{"time":"2026-07-26 03:23:17,309","level":"WARNING","node":2,"msg":"ZKP norm violation (clipping applied): slack=-31731, retry=0"}
+{"time":"2026-07-26 03:23:23,381","level":"INFO","node":2,"msg":"[TIMING] node 2 round=3 ZKP proof generation (voter) took 6.04s"}
+{"time":"2026-07-26 03:23:23,381","level":"INFO","node":2,"msg":"[TIMING] node 2 round=3 HE encryption (voter) took 0.00s"}
+{"time":"2026-07-26 03:23:23,381","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-26 03:23:23,433","level":"INFO","node":2,"msg":"Synced weights from master for round 3"}
+{"time":"2026-07-26 03:23:23,442","level":"INFO","node":2,"msg":"Sent commit vote to node 3"}
+{"time":"2026-07-26 03:23:29,790","level":"INFO","node":2,"msg":"Proposal received: round=4 origin=0 hash=6d182ce6a3ab..."}
+{"time":"2026-07-26 03:23:29,819","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=4 new=True satisfied=False"}
+{"time":"2026-07-26 03:23:39,830","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=4 new=True satisfied=False"}
+{"time":"2026-07-26 03:23:46,000","level":"INFO","node":2,"msg":"Received update from node 1, round 4"}
+{"time":"2026-07-26 03:23:55,815","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-26 03:23:55,819","level":"INFO","node":2,"msg":"Per-class agreement with node 0: class0=0.616 class1=0.771 gap=0.155"}
+{"time":"2026-07-26 03:23:55,819","level":"INFO","node":2,"msg":"Per-class rolling gap for node 0: mean=0.155 over last 1 round(s)"}
+{"time":"2026-07-26 03:23:55,822","level":"INFO","node":2,"msg":"Trust score for node 0: S=0.574 (Z=1.00 A=0.67 P=0.52 R=1.00) advisory only"}
+{"time":"2026-07-26 03:23:55,841","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-26 03:23:55,842","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-26 03:23:55,842","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-26 03:23:55,875","level":"WARNING","node":2,"msg":"[ATTACK SIMULATION] stale_update active on node 2 — resent previous round's update unchanged"}
+{"time":"2026-07-26 03:23:55,875","level":"INFO","node":2,"msg":"[FC2 DELTA NORM] node 2 round=4 — fc2 delta norm this round: 0.3298"}
+{"time":"2026-07-26 03:23:55,875","level":"WARNING","node":2,"msg":"ZKP norm violation (clipping applied): slack=-31731, retry=0"}
+{"time":"2026-07-26 03:24:02,019","level":"INFO","node":2,"msg":"[TIMING] node 2 round=4 ZKP proof generation (voter) took 6.13s"}
+{"time":"2026-07-26 03:24:02,019","level":"INFO","node":2,"msg":"[TIMING] node 2 round=4 HE encryption (voter) took 0.00s"}
+{"time":"2026-07-26 03:24:02,036","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-26 03:24:11,811","level":"INFO","node":2,"msg":"Prediction agreement with node 3 round=4: A=0.964"}
+{"time":"2026-07-26 03:24:11,811","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=4 new=True satisfied=True"}
+{"time":"2026-07-26 03:24:18,017","level":"INFO","node":2,"msg":"Synced weights from master for round 4"}
+{"time":"2026-07-26 03:24:18,047","level":"INFO","node":2,"msg":"Sent commit vote to node 0"}
+{"time":"2026-07-26 03:24:24,418","level":"INFO","node":2,"msg":"Proposal received: round=5 origin=1 hash=3b8e7e481f3c..."}
+{"time":"2026-07-26 03:24:24,430","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=True reason=zkp_ok round=5 new=True satisfied=False"}
+{"time":"2026-07-26 03:24:24,437","level":"INFO","node":2,"msg":"Received update from node 1, round 5"}
+{"time":"2026-07-26 03:24:34,145","level":"INFO","node":2,"msg":"ZKP ACCEPTED from node 1"}
+{"time":"2026-07-26 03:24:34,145","level":"INFO","node":2,"msg":"Per-class agreement with node 1: class0=0.780 class1=0.927 gap=0.146"}
+{"time":"2026-07-26 03:24:34,145","level":"INFO","node":2,"msg":"Per-class rolling gap for node 1: mean=0.146 over last 1 round(s)"}
+{"time":"2026-07-26 03:24:34,158","level":"INFO","node":2,"msg":"Trust score for node 1: S=0.713 (Z=1.00 A=0.83 P=0.52 R=1.00) advisory only"}
+{"time":"2026-07-26 03:24:34,178","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-26 03:24:34,189","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-26 03:24:34,190","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-26 03:24:34,219","level":"WARNING","node":2,"msg":"[ATTACK SIMULATION] stale_update active on node 2 — resent previous round's update unchanged"}
+{"time":"2026-07-26 03:24:34,220","level":"INFO","node":2,"msg":"[FC2 DELTA NORM] node 2 round=5 — fc2 delta norm this round: 0.3172"}
+{"time":"2026-07-26 03:24:34,220","level":"WARNING","node":2,"msg":"ZKP norm violation (clipping applied): slack=-31731, retry=0"}
+{"time":"2026-07-26 03:24:40,314","level":"INFO","node":2,"msg":"[TIMING] node 2 round=5 ZKP proof generation (voter) took 6.09s"}
+{"time":"2026-07-26 03:24:40,314","level":"INFO","node":2,"msg":"[TIMING] node 2 round=5 HE encryption (voter) took 0.00s"}
+{"time":"2026-07-26 03:24:40,331","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-26 03:24:50,130","level":"INFO","node":2,"msg":"Prediction agreement with node 3 round=5: A=0.954"}
+{"time":"2026-07-26 03:24:50,130","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=True reason=zkp_ok round=5 new=True satisfied=True"}
+{"time":"2026-07-26 03:25:06,010","level":"INFO","node":2,"msg":"Prediction agreement with node 0 round=5: A=0.952"}
+{"time":"2026-07-26 03:25:06,011","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=True reason=zkp_ok round=5 new=True satisfied=True"}
+{"time":"2026-07-26 03:25:12,313","level":"INFO","node":2,"msg":"Synced weights from master for round 5"}
+{"time":"2026-07-26 03:25:12,328","level":"INFO","node":2,"msg":"Sent commit vote to node 1"}
+{"time":"2026-07-26 03:25:12,339","level":"INFO","node":2,"msg":"My turn — starting round 7 as proposer."}
+{"time":"2026-07-26 03:25:12,340","level":"INFO","node":2,"msg":"Starting round 7"}
+{"time":"2026-07-26 03:25:12,398","level":"WARNING","node":2,"msg":"[ATTACK SIMULATION] stale_update active on node 2 — resent previous round's update unchanged"}
+{"time":"2026-07-26 03:25:12,398","level":"INFO","node":2,"msg":"[FC2 DELTA NORM] node 2 round=6 — fc2 delta norm this round: 0.2905"}
+{"time":"2026-07-26 03:25:12,398","level":"WARNING","node":2,"msg":"ZKP norm violation (clipping applied): slack=-31731, retry=0"}
+{"time":"2026-07-26 03:25:12,398","level":"WARNING","node":2,"msg":"[STALE-UPDATE CHECK] node 2 slack unchanged from last round (90000375743) — possible replayed/stale update, advisory only"}
+{"time":"2026-07-26 03:25:18,641","level":"INFO","node":2,"msg":"[TIMING] node 2 round=6 ZKP proof generation took 6.24s"}
+{"time":"2026-07-26 03:25:18,641","level":"INFO","node":2,"msg":"[TIMING] node 2 round=6 HE encryption took 0.00s"}
+{"time":"2026-07-26 03:25:18,641","level":"INFO","node":2,"msg":"Sent proposal to node 3"}
+{"time":"2026-07-26 03:25:18,641","level":"INFO","node":2,"msg":"Sent proposal to node 0"}
+{"time":"2026-07-26 03:25:18,654","level":"INFO","node":2,"msg":"Sent proposal to node 1"}
+{"time":"2026-07-26 03:25:18,661","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-26 03:25:18,662","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-26 03:25:18,662","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-26 03:25:18,667","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-26 03:25:28,396","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=False reason=stale_update_replay round=6 new=True satisfied=False"}
+{"time":"2026-07-26 03:25:44,429","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=False reason=stale_update_replay round=6 new=True satisfied=False"}
+{"time":"2026-07-26 03:26:00,393","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=False reason=stale_update_replay round=6 new=True satisfied=False"}
+{"time":"2026-07-26 03:26:06,457","level":"INFO","node":2,"msg":"Received update from node 1, round 6"}
+{"time":"2026-07-26 03:26:06,457","level":"INFO","node":2,"msg":"Round 7 complete — aggregating"}
+{"time":"2026-07-26 03:26:06,458","level":"WARNING","node":2,"msg":"Round 7 REJECTED — quorum not satisfied (attempt 1/3). Retrying round."}
+{"time":"2026-07-26 03:26:06,968","level":"INFO","node":2,"msg":"Starting round 7"}
+{"time":"2026-07-26 03:26:07,005","level":"WARNING","node":2,"msg":"[ATTACK SIMULATION] stale_update active on node 2 — resent previous round's update unchanged"}
+{"time":"2026-07-26 03:26:07,005","level":"INFO","node":2,"msg":"[FC2 DELTA NORM] node 2 round=6 — fc2 delta norm this round: 0.2361"}
+{"time":"2026-07-26 03:26:07,005","level":"WARNING","node":2,"msg":"ZKP norm violation (clipping applied): slack=-31731, retry=0"}
+{"time":"2026-07-26 03:26:07,005","level":"WARNING","node":2,"msg":"[STALE-UPDATE CHECK] node 2 slack unchanged from last round (90000375743) — possible replayed/stale update, advisory only"}
+{"time":"2026-07-26 03:26:13,160","level":"INFO","node":2,"msg":"[TIMING] node 2 round=6 ZKP proof generation took 6.15s"}
+{"time":"2026-07-26 03:26:13,160","level":"INFO","node":2,"msg":"[TIMING] node 2 round=6 HE encryption took 0.00s"}
+{"time":"2026-07-26 03:26:13,160","level":"INFO","node":2,"msg":"Sent proposal to node 0"}
+{"time":"2026-07-26 03:26:13,175","level":"INFO","node":2,"msg":"Sent proposal to node 1"}
+{"time":"2026-07-26 03:26:13,175","level":"INFO","node":2,"msg":"Sent proposal to node 3"}
+{"time":"2026-07-26 03:26:13,183","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-26 03:26:13,183","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-26 03:26:13,184","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-26 03:26:13,188","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-26 03:26:23,091","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=False reason=stale_update_replay round=6 new=False satisfied=False"}
+{"time":"2026-07-26 03:26:39,007","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=False reason=stale_update_replay round=6 new=False satisfied=False"}
+{"time":"2026-07-26 03:26:54,884","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=False reason=stale_update_replay round=6 new=False satisfied=False"}
+{"time":"2026-07-26 03:27:01,073","level":"INFO","node":2,"msg":"Received update from node 1, round 6"}
+{"time":"2026-07-26 03:27:01,073","level":"INFO","node":2,"msg":"Round 7 complete — aggregating"}
+{"time":"2026-07-26 03:27:01,073","level":"WARNING","node":2,"msg":"Round 7 REJECTED — quorum not satisfied (attempt 2/3). Retrying round."}
+{"time":"2026-07-26 03:27:01,576","level":"INFO","node":2,"msg":"Starting round 7"}
+{"time":"2026-07-26 03:27:01,609","level":"WARNING","node":2,"msg":"[ATTACK SIMULATION] stale_update active on node 2 — resent previous round's update unchanged"}
+{"time":"2026-07-26 03:27:01,609","level":"INFO","node":2,"msg":"[FC2 DELTA NORM] node 2 round=6 — fc2 delta norm this round: 0.2200"}
+{"time":"2026-07-26 03:27:01,609","level":"WARNING","node":2,"msg":"ZKP norm violation (clipping applied): slack=-31731, retry=0"}
+{"time":"2026-07-26 03:27:01,609","level":"WARNING","node":2,"msg":"[STALE-UPDATE CHECK] node 2 slack unchanged from last round (90000375743) — possible replayed/stale update, advisory only"}
+{"time":"2026-07-26 03:27:07,741","level":"INFO","node":2,"msg":"[TIMING] node 2 round=6 ZKP proof generation took 6.12s"}
+{"time":"2026-07-26 03:27:07,741","level":"INFO","node":2,"msg":"[TIMING] node 2 round=6 HE encryption took 0.00s"}
+{"time":"2026-07-26 03:27:07,741","level":"INFO","node":2,"msg":"Sent proposal to node 0"}
+{"time":"2026-07-26 03:27:07,748","level":"INFO","node":2,"msg":"Sent proposal to node 3"}
+{"time":"2026-07-26 03:27:07,762","level":"INFO","node":2,"msg":"Sent proposal to node 1"}
+{"time":"2026-07-26 03:27:07,783","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-26 03:27:07,786","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-26 03:27:07,786","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-26 03:27:07,791","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-26 03:27:17,535","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=False reason=stale_update_replay round=6 new=False satisfied=False"}
+{"time":"2026-07-26 03:27:33,554","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=False reason=stale_update_replay round=6 new=False satisfied=False"}
+{"time":"2026-07-26 03:27:49,597","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=False reason=stale_update_replay round=6 new=False satisfied=False"}
+{"time":"2026-07-26 03:27:55,764","level":"INFO","node":2,"msg":"Received update from node 1, round 6"}
+{"time":"2026-07-26 03:27:55,765","level":"INFO","node":2,"msg":"Round 7 complete — aggregating"}
+{"time":"2026-07-26 03:27:55,766","level":"WARNING","node":2,"msg":"Round 7 REJECTED — quorum not satisfied (attempt 3/3). Retrying round."}
+{"time":"2026-07-26 03:27:56,268","level":"INFO","node":2,"msg":"Starting round 7"}
+{"time":"2026-07-26 03:27:56,307","level":"WARNING","node":2,"msg":"[ATTACK SIMULATION] stale_update active on node 2 — resent previous round's update unchanged"}
+{"time":"2026-07-26 03:27:56,307","level":"INFO","node":2,"msg":"[FC2 DELTA NORM] node 2 round=6 — fc2 delta norm this round: 0.2444"}
+{"time":"2026-07-26 03:27:56,307","level":"WARNING","node":2,"msg":"ZKP norm violation (clipping applied): slack=-31731, retry=0"}
+{"time":"2026-07-26 03:27:56,309","level":"WARNING","node":2,"msg":"[STALE-UPDATE CHECK] node 2 slack unchanged from last round (90000375743) — possible replayed/stale update, advisory only"}
+{"time":"2026-07-26 03:28:02,380","level":"INFO","node":2,"msg":"[TIMING] node 2 round=6 ZKP proof generation took 6.05s"}
+{"time":"2026-07-26 03:28:02,380","level":"INFO","node":2,"msg":"[TIMING] node 2 round=6 HE encryption took 0.00s"}
+{"time":"2026-07-26 03:28:02,393","level":"INFO","node":2,"msg":"Sent proposal to node 1"}
+{"time":"2026-07-26 03:28:02,393","level":"INFO","node":2,"msg":"Sent proposal to node 0"}
+{"time":"2026-07-26 03:28:02,393","level":"INFO","node":2,"msg":"Sent proposal to node 3"}
+{"time":"2026-07-26 03:28:02,398","level":"INFO","node":2,"msg":"Sent consensus vote to node 1"}
+{"time":"2026-07-26 03:28:02,400","level":"INFO","node":2,"msg":"Sent consensus vote to node 0"}
+{"time":"2026-07-26 03:28:02,400","level":"INFO","node":2,"msg":"Sent consensus vote to node 3"}
+{"time":"2026-07-26 03:28:02,404","level":"INFO","node":2,"msg":"Forwarded to http://127.0.0.1:8003"}
+{"time":"2026-07-26 03:28:12,166","level":"INFO","node":2,"msg":"Consensus vote recorded: node 3 decision=False reason=stale_update_replay round=6 new=False satisfied=False"}
+{"time":"2026-07-26 03:28:28,127","level":"INFO","node":2,"msg":"Consensus vote recorded: node 0 decision=False reason=stale_update_replay round=6 new=False satisfied=False"}
+{"time":"2026-07-26 03:28:44,024","level":"INFO","node":2,"msg":"Consensus vote recorded: node 1 decision=False reason=stale_update_replay round=6 new=False satisfied=False"}
+{"time":"2026-07-26 03:28:50,265","level":"INFO","node":2,"msg":"Received update from node 1, round 6"}
+{"time":"2026-07-26 03:28:50,265","level":"INFO","node":2,"msg":"Round 7 complete — aggregating"}
+{"time":"2026-07-26 03:28:50,265","level":"ERROR","node":2,"msg":"Round 7 REJECTED — quorum not satisfied after 3 retries. Skipping round, model NOT updated."}
+{"time":"2026-07-26 03:28:50,329","level":"WARNING","node":2,"msg":"Node 2 accused by node 0, but only 1/3 distinct accusers so far (3f+1 quorum) — NOT excluding yet (avoids a single compromised node unilaterally removing an honest peer)."}
+{"time":"2026-07-26 03:28:50,345","level":"INFO","node":2,"msg":"Sent skip notice to node 0"}
+{"time":"2026-07-26 03:28:50,383","level":"WARNING","node":2,"msg":"Node 2 accused by node 1, but only 2/3 distinct accusers so far (3f+1 quorum) — NOT excluding yet (avoids a single compromised node unilaterally removing an honest peer)."}
+{"time":"2026-07-26 03:28:50,406","level":"INFO","node":2,"msg":"Sent skip notice to node 1"}
+{"time":"2026-07-26 03:29:00,507","level":"ERROR","node":2,"msg":"Node 2 accused by 3 independent peers ([0, 1, 3]) — quorum-corroborated, excluding."}
+{"time":"2026-07-26 03:29:00,508","level":"ERROR","node":2,"msg":"Node 2 EXCLUDED from proposing and quorum. Quorum requirement adjusted to 3 of 3 remaining trusted nodes."}
+{"time":"2026-07-26 03:29:00,508","level":"ERROR","node":2,"msg":"*** THIS NODE HAS BEEN EXCLUDED from the consensus ring. No further rounds will be routed to it. This is expected behavior, not a crash or hang — it is now safe to close this process. ***"}
+{"time":"2026-07-26 03:29:00,540","level":"INFO","node":2,"msg":"Sent exclusion notice for node 2 to node 0"}
+{"time":"2026-07-26 03:29:00,557","level":"INFO","node":2,"msg":"Sent exclusion notice for node 2 to node 1"}
+{"time":"2026-07-26 03:29:10,590","level":"WARNING","node":2,"msg":"Failed to send exclusion notice to node 3: HTTPConnectionPool(host='127.0.0.1', port=8003): Read timed out. (read timeout=10)"}
+{"time":"2026-07-26 03:29:10,654","level":"INFO","node":2,"msg":"Sent skip notice to node 3"}
+{"time":"2026-07-26 03:29:10,662","level":"INFO","node":2,"msg":"Notified next proposer to node 3"}
+{"time":"2026-07-26 03:29:10,663","level":"INFO","node":2,"msg":"[WATCHDOG SPAWNED] round=7 expected_proposer=3 timeout_s=600 spawned_at=03:29:10"}
