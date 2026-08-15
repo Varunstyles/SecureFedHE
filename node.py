@@ -2662,8 +2662,25 @@ def _gossip_relay(payload: dict):
     excluded = STATE.get("excluded_nodes", set())
 
     # ── Fold in this node's own contribution, once, if not done yet ──
+    # CRITICAL: must claim the round atomically, BEFORE doing any slow
+    # work (training, encryption) — multiple copies of this round's
+    # payload can arrive nearly simultaneously from different gossip
+    # senders, each spawning its own thread. Checking "have I
+    # contributed" and only marking it done AFTER folding in leaves a
+    # race window where several threads all pass the check before any
+    # of them finish, causing this node to fold itself into the
+    # aggregate multiple times (confirmed live: node 1 folded in 3x,
+    # node 3 folded in 2x, in a single round). A lock around the
+    # check-and-claim closes that window — the claim itself is cheap
+    # (a set add), only the WORK that follows is slow.
     contributed = STATE.setdefault("gossip_contributed_rounds", set())
-    if nid != origin and rnd not in contributed and nid not in excluded:
+    gossip_lock = STATE.setdefault("gossip_contribution_lock", threading.Lock())
+    with gossip_lock:
+        _should_contribute = (nid != origin and rnd not in contributed
+                               and nid not in excluded)
+        if _should_contribute:
+            contributed.add(rnd)  # claim BEFORE doing the work, not after
+    if _should_contribute:
         attack_cfg = config.get("attack_simulation", {})
         _is_attacker = (attack_cfg.get("enabled", False)
                          and nid == attack_cfg.get("target_node"))
@@ -2818,22 +2835,34 @@ def _gossip_round_complete(payload: dict, expected_contributor_count: int) -> bo
     contributors), this compares against the sum of all non-excluded
     nodes' own n_samples, not a plain node count — reuses the same
     'origin votes for itself too' accounting the ring path already
-    relies on (origin's own n_samples is baked in from round start)."""
+    relies on (origin's own n_samples is baked in from round start).
+
+    CRITICAL PERFORMANCE FIX: the per-node sample counts are computed
+    ONCE and cached in STATE, instead of calling load_diabetes_datasets()
+    (a full disk read + Dirichlet repartition of the whole dataset,
+    with its own startup print() banner) on EVERY call to this
+    function. This function can be called many times per round —
+    confirmed live: with the gossip fan-out plus (at the time) an
+    unfixed contribution race, this was reloading the dataset dozens
+    of times in quick succession, producing the repeated/garbled
+    banner output and severe slowdown that looked like a freeze but
+    was actually redundant I/O-bound work."""
     nodes = STATE["config"]["ring"]["nodes"]
     excluded = STATE.get("excluded_nodes", set())
     N_MAX = STATE["config"]["privacy"].get("max_aggregation_weight", 100)
-    loader_len = len(STATE["loader"].dataset)  # this node's own count, as a
-    # reasonable proxy for expected per-node contribution size when the
-    # exact other nodes' counts aren't locally known; every node runs
-    # the identical Dirichlet partition function with the same seed
-    # (see load_diabetes_datasets(seed=42) in main()), so in practice
-    # all nodes compute the same expected total independently.
-    from data.diabetes_loader import load_diabetes_datasets
-    loaders, _, _, _ = load_diabetes_datasets(
-        num_clients=len(nodes), alpha=0.5, seed=42
-    )
+
+    if "_per_node_sample_counts" not in STATE:
+        from data.diabetes_loader import load_diabetes_datasets
+        loaders, _, _, _ = load_diabetes_datasets(
+            num_clients=len(nodes), alpha=0.5, seed=42
+        )
+        STATE["_per_node_sample_counts"] = {
+            n["id"]: len(loaders[n["id"]].dataset) for n in nodes
+        }
+
+    counts = STATE["_per_node_sample_counts"]
     expected_total = sum(
-        min(len(loaders[n["id"]].dataset), N_MAX)
+        min(counts[n["id"]], N_MAX)
         for n in nodes if n["id"] not in excluded
     )
     return payload.get("weight_sum", 0) >= expected_total
@@ -2864,6 +2893,34 @@ def _forward(payload: dict):
             break
     url  = get_successor_url()
     sess = STATE["session"]
+
+    # ── Selective relay-drop attack (System Model ring-vs-gossip
+    # comparison) — a Byzantine node that stays fully responsive on
+    # every OTHER channel (status, votes, proposals) but silently
+    # withholds this ONE hop's forward toward a specific configured
+    # victim. Only meaningful in ring mode: gossip mode's own drop
+    # check lives in _gossip_relay() and is bypassed by having
+    # multiple redundant senders reach the same target anyway. This
+    # branch is what was MISSING before — attack_simulation.type ==
+    # "selective_relay_drop" was previously read only inside
+    # _gossip_relay(), so setting it under relay_mode: "ring" had no
+    # effect at all and the ring forwarded normally.
+    attack_cfg = STATE["config"].get("attack_simulation", {})
+    _is_dropper = (
+        attack_cfg.get("enabled", False)
+        and nid == attack_cfg.get("target_node")
+        and attack_cfg.get("type") == "selective_relay_drop"
+        and succ_id == attack_cfg.get("drop_target_node")
+    )
+    if _is_dropper:
+        log.warning(
+            f'"[ATTACK SIMULATION] selective_relay_drop active on node {nid} — '
+            f'silently withholding forward to node {succ_id} (successor this round). '
+            f'Node {nid} will continue answering /status, votes, and proposals '
+            f'normally — only this ring-relay hop is dropped."'
+        )
+        return
+
     ok, _ = _call_with_hard_timeout(
         lambda: sess.post(f"{url}/receive_update", json=payload, timeout=30),
         timeout_s=20,
