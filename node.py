@@ -619,6 +619,20 @@ STATE = {
     "trust_score_history": {},
     "zkp_ready":     False,
     "dev_mode": False,
+    # ── Gossip relay mode (System Model / ring-vs-gossip comparison) ──
+    # Only used when config["ring"]["relay_mode"] == "gossip". Same
+    # single-proposer-per-round model as ring mode (get_proposer_for_
+    # round is unchanged) — only how the AGGREGATE PAYLOAD reaches
+    # every peer changes: broadcast to all reachable peers at every
+    # hop, instead of a single successor. round_id -> set of node_ids
+    # this node has already folded its OWN local contribution into,
+    # so a payload arriving via more than one gossip path never gets
+    # this node's training merged in twice.
+    "gossip_contributed_rounds": set(),
+    # round_id -> set of node_ids we've already gossip-sent THIS
+    # round's current payload version to — de-dup guard against
+    # redundant re-sends as new merged versions keep arriving.
+    "gossip_sent_to": {},
 }
 
 
@@ -1659,6 +1673,17 @@ async def receive_update(request: Request):
     return {"status": "accepted"}
 
 
+@app.post("/gossip_update")
+async def gossip_update(request: Request):
+    """Gossip-mode payload endpoint (see _gossip_relay). A node can
+    receive this MORE THAN ONCE per round via different paths — that's
+    expected and handled by the de-dup/weight_sum-regression guards
+    inside _gossip_relay(), not by rejecting duplicates here."""
+    data = await request.json()
+    threading.Thread(target=_gossip_relay, args=(data,), daemon=True).start()
+    return {"status": "accepted"}
+
+
 @app.get("/shutdown")
 async def shutdown():
     STATE["logger"].info('"Shutdown requested"')
@@ -2005,7 +2030,7 @@ def execute_round():
     )
     _broadcast_vote(my_own_vote)
 
-    _forward(payload)
+    _relay_dispatch(payload)
 
 
 def handle_update(data: dict):
@@ -2365,7 +2390,7 @@ def handle_update(data: dict):
     )
 
     if not zkp_ok:
-        _forward(data)  # skip: forward unchanged (Fix-1 protocol)
+        _relay_dispatch(data)  # skip: forward unchanged (Fix-1 protocol)
         return
 
     # ── Local training ────────────────────────────────────────
@@ -2537,7 +2562,7 @@ def handle_update(data: dict):
         # under a different origin's key from an earlier round.
     }
 
-    _forward(payload)
+    _relay_dispatch(payload)
 
 
 def _call_with_hard_timeout(fn, timeout_s: float):
@@ -2572,6 +2597,246 @@ def _call_with_hard_timeout(fn, timeout_s: float):
     if result.get("ok"):
         return True, result["value"]
     return False, None
+
+
+def _relay_dispatch(payload: dict):
+    """Route a payload through whichever relay_mode is configured.
+    'ring' preserves the exact original single-hop behavior. 'gossip'
+    broadcasts the current payload directly to every non-excluded
+    peer, so a single Byzantine relay silently dropping ONE outbound
+    edge cannot suppress delivery — every other peer already has (or
+    will get) an independent copy via a different path. Same single-
+    proposer-per-round model, same consensus/crypto/detection logic
+    either way; only the payload TRANSPORT differs."""
+    relay_mode = STATE["config"]["ring"].get("relay_mode", "ring")
+    if relay_mode == "gossip":
+        _gossip_relay(payload)
+    else:
+        _forward(payload)
+
+
+def _gossip_relay(payload: dict):
+    """Full-gossip payload transport (System Model comparison — see
+    _relay_dispatch). Threat model this defends against: a Byzantine
+    node that stays reachable and behaves normally on every OTHER
+    channel (status, votes, proposals — already star-broadcast in
+    this codebase) but silently drops the model-weight payload on
+    one specific outbound edge. Under fixed-ring relay this is
+    undetectable and permanently loses that round's downstream
+    contributions (get_successor_url()/_forward() only route around
+    nodes that are UNREACHABLE or consensus-EXCLUDED, never around a
+    reachable node quietly not forwarding — see node.py's _forward()
+    docstring). Under gossip, the same drop just removes one of
+    several redundant paths; every other peer still receives a copy
+    directly.
+
+    Mechanics: whoever currently HOLDS the payload (origin, or any
+    peer that already merged its own contribution in) sends it to
+    every peer it hasn't sent a copy to yet this round. A receiving
+    node that has not yet folded its OWN local training into this
+    round's aggregate does so now (mirroring handle_update()'s
+    existing merge math), then re-gossips the newly-merged payload
+    onward. A node that has ALREADY contributed just re-gossips the
+    payload unchanged (so a peer that only heard about this round
+    via a slow/dropped path still gets it from someone else).
+    Whoever originated the round finalizes once its own held payload's
+    weight_sum covers every non-excluded node — same completion
+    condition as "the ring came back around", just reachable via
+    multiple paths instead of one.
+
+    Selective-drop attack simulation hook: if this node is the
+    configured attacker (attack_simulation.type ==
+    "selective_relay_drop"), it withholds the payload from
+    attack_simulation.drop_target_node only, sending normally to
+    everyone else — modeling a Byzantine relay that is reachable and
+    cooperative except toward one specific victim."""
+    log    = STATE["logger"]
+    nid    = STATE["node_id"]
+    rnd    = payload["round"]
+    origin = payload["origin_id"]
+    config = STATE["config"]
+    dp     = config["privacy"]
+    nodes  = config["ring"]["nodes"]
+    sess   = STATE["session"]
+    scheme = "http" if STATE.get("dev_mode") else "https"
+    excluded = STATE.get("excluded_nodes", set())
+
+    # ── Fold in this node's own contribution, once, if not done yet ──
+    contributed = STATE.setdefault("gossip_contributed_rounds", set())
+    if nid != origin and rnd not in contributed and nid not in excluded:
+        attack_cfg = config.get("attack_simulation", {})
+        _is_attacker = (attack_cfg.get("enabled", False)
+                         and nid == attack_cfg.get("target_node"))
+        _attack_type = attack_cfg.get("type") if _is_attacker else None
+        _lf_frac = attack_cfg.get("poison_fraction", 0.3) if _attack_type == "label_flip" else 0.0
+        _bd_frac = attack_cfg.get("poison_fraction", 0.3) if _attack_type == "backdoor" else 0.0
+        _bd_target = attack_cfg.get("backdoor_target_class", 1)
+
+        with STATE["model_lock"]:
+            STATE["_pre_training_snapshot"] = {
+                k: v.detach().cpu().numpy().copy() if hasattr(v, "detach") else np.asarray(v).copy()
+                for k, v in STATE["model"].state_dict().items()
+            }
+            params = local_train(
+                STATE["model"], STATE["loader"],
+                epochs=config["model"]["local_epochs"],
+                lr=config["model"]["lr"],
+                device=STATE["device"],
+                label_flip_frac=_lf_frac,
+                backdoor_frac=_bd_frac,
+                backdoor_target_class=_bd_target,
+            )
+        params = apply_attack_simulation(params, nid, log)
+
+        _pre_snapshot = STATE.get("_pre_training_snapshot", {})
+        fc2_delta_cap = dp.get("fc2_delta_cap", 0.5)
+        if "fc2.weight" in _pre_snapshot:
+            fc2_delta = params["fc2.weight"] - _pre_snapshot["fc2.weight"]
+            fc2_delta_norm = np.linalg.norm(fc2_delta.flatten())
+            if fc2_delta_norm > fc2_delta_cap:
+                fc2_delta = fc2_delta * (fc2_delta_cap / fc2_delta_norm)
+                params["fc2.weight"] = _pre_snapshot["fc2.weight"] + fc2_delta
+
+        clip_C = dp.get("clip_threshold", 0.5)
+        fc2_w_pre = params["fc2.weight"]
+        fc2_pre_norm = np.linalg.norm(fc2_w_pre.flatten())
+        if fc2_pre_norm > clip_C:
+            params["fc2.weight"] = fc2_w_pre * (clip_C / fc2_pre_norm)
+
+        noised = add_dp_noise(params, dp["dp_epsilon"], dp["dp_delta"], dp["dp_sensitivity"])
+
+        he = STATE["he"]
+        N_MAX = dp.get("max_aggregation_weight", 100)
+        n_samples = min(len(STATE["loader"].dataset), N_MAX)
+        inc_enc = deserialize_enc(payload["enc_fc2"])
+        inc_plain = deserialize_params(payload["plain"])
+        inc_w = payload["weight_sum"]
+        total_w = inc_w + n_samples
+
+        my_enc = {
+            "fc2.weight": he.encrypt(noised["fc2.weight"].flatten()),
+            "fc2.bias":   he.encrypt(noised["fc2.bias"]),
+        }
+        agg_enc = {}
+        for k in inc_enc:
+            scaled_inc = he.scale(inc_enc[k], inc_w / total_w)
+            scaled_my  = he.scale(my_enc[k],  n_samples / total_w)
+            agg_enc[k] = he.add(scaled_inc, scaled_my)
+
+        agg_plain = {}
+        for k in inc_plain:
+            if k in noised:
+                agg_plain[k] = (inc_plain[k] * inc_w + noised[k] * n_samples) / total_w
+            else:
+                agg_plain[k] = inc_plain[k]
+
+        payload = {
+            **payload,
+            "sender_id":  nid,
+            "enc_fc2":    serialize_enc(agg_enc),
+            "plain":      serialize_params(agg_plain),
+            "weight_sum": total_w,
+        }
+        contributed.add(rnd)
+        log.info(
+            f'"[GOSSIP] node {nid} folded own contribution into round={rnd} '
+            f'origin={origin} — weight_sum now {total_w}"'
+        )
+        # This node now holds the authoritative merged payload for this
+        # round going forward — keep it, so a later re-gossip from a
+        # slower path doesn't stomp our own progress with a smaller
+        # (earlier) weight_sum. See STATE["gossip_latest_payload"] below.
+        STATE.setdefault("gossip_latest_payload", {})[rnd] = payload
+
+    # If we already hold a MORE advanced merged version than what just
+    # arrived (higher weight_sum = more nodes folded in), keep ours —
+    # never regress to an earlier, less-complete version when re-
+    # gossiping onward.
+    held = STATE.get("gossip_latest_payload", {}).get(rnd)
+    if held is not None and held.get("weight_sum", 0) >= payload.get("weight_sum", 0):
+        payload = held
+    else:
+        STATE.setdefault("gossip_latest_payload", {})[rnd] = payload
+
+    # ── Origin: check completion (all non-excluded nodes folded in) ──
+    if nid == origin:
+        expected = len([n for n in nodes if n["id"] not in excluded])
+        if payload["weight_sum"] >= 0 and _gossip_round_complete(payload, expected):
+            log.info(f'"[GOSSIP] round={rnd} origin={origin} — all contributions '
+                      f'received, finalizing"')
+            _finalize_round(payload)
+            return
+
+    # ── Re-gossip current payload to every peer not yet sent this round ──
+    attack_cfg = config.get("attack_simulation", {})
+    _is_dropper = (
+        attack_cfg.get("enabled", False)
+        and nid == attack_cfg.get("target_node")
+        and attack_cfg.get("type") == "selective_relay_drop"
+    )
+    _drop_target = attack_cfg.get("drop_target_node") if _is_dropper else None
+
+    already_sent = STATE.setdefault("gossip_sent_to", {}).setdefault(rnd, set())
+
+    def _send_one(node):
+        target_id = node["id"]
+        if target_id == nid or target_id in excluded or target_id in already_sent:
+            return
+        if _drop_target is not None and target_id == _drop_target:
+            log.warning(
+                f'"[ATTACK SIMULATION] selective_relay_drop active on node {nid} — '
+                f'withholding round={rnd} origin={origin} payload from node '
+                f'{target_id} only (all other peers sent normally)"'
+            )
+            return
+        url = f"{scheme}://{node['ip']}:{node['port']}/gossip_update"
+        ok, _ = _call_with_hard_timeout(
+            lambda: sess.post(url, json=payload, timeout=30),
+            timeout_s=20,
+        )
+        if ok:
+            already_sent.add(target_id)
+            log.info(f'"[GOSSIP] Sent round={rnd} origin={origin} '
+                      f'(weight_sum={payload["weight_sum"]}) to node {target_id}"')
+        else:
+            log.warning(f'"[GOSSIP] Send to node {target_id} failed '
+                         f'(round={rnd} origin={origin})"')
+
+    threads = []
+    for node in nodes:
+        th = threading.Thread(target=_send_one, args=(node,), daemon=True)
+        th.start()
+        threads.append(th)
+    for th in threads:
+        th.join()
+
+
+def _gossip_round_complete(payload: dict, expected_contributor_count: int) -> bool:
+    """A round is complete once weight_sum reflects every non-excluded
+    node's own sample count having been folded in exactly once. Since
+    weight_sum is a running SUM of sample counts (not a count of
+    contributors), this compares against the sum of all non-excluded
+    nodes' own n_samples, not a plain node count — reuses the same
+    'origin votes for itself too' accounting the ring path already
+    relies on (origin's own n_samples is baked in from round start)."""
+    nodes = STATE["config"]["ring"]["nodes"]
+    excluded = STATE.get("excluded_nodes", set())
+    N_MAX = STATE["config"]["privacy"].get("max_aggregation_weight", 100)
+    loader_len = len(STATE["loader"].dataset)  # this node's own count, as a
+    # reasonable proxy for expected per-node contribution size when the
+    # exact other nodes' counts aren't locally known; every node runs
+    # the identical Dirichlet partition function with the same seed
+    # (see load_diabetes_datasets(seed=42) in main()), so in practice
+    # all nodes compute the same expected total independently.
+    from data.diabetes_loader import load_diabetes_datasets
+    loaders, _, _, _ = load_diabetes_datasets(
+        num_clients=len(nodes), alpha=0.5, seed=42
+    )
+    expected_total = sum(
+        min(len(loaders[n["id"]].dataset), N_MAX)
+        for n in nodes if n["id"] not in excluded
+    )
+    return payload.get("weight_sum", 0) >= expected_total
 
 
 def _forward(payload: dict):
