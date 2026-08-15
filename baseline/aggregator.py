@@ -30,15 +30,24 @@ def fedavg(
     total = sum(client_sizes)
     weights = [s / total for s in client_sizes]
 
-    # Build the averaged state dict
+    # Build the averaged state dict. Skip BatchNorm's non-trainable
+    # bookkeeping buffers (running_mean, running_var, num_batches_tracked)
+    # from weighted-averaging — these are not model weights, are not
+    # meant to be federated the same way trainable parameters are, and
+    # num_batches_tracked is natively int64 (averaging it as float and
+    # casting back corrupts BN's internal momentum counter). Keep the
+    # global model's own current buffer values instead.
+    ref_state = global_model.state_dict()
     avg_state: Dict[str, torch.Tensor] = {}
     for key in client_updates[0]:
+        if key.endswith(("num_batches_tracked", "running_mean", "running_var")):
+            continue
         stacked = np.stack([u[key] for u in client_updates], axis=0)      # [C, ...]
         w_array = np.array(weights).reshape([-1] + [1] * (stacked.ndim - 1))
         avg_state[key] = torch.tensor((stacked * w_array).sum(axis=0),
-                                      dtype=torch.float32)
+                                      dtype=ref_state[key].dtype)
 
-    global_model.load_state_dict(avg_state, strict=True)
+    global_model.load_state_dict(avg_state, strict=False)
     return global_model
 
 
@@ -48,7 +57,22 @@ def get_model_params(model: nn.Module) -> Dict[str, np.ndarray]:
 
 
 def set_model_params(model: nn.Module, params: Dict[str, np.ndarray]) -> nn.Module:
-    """Load numpy state dict back into a model (server → client broadcast)."""
-    state = {k: torch.tensor(v, dtype=torch.float32) for k, v in params.items()}
+    """Load numpy state dict back into a model (server → client broadcast).
+
+    IMPORTANT: BatchNorm's `num_batches_tracked` buffer is natively an
+    int64 tensor in PyTorch's state_dict(), used internally as a running
+    counter for BN's momentum-averaging formula. Casting it to float32
+    unconditionally (as this function previously did for every key) is
+    silently accepted by load_state_dict — PyTorch does not error on the
+    dtype mismatch here — but corrupts that counter every round, which
+    compounds over training and produces exactly the kind of late-round
+    accuracy collapse independent of any DP-noise or clipping value.
+    Every key's ORIGINAL dtype, not a hardcoded float32, must be preserved.
+    """
+    ref_state = model.state_dict()
+    state = {}
+    for k, v in params.items():
+        target_dtype = ref_state[k].dtype if k in ref_state else torch.float32
+        state[k] = torch.tensor(v, dtype=target_dtype)
     model.load_state_dict(state, strict=True)
     return model

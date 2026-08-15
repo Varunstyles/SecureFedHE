@@ -1784,6 +1784,11 @@ def execute_round():
     STATE.get("round_pairwise_cosines", {}).pop(rnd, None)
     log.info(f'"Starting round {rnd + 1}"')
     STATE.setdefault("round_start_times", {})[rnd] = time.time()
+    # Fresh attempt at this round — clear any stale gossip finalize-
+    # trigger flag from a PREVIOUS attempt at the same round number,
+    # so this new attempt's eventual completion can actually finalize
+    # (see _gossip_relay's finalize-trigger guard).
+    STATE.setdefault("gossip_finalize_triggered", set()).discard(rnd)
 
     attack_cfg = config.get("attack_simulation", {})
     _is_attacker = (attack_cfg.get("enabled", False)
@@ -2838,9 +2843,32 @@ def _gossip_relay(payload: dict):
             STATE["gossip_latest_payload"][rnd] = payload
 
     # ── Origin: check completion (every non-excluded node contributed) ──
+    # CRITICAL: gossip fan-out means MULTIPLE threads on the origin
+    # node can each independently observe a complete contributor set
+    # for the SAME round (confirmed live: 15+ concurrent "all
+    # contributors present" triggers for one round). _finalize_round()
+    # only de-duplicates AFTER a round successfully commits — if
+    # quorum voting hasn't caught up yet, every one of those redundant
+    # calls falls through into the RETRY path instead, which has NO
+    # dedup at all, spawning a thundering herd of concurrent
+    # execute_round() threads that cascades into false accusations
+    # and node exclusions. Gate entry into _finalize_round itself,
+    # per round, so only the FIRST thread to observe completion ever
+    # calls it — later threads (redundant merges of the same already-
+    # complete branch) stand down instead of re-triggering finalize.
     if nid == origin:
         expected_ids = {n["id"] for n in nodes if n["id"] not in excluded}
         if expected_ids.issubset(set(payload.get("contributors", []))):
+            finalize_trigger_lock = STATE.setdefault(
+                "gossip_finalize_trigger_lock", threading.Lock()
+            )
+            triggered = STATE.setdefault("gossip_finalize_triggered", set())
+            with finalize_trigger_lock:
+                already_triggered = rnd in triggered
+                if not already_triggered:
+                    triggered.add(rnd)
+            if already_triggered:
+                return
             log.info(f'"[GOSSIP] round={rnd} origin={origin} — all contributors '
                       f'{sorted(expected_ids)} present, finalizing"')
             _finalize_round(payload)
