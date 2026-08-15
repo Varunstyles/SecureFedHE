@@ -2623,26 +2623,38 @@ def _gossip_relay(payload: dict):
     this codebase) but silently drops the model-weight payload on
     one specific outbound edge. Under fixed-ring relay this is
     undetectable and permanently loses that round's downstream
-    contributions (get_successor_url()/_forward() only route around
-    nodes that are UNREACHABLE or consensus-EXCLUDED, never around a
-    reachable node quietly not forwarding — see node.py's _forward()
-    docstring). Under gossip, the same drop just removes one of
+    contributions. Under gossip, the same drop just removes one of
     several redundant paths; every other peer still receives a copy
     directly.
 
-    Mechanics: whoever currently HOLDS the payload (origin, or any
-    peer that already merged its own contribution in) sends it to
-    every peer it hasn't sent a copy to yet this round. A receiving
-    node that has not yet folded its OWN local training into this
-    round's aggregate does so now (mirroring handle_update()'s
-    existing merge math), then re-gossips the newly-merged payload
-    onward. A node that has ALREADY contributed just re-gossips the
-    payload unchanged (so a peer that only heard about this round
-    via a slow/dropped path still gets it from someone else).
-    Whoever originated the round finalizes once its own held payload's
-    weight_sum covers every non-excluded node — same completion
-    condition as "the ring came back around", just reachable via
-    multiple paths instead of one.
+    REDESIGNED MERGE MECHANISM (v2). The original design tracked
+    progress as a single running weight_sum and had each node fold
+    itself into "whichever payload copy happened to arrive first" —
+    confirmed live to NEVER converge: node 0 fans its raw payload out
+    to nodes 1, 2, 3 simultaneously, so multiple nodes each grab a
+    still-early copy and fold into DIFFERENT branches in parallel
+    (e.g. node 1 -> {0,1}, node 3 -> {0,3}), and nothing ever forced
+    those branches back together — every branch capped out at
+    "origin + whoever grabbed it first" and just re-circulated at
+    that level forever, well short of the full 4-node total.
+
+    Fix: every payload now carries an explicit `contributors` list —
+    the set of node_ids already folded into it — instead of an opaque
+    weight_sum alone. A node folds itself in only if it is NOT already
+    in that set (so a node genuinely only ever contributes once,
+    tracked per-PAYLOAD-BRANCH, not per-round-globally — this also
+    fixes needing a separate STATE-wide 'have I contributed this
+    round' flag, which was itself the source of the fold-into-the-
+    wrong-branch bug). Whenever a node holds two different payload
+    branches for the same round (its own in-progress one, and one
+    that just arrived from a peer), it MERGES them — combining both
+    branches' contributor sets and combining their encrypted/plain
+    weights, weighted by each branch's total sample count — rather
+    than picking one and discarding the other. This is what makes
+    convergence guaranteed: every branch that ever meets another
+    branch merges into a strictly larger contributor set, so the
+    union of all branches monotonically grows toward the full node
+    set no matter what order gossip messages arrive in.
 
     Selective-drop attack simulation hook: if this node is the
     configured attacker (attack_simulation.type ==
@@ -2661,25 +2673,79 @@ def _gossip_relay(payload: dict):
     scheme = "http" if STATE.get("dev_mode") else "https"
     excluded = STATE.get("excluded_nodes", set())
 
-    # ── Fold in this node's own contribution, once, if not done yet ──
-    # CRITICAL: must claim the round atomically, BEFORE doing any slow
-    # work (training, encryption) — multiple copies of this round's
-    # payload can arrive nearly simultaneously from different gossip
-    # senders, each spawning its own thread. Checking "have I
-    # contributed" and only marking it done AFTER folding in leaves a
-    # race window where several threads all pass the check before any
-    # of them finish, causing this node to fold itself into the
-    # aggregate multiple times (confirmed live: node 1 folded in 3x,
-    # node 3 folded in 2x, in a single round). A lock around the
-    # check-and-claim closes that window — the claim itself is cheap
-    # (a set add), only the WORK that follows is slow.
-    contributed = STATE.setdefault("gossip_contributed_rounds", set())
+    payload.setdefault("contributors", [origin])
+
     gossip_lock = STATE.setdefault("gossip_contribution_lock", threading.Lock())
+
     with gossip_lock:
-        _should_contribute = (nid != origin and rnd not in contributed
+        held = STATE.setdefault("gossip_latest_payload", {}).get(rnd)
+
+        # ── Step 1: merge with whatever branch we already hold, if any ──
+        if held is not None:
+            held_contributors = set(held.get("contributors", [held["origin_id"]]))
+            new_contributors = set(payload.get("contributors", [origin]))
+            if held_contributors == new_contributors:
+                # Identical branch (e.g. a duplicate re-send) — keep
+                # whichever we already have, nothing to merge.
+                payload = held
+            elif held_contributors.issubset(new_contributors):
+                # Incoming branch is a strict superset (or equal) —
+                # it already includes everything we have, adopt it.
+                pass  # payload as received is already the better one
+            elif new_contributors.issubset(held_contributors):
+                # Our held branch already includes everything incoming
+                # has — keep ours, nothing new to learn from this copy.
+                payload = held
+            else:
+                # Genuinely disjoint (or partially overlapping)
+                # contributor sets — MERGE both branches together so
+                # neither node's work is lost. Weighted by each
+                # branch's own accumulated weight_sum.
+                he = STATE["he"]
+                w_a, w_b = held["weight_sum"], payload["weight_sum"]
+                total_w = w_a + w_b
+                enc_a = deserialize_enc(held["enc_fc2"])
+                enc_b = deserialize_enc(payload["enc_fc2"])
+                plain_a = deserialize_params(held["plain"])
+                plain_b = deserialize_params(payload["plain"])
+
+                agg_enc = {}
+                for k in enc_a:
+                    scaled_a = he.scale(enc_a[k], w_a / total_w)
+                    scaled_b = he.scale(enc_b[k], w_b / total_w)
+                    agg_enc[k] = he.add(scaled_a, scaled_b)
+
+                agg_plain = {}
+                for k in plain_a:
+                    agg_plain[k] = (plain_a[k] * w_a + plain_b[k] * w_b) / total_w
+
+                merged_contributors = sorted(held_contributors | new_contributors)
+                payload = {
+                    **payload,
+                    "sender_id":    nid,
+                    "enc_fc2":      serialize_enc(agg_enc),
+                    "plain":        serialize_params(agg_plain),
+                    "weight_sum":   total_w,
+                    "contributors": merged_contributors,
+                }
+                log.info(
+                    f'"[GOSSIP] node {nid} merged two branches for round={rnd} '
+                    f'origin={origin} — {sorted(held_contributors)} + '
+                    f'{sorted(new_contributors)} -> {merged_contributors} '
+                    f'(weight_sum now {total_w})"'
+                )
+
+        # ── Step 2: fold in OUR OWN contribution, if not already present
+        # in whichever branch we're now holding (post-merge) ──
+        current_contributors = set(payload.get("contributors", [origin]))
+        _should_contribute = (nid not in current_contributors
                                and nid not in excluded)
         if _should_contribute:
-            contributed.add(rnd)  # claim BEFORE doing the work, not after
+            # Claim immediately so no other thread on this node can
+            # also decide to fold in concurrently — the payload dict
+            # itself is about to be reassigned below.
+            payload = {**payload, "contributors": sorted(current_contributors | {nid})}
+
     if _should_contribute:
         attack_cfg = config.get("attack_simulation", {})
         _is_attacker = (attack_cfg.get("enabled", False)
@@ -2754,37 +2820,39 @@ def _gossip_relay(payload: dict):
             "plain":      serialize_params(agg_plain),
             "weight_sum": total_w,
         }
-        contributed.add(rnd)
         log.info(
             f'"[GOSSIP] node {nid} folded own contribution into round={rnd} '
-            f'origin={origin} — weight_sum now {total_w}"'
+            f'origin={origin} — contributors now {payload["contributors"]}, '
+            f'weight_sum now {total_w}"'
         )
-        # This node now holds the authoritative merged payload for this
-        # round going forward — keep it, so a later re-gossip from a
-        # slower path doesn't stomp our own progress with a smaller
-        # (earlier) weight_sum. See STATE["gossip_latest_payload"] below.
-        STATE.setdefault("gossip_latest_payload", {})[rnd] = payload
 
-    # If we already hold a MORE advanced merged version than what just
-    # arrived (higher weight_sum = more nodes folded in), keep ours —
-    # never regress to an earlier, less-complete version when re-
-    # gossiping onward.
-    held = STATE.get("gossip_latest_payload", {}).get(rnd)
-    if held is not None and held.get("weight_sum", 0) >= payload.get("weight_sum", 0):
-        payload = held
-    else:
-        STATE.setdefault("gossip_latest_payload", {})[rnd] = payload
+    with gossip_lock:
+        # Keep whichever version (ours post-fold/merge, or something
+        # even newer that arrived on another thread meanwhile) has the
+        # strictly larger contributor set — never regress.
+        held_now = STATE.get("gossip_latest_payload", {}).get(rnd)
+        if (held_now is not None
+                and len(held_now.get("contributors", [])) >= len(payload.get("contributors", []))):
+            payload = held_now
+        else:
+            STATE["gossip_latest_payload"][rnd] = payload
 
-    # ── Origin: check completion (all non-excluded nodes folded in) ──
+    # ── Origin: check completion (every non-excluded node contributed) ──
     if nid == origin:
-        expected = len([n for n in nodes if n["id"] not in excluded])
-        if payload["weight_sum"] >= 0 and _gossip_round_complete(payload, expected):
-            log.info(f'"[GOSSIP] round={rnd} origin={origin} — all contributions '
-                      f'received, finalizing"')
+        expected_ids = {n["id"] for n in nodes if n["id"] not in excluded}
+        if expected_ids.issubset(set(payload.get("contributors", []))):
+            log.info(f'"[GOSSIP] round={rnd} origin={origin} — all contributors '
+                      f'{sorted(expected_ids)} present, finalizing"')
             _finalize_round(payload)
             return
 
-    # ── Re-gossip current payload to every peer not yet sent this round ──
+    # ── Re-gossip current payload to every peer not yet sent THIS
+    # EXACT branch to. Keyed by (round, tuple(contributors)) instead of
+    # just round, so a newly-merged/advanced branch is always re-sent
+    # even to peers that already received an earlier, smaller branch
+    # this round — otherwise a peer that already has the "old" branch
+    # would never learn about a subsequent merge. ──
+    branch_key = (rnd, tuple(sorted(payload.get("contributors", []))))
     attack_cfg = config.get("attack_simulation", {})
     _is_dropper = (
         attack_cfg.get("enabled", False)
@@ -2793,7 +2861,7 @@ def _gossip_relay(payload: dict):
     )
     _drop_target = attack_cfg.get("drop_target_node") if _is_dropper else None
 
-    already_sent = STATE.setdefault("gossip_sent_to", {}).setdefault(rnd, set())
+    already_sent = STATE.setdefault("gossip_sent_to", {}).setdefault(branch_key, set())
 
     def _send_one(node):
         target_id = node["id"]
@@ -2814,6 +2882,7 @@ def _gossip_relay(payload: dict):
         if ok:
             already_sent.add(target_id)
             log.info(f'"[GOSSIP] Sent round={rnd} origin={origin} '
+                      f'contributors={payload.get("contributors")} '
                       f'(weight_sum={payload["weight_sum"]}) to node {target_id}"')
         else:
             log.warning(f'"[GOSSIP] Send to node {target_id} failed '
@@ -2826,46 +2895,6 @@ def _gossip_relay(payload: dict):
         threads.append(th)
     for th in threads:
         th.join()
-
-
-def _gossip_round_complete(payload: dict, expected_contributor_count: int) -> bool:
-    """A round is complete once weight_sum reflects every non-excluded
-    node's own sample count having been folded in exactly once. Since
-    weight_sum is a running SUM of sample counts (not a count of
-    contributors), this compares against the sum of all non-excluded
-    nodes' own n_samples, not a plain node count — reuses the same
-    'origin votes for itself too' accounting the ring path already
-    relies on (origin's own n_samples is baked in from round start).
-
-    CRITICAL PERFORMANCE FIX: the per-node sample counts are computed
-    ONCE and cached in STATE, instead of calling load_diabetes_datasets()
-    (a full disk read + Dirichlet repartition of the whole dataset,
-    with its own startup print() banner) on EVERY call to this
-    function. This function can be called many times per round —
-    confirmed live: with the gossip fan-out plus (at the time) an
-    unfixed contribution race, this was reloading the dataset dozens
-    of times in quick succession, producing the repeated/garbled
-    banner output and severe slowdown that looked like a freeze but
-    was actually redundant I/O-bound work."""
-    nodes = STATE["config"]["ring"]["nodes"]
-    excluded = STATE.get("excluded_nodes", set())
-    N_MAX = STATE["config"]["privacy"].get("max_aggregation_weight", 100)
-
-    if "_per_node_sample_counts" not in STATE:
-        from data.diabetes_loader import load_diabetes_datasets
-        loaders, _, _, _ = load_diabetes_datasets(
-            num_clients=len(nodes), alpha=0.5, seed=42
-        )
-        STATE["_per_node_sample_counts"] = {
-            n["id"]: len(loaders[n["id"]].dataset) for n in nodes
-        }
-
-    counts = STATE["_per_node_sample_counts"]
-    expected_total = sum(
-        min(counts[n["id"]], N_MAX)
-        for n in nodes if n["id"] not in excluded
-    )
-    return payload.get("weight_sum", 0) >= expected_total
 
 
 def _forward(payload: dict):
